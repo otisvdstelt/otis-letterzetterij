@@ -50,7 +50,20 @@ export interface Zetsel {
   tweedeInkt: Hex | null
   /** Je eigen zin, hooguit 280 tekens. Hij reist mee in de link */
   zin: string
+  /** De rest van jouw tekst: leeg betekent dat het sjabloon zijn eigen voorbeeld zet */
+  eigen: EigenTekst
 }
+
+/** Jouw tekst naast de kop: de naam van je project, een alinea, de tekst op een knop, en een menu (komma's ertussen) */
+export interface EigenTekst {
+  naam: string
+  alinea: string
+  knop: string
+  menu: string
+}
+
+export const MAX_EIGEN: Record<keyof EigenTekst, number> = { naam: 40, alinea: 800, knop: 40, menu: 80 }
+export const leegEigen = (): EigenTekst => ({ naam: '', alinea: '', knop: '', menu: '' })
 
 export const MAX_ZIN = 280
 export const MAX_MOODS = 2
@@ -100,6 +113,7 @@ export function startZetsel(zin: string, kop = 'fraunces', tekst = 'inter'): Zet
     papier: '#fcfaf3',
     tweedeInkt: '#8f4526',
     zin,
+    eigen: leegEigen(),
   }
 }
 
@@ -156,8 +170,17 @@ export function normalize(z: Zetsel): Zetsel {
     papier: isHex(z.papier) ? z.papier : '#fcfaf3',
     tweedeInkt: z.tweedeInkt && isHex(z.tweedeInkt) ? z.tweedeInkt : null,
     zin: cleanZin(z.zin),
+    eigen: {
+      naam: clip(z.eigen?.naam ?? '', MAX_EIGEN.naam),
+      // Een alinea mag regels hebben, maar geen lege regels achter elkaar
+      alinea: [...(z.eigen?.alinea ?? '').replace(/\n{3,}/g, '\n\n').trimStart()].slice(0, MAX_EIGEN.alinea).join(''),
+      knop: clip(z.eigen?.knop ?? '', MAX_EIGEN.knop),
+      menu: clip(z.eigen?.menu ?? '', MAX_EIGEN.menu),
+    },
   }
 }
+
+const clip = (text: string, max: number) => [...text.replace(/\s+/g, ' ').trimStart()].slice(0, max).join('')
 
 /** Zet een rol om in zijn stijl, met een wijziging erin */
 export function withStyle(z: Zetsel, role: Role, patch: Partial<RoleStyle>): Zetsel {
