@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useState, type ReactNode } from 'react'
 import { PaperFilters } from './components/ui/Chrome'
 import { Header } from './components/ui/Header'
 import { InktPapier } from './components/ui/InktPapier'
-import { Inktrol } from './components/ui/Inktrol'
+import { Inktrol, Rollend } from './components/ui/Inktrol'
 import { Kast } from './components/ui/Kast'
 import { Leesbaar } from './components/ui/Leesbaar'
 import { Meenemen } from './components/ui/Meenemen'
@@ -16,9 +16,27 @@ import { Werkbank } from './components/ui/Werkbank'
 import { Winkelhaak } from './components/ui/Winkelhaak'
 import { strings } from './content/strings'
 import { useCatalogue } from './hooks/useCatalogue'
+import { canPaint, isModest, useMediaQuery } from './hooks/useLayout'
 import { keepPhase, readPhase, type Phase } from './lib/air'
 import { keepOwn } from './lib/route'
 import { codeOf, currentScale, lettersOf, store, useLetters } from './lib/store'
+
+// three.js en alles wat erbij hoort komt in een eigen chunk, zodat het papieren vel eerst staat
+const World = lazy(() => import('./components/World'))
+
+/** Kan de drukkerij niet geschilderd worden (geen WebGL, een mislukte download), dan blijft alles op papier werken */
+class Unpaintable extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  componentDidCatch() {
+    this.props.onFail()
+  }
+  render() {
+    return this.state.failed ? null : this.props.children
+  }
+}
 
 /**
  * Zolang er een vel openstaat, staat het in het adres: /vel/<code>. Dat is zo vanaf de eerste verandering,
@@ -54,6 +72,16 @@ function HetVel() {
 export default function App({ broken = false }: { broken?: boolean }) {
   const [phase, setPhase] = useState<Phase>(readPhase)
   const catalogue = useCatalogue()
+  const [painted, setPainted] = useState(canPaint)
+  const [failed, setFailed] = useState(false)
+  // Tot de drukkerij er is, staat de getekende pers in het midden
+  const [worldReady, setWorldReady] = useState(false)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const [modest] = useState(isModest)
+  const fail = useCallback(() => {
+    setPainted(false)
+    setFailed(true)
+  }, [])
   useAddress()
 
   const choosePhase = useCallback((next: Phase) => {
@@ -94,6 +122,7 @@ export default function App({ broken = false }: { broken?: boolean }) {
       <PaperFilters />
       <Header phase={phase} onPhase={choosePhase} />
       {broken && <p className="mislukt slip paper hand">{strings.welkom.onleesbaar}</p>}
+      {failed && <p className="mislukt slip paper hand">{strings.wereld.mislukt}</p>}
       <main className="drukkerij">
         <div className="links">
           <Werkbank />
@@ -101,7 +130,19 @@ export default function App({ broken = false }: { broken?: boolean }) {
         </div>
         <div className="midden">
           <Welkom />
-          <Pers />
+          <Pers
+            painted={painted}
+            ready={worldReady}
+            stage={
+              painted && (
+                <Unpaintable onFail={fail}>
+                  <Suspense fallback={<Rollend />}>
+                    <World phase={phase} reducedMotion={reducedMotion} modest={modest} onReady={() => setWorldReady(true)} />
+                  </Suspense>
+                </Unpaintable>
+              )
+            }
+          />
           <HetVel />
           <Waslijn />
         </div>
