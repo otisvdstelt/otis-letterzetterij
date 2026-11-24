@@ -101,6 +101,17 @@ describe('opmeten', () => {
   })
 })
 
+describe('variabel', () => {
+  it('meet een variabel font op 400, ook als het standaard op 900 staat', () => {
+    const bold = fakeFont({ x: glyph(rect(0, 0, 500, 520)) })
+    const regular = fakeFont()
+    const font: FontLike = { ...bold, variationAxes: { wght: { min: 100, default: 900, max: 900 } }, getVariation: (s) => (s.wght === 400 ? regular : bold) }
+    const measured = measure([font])
+    expect(measured.metrics.xHeight).toBe(0.5)
+    expect(measured.axes.wght.default).toBe(900)
+  })
+})
+
 describe('specimen', () => {
   it('zet Aa naast elkaar op een em van 1000, met y omgedraaid', () => {
     const s = specimenOf([fakeFont()])

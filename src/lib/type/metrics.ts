@@ -28,6 +28,15 @@ export interface FontLike {
   variationAxes: Record<string, AxisLike>
   hasGlyphForCodePoint(codePoint: number): boolean
   glyphForCodePoint(codePoint: number): GlyphLike
+  /** Een variabel font op andere asstanden. Niet elk font kan het */
+  getVariation?(settings: Record<string, number>): FontLike
+}
+
+/** Een variabel font dat standaard niet op 400 staat (Fraunces staat op 900), zetten we op 400 voor het meten */
+export function atRegular(font: FontLike): FontLike {
+  const wght = font.variationAxes.wght
+  if (!wght || wght.default === 400 || !font.getVariation) return font
+  return font.getVariation({ wght: Math.min(wght.max, Math.max(wght.min, 400)) })
 }
 
 export interface Metrics {
@@ -165,7 +174,10 @@ const perEm = (value: number, em: number) => Math.round((value / em) * 1000) / 1
 /**
  * Meet een font. Het eerste is het hoofdbestand; de rest (zoals latin-ext) telt mee voor welke tekens en features er zijn
  */
-export function measure(fonts: readonly FontLike[]): Measured {
+export function measure(given: readonly FontLike[]): Measured {
+  // De assen komen van het bestand zelf, met hun echte standaardstand
+  const axes = Object.fromEntries(Object.entries(given[0].variationAxes).map(([tag, a]) => [tag, { min: a.min, default: a.default, max: a.max }]))
+  const fonts = given.map(atRegular)
   const main = fonts[0]
   const em = main.unitsPerEm
   const height = (ch: string, fallback: number) => {
@@ -184,8 +196,6 @@ export function measure(fonts: readonly FontLike[]): Measured {
 
   const features = [...new Set(fonts.flatMap((f) => f.availableFeatures))].sort()
   const has = (cp: number) => fonts.some((f) => f.hasGlyphForCodePoint(cp))
-
-  const axes = Object.fromEntries(Object.entries(main.variationAxes).map(([tag, a]) => [tag, { min: a.min, default: a.default, max: a.max }]))
 
   return {
     metrics: {
