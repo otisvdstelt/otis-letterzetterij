@@ -398,11 +398,28 @@ export const store = {
     if (drawer !== state.drawer) set({ drawer, ...(drawer ? { view: 'kast' as const } : {}) })
   },
 
-  /** Een eigen font erbij (fase 7: slepen op de werkbank) */
-  addOwn(font: FontEntry, role: Role) {
+  /**
+   * Een eigen font op de werkbank: het komt in de rol die je nu zet, met een klem erop, want het is jouw letter.
+   * Het bestand zelf blijft op dit apparaat
+   */
+  addOwn(font: FontEntry) {
+    const role = state.role
     const own = [...state.own.filter((f) => f.id !== font.id), font]
     set({ own })
-    commit(withFont(state.zetsel, role, font), say(strings.nieuws.gepakt(font.family, role)))
+    commit({ ...withFont(state.zetsel, role, font), klem: role }, say(strings.nieuws.eigen(font.family, role)))
+  },
+
+  /** Zeg wat voor letter een eigen font is, als de drukker het verkeerd raadde */
+  ownKind(id: string, kind: FontEntry['kind']) {
+    const own = state.own.map((f) => (f.id === id ? { ...f, kind, drawer: kind } : f))
+    const font = own.find((f) => f.id === id)
+    if (!font) return
+    set({ own, ...say(strings.nieuws.soort(font.family, strings.eigen.soorten[kind])) })
+  },
+
+  /** Inkt en papier uit een flesje van de Kleurenalchemist */
+  inkFrom(flesje: { inkt: string; papier: string; tweedeInkt: string | null; naam: string }) {
+    commit({ ...state.zetsel, inkt: flesje.inkt, papier: flesje.papier, tweedeInkt: flesje.tweedeInkt }, say(strings.nieuws.flesje(flesje.naam)))
   },
 }
 
