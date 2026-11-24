@@ -1330,6 +1330,13 @@
   }
 
   /* De qr-code met de link naar het vel */
+  .mee-keuze {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+  }
+
   .vel-qr {
     display: flex;
     align-items: center;

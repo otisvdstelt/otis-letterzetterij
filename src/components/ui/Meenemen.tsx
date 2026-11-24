@@ -87,6 +87,7 @@ export function Meenemen() {
   const suggestions = useLetters(currentSuggestions)
   const [busy, setBusy] = useState(false)
   const [packing, setPacking] = useState(false)
+  const [latin, setLatin] = useState(false)
   if (!letters || !scale) return null
   const input: ExportInput = { zetsel: z, kop: letters.kop, tekst: letters.tekst, scale }
   const npm = npmExport(input)
@@ -95,7 +96,9 @@ export function Meenemen() {
   const book = suggestions.find((s) => s.kop === z.kop && s.tekst === z.tekst && s.reason.kind === 'zetboek')
   const note = briefje(input, remarks, book?.reason.kind === 'zetboek' ? book.reason.waarom : null, waaromZin(waaromPaar(letters.kop, letters.tekst)))
   const fonts = [...new Map([letters.kop, letters.tekst].map((f) => [f.id, f])).values()]
-  const host = selfHost({ zetsel: z, kop: letters.kop, tekst: letters.tekst })
+  const alles = selfHost({ zetsel: z, kop: letters.kop, tekst: letters.tekst })
+  const alleenLatin = selfHost({ zetsel: z, kop: letters.kop, tekst: letters.tekst, alleenLatin: true })
+  const host = latin ? alleenLatin : alles
 
   const pack = async () => {
     setPacking(true)
@@ -166,6 +169,11 @@ export function Meenemen() {
             <Kopieer text={host.css} what={m.zelfHosten} />
           </div>
           <p className="klein-uitleg">{m.zelfHostenUitleg(kb(host.bytes), host.files.length)}</p>
+          <label className="mee-keuze">
+            <input type="checkbox" checked={latin} onChange={(e) => setLatin(e.target.checked)} />
+            {m.alleenLatin}
+          </label>
+          <p className="klein-uitleg">{m.alleenLatinUitleg(kb(alles.bytes - alleenLatin.bytes))}</p>
           <ul className="klein-uitleg mee-bestanden">
             {host.files.map((f) => (
               <li key={f.name}>{m.bestand(f.name, kb(f.bytes))}</li>
