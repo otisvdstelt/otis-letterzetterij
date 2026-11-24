@@ -1061,6 +1061,13 @@
     word-spacing: 0.3em;
   }
 
+  .letters-grens {
+    padding: 0.6rem 0.2rem 0.1rem;
+    border-top: 1px dashed rgb(243 234 216 / 0.4);
+    color: #e6dcc8;
+    font-size: 0.95rem;
+  }
+
   .letter-knopjes {
     display: flex;
     justify-content: flex-end;

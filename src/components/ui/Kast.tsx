@@ -1,10 +1,10 @@
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { alternatieven } from '../../content/alternatieven'
 import { strings, waaromZin } from '../../content/strings'
 import { DRAWERS, type FontEntry } from '../../lib/type/catalogue'
 import { fontStack } from '../../lib/type/fontface'
 import { waaromPaar } from '../../lib/type/paar'
-import { bouw, lijktOp, richting, RICHTINGEN, schreefvorm, voldoet, zoekAlternatief, type Richting } from '../../lib/type/zoek'
+import { bouw, lijktOp, mist, richting, RICHTINGEN, schreefvorm, voldoet, voldoetEerst, zoekAlternatief, type Richting } from '../../lib/type/zoek'
 import { ROLES, type Role } from '../../lib/type/zetsel'
 import { currentScale, familyOf, fontById, lettersOf, store, useLetters } from '../../lib/store'
 import { useFontFaces } from '../../hooks/useFontFaces'
@@ -58,6 +58,7 @@ function Letter({ font, tab, onAlike }: { font: FontEntry; tab: boolean; onAlike
   const eisen = useLetters((s) => s.eisen)
   const opzij = useLetters((s) => s.shortlist.includes(font.id))
   const ok = voldoet(font, eisen)
+  const gemist = ok ? null : mist(font, eisen)
   const used = ROLES.filter((r) => z[r] === font.id)
   const vorm = schreefvorm(font)
   const b = bouw(font)
@@ -67,7 +68,7 @@ function Letter({ font, tab, onAlike }: { font: FontEntry; tab: boolean; onAlike
       <button type="button" className="letter" tabIndex={tab ? 0 : -1} aria-label={k.pakLabel(font.family, role)} aria-pressed={z[role] === font.id} onClick={() => store.pick(font.id)}>
         <InDeLetter font={font} text={z.zin.slice(0, 48)} />
         <span className="letter-naam">{font.family}</span>
-        <span className="letter-meta">{ok ? meta : strings.eisen.grijs}</span>
+        <span className="letter-meta">{gemist ? strings.eisen.mist(gemist.eisen, gemist.gewichten) : meta}</span>
         {used.length > 0 && <span className="letter-in-gebruik">{used.map(k.inGebruik).join(', ')}</span>}
       </button>
       <span className="letter-knopjes">
@@ -85,11 +86,22 @@ function Letter({ font, tab, onAlike }: { font: FontEntry; tab: boolean; onAlike
 function Lijst({ fonts, onAlike }: { fonts: readonly FontEntry[]; onAlike: (f: FontEntry) => void }) {
   const role = useLetters((s) => s.role)
   const current = useLetters((s) => s.zetsel[role])
-  const chosen = fonts.findIndex((f) => f.id === current)
+  const eisen = useLetters((s) => s.eisen)
+  // Wat je eisen niet haalt, staat onderaan, met een streep ertussen
+  const sorted = voldoetEerst(fonts, eisen)
+  const goed = eisen.length ? sorted.filter((f) => voldoet(f, eisen)).length : sorted.length
+  const chosen = sorted.findIndex((f) => f.id === current)
   return (
     <ul className="letters" onKeyDown={walk}>
-      {fonts.map((f, i) => (
-        <Letter key={f.id} font={f} tab={i === (chosen >= 0 ? chosen : 0)} onAlike={onAlike} />
+      {sorted.map((f, i) => (
+        <Fragment key={f.id}>
+          {i === goed && (
+            <li className="letters-grens hand" aria-hidden="true">
+              {strings.eisen.onderaan(sorted.length - goed)}
+            </li>
+          )}
+          <Letter font={f} tab={i === (chosen >= 0 ? chosen : 0)} onAlike={onAlike} />
+        </Fragment>
       ))}
     </ul>
   )
