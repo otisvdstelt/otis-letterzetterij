@@ -1,7 +1,8 @@
 import { Text } from '@react-three/drei'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useEffect, useRef, useState } from 'react'
-import { BoxGeometry, MeshToonMaterial, type BufferGeometry, type Mesh } from 'three'
+import { BoxGeometry, MeshToonMaterial, PlaneGeometry, type BufferGeometry, type Mesh } from 'three'
+import { strings } from '../../content/strings'
 import { air } from '../../lib/air'
 import { DRAWERS } from '../../lib/type/catalogue'
 import { drawerAt, WINKELHAAK, ZETBANK, zetbankRow } from '../../lib/world/spec'
@@ -17,7 +18,7 @@ const ROW = { width: ZETBANK.x1 - ZETBANK.x0 - 0.12, body: 0.09 }
 const TILT = 0.6
 
 /** Eén paar van de drukker: de kop in lood, leesbaar, met de tekstletter op een kaartje ervoor. Erop tikken zet het op het vel */
-function Regel({ index, kop, tekst }: { index: number; kop: string; tekst: string }) {
+function Regel({ index, count, kop, tekst, mine = false }: { index: number; count: number; kop: string; tekst: string; mine?: boolean }) {
   const [geometry, setGeometry] = useState<BufferGeometry | null>(null)
   const kopFont = useLetters((s) => fontById(kop, s))
   const tekstFont = useLetters((s) => fontById(tekst, s))
@@ -46,44 +47,69 @@ function Regel({ index, kop, tekst }: { index: number; kop: string; tekst: strin
     if (Math.abs(want - lift.current) > 0.001) motion.wake(0.1)
   })
 
-  const [x, y, z] = zetbankRow(index)
+  const { at, rise } = zetbankRow(index, count)
+  const [x, y, z] = at
   return (
-    <group
-      position={[x, y + 0.03 + (2 - index) * 0.04, z]}
-      rotation={[TILT, 0, 0]}
-      onClick={(event: ThreeEvent<MouseEvent>) => {
-        event.stopPropagation()
-        store.take({ kop, tekst })
-      }}
-      onPointerOver={(event: ThreeEvent<PointerEvent>) => {
-        event.stopPropagation()
-        hover.current = true
-        document.body.style.cursor = 'pointer'
-        motion.wake(0.5)
-      }}
-      onPointerOut={() => {
-        hover.current = false
-        document.body.style.cursor = ''
-        motion.wake(0.5)
-      }}
-    >
-      <mesh ref={group} geometry={geometry ?? undefined} material={paint} castShadow receiveShadow visible={geometry !== null} />
+    <group position={[x, y - rise, z]}>
+      {/* De tree eronder staat recht op de bank; de regel ligt er schuin op */}
+      <mesh geometry={tree} material={wood} position={[0, rise / 2, 0]} scale={[1, rise, 1]} castShadow receiveShadow />
+      <group
+        position={[0, rise + 0.03, 0]}
+        rotation={[TILT, 0, 0]}
+        onClick={(event: ThreeEvent<MouseEvent>) => {
+          event.stopPropagation()
+          store.take({ kop, tekst })
+        }}
+        onPointerOver={(event: ThreeEvent<PointerEvent>) => {
+          event.stopPropagation()
+          hover.current = true
+          document.body.style.cursor = 'pointer'
+          motion.wake(0.5)
+        }}
+        onPointerOut={() => {
+          hover.current = false
+          document.body.style.cursor = ''
+          motion.wake(0.5)
+        }}
+      >
+        <mesh ref={group} geometry={geometry ?? undefined} material={paint} castShadow receiveShadow visible={geometry !== null} />
+      </group>
+      {/* Het kaartje met de tekstletter hangt op de voorkant van de tree */}
       {tekstFont && (
-        <Text font={FACES.hand} fontSize={0.034} anchorX="center" anchorY="middle" color={PAGE_INK} position={[0, 0.002, 0.072]} rotation={[-Math.PI / 2, 0, 0]}>
-          {`met ${tekstFont.family}`}
-        </Text>
+        <group position={[0, rise - 0.025, 0.051]}>
+          <mesh geometry={card} material={cardPaper} receiveShadow />
+          <Text font={FACES.hand} fontSize={0.036} anchorX="center" anchorY="middle" color={mine ? '#8f4526' : PAGE_INK} position={[0, 0, 0.001]}>
+            {mine ? strings.zetbank.jouw(tekstFont.family) : strings.zetbank.met(tekstFont.family)}
+          </Text>
+        </group>
       )}
     </group>
   )
 }
 
-/** De drie paren die de drukker op de zetbank klaarlegt */
+/** Een tree van het rekje: een plankje dat de regel erachter optilt */
+const tree = new BoxGeometry(ROW.width + 0.05, 1, 0.1)
+const wood = new MeshToonMaterial({ color: '#7a5233', gradientMap: toonGradient })
+
+/** Het kaartje met de tekstletter, op papier zodat het tegen het lood leesbaar is */
+const card = new PlaneGeometry(ROW.width * 0.72, 0.048)
+const cardPaper = new MeshToonMaterial({ color: '#f3ead8', gradientMap: toonGradient })
+
+/**
+ * De drie paren die de drukker op de zetbank klaarlegt. Staat er een paar op het vel dat er niet bij hoort
+ * (uit de oogarts, de proefdruk of zelf gepakt), dan ligt dat vooraan
+ */
 export function Zetbank3D() {
   const list = useLetters(currentSuggestions)
+  const kop = useLetters((s) => s.zetsel.kop)
+  const tekst = useLetters((s) => s.zetsel.tekst)
+  const drie = list.slice(0, 3)
+  const mine = drie.some((s) => s.kop === kop && s.tekst === tekst) ? null : { kop, tekst }
+  const rows = mine ? [...drie, mine] : drie
   return (
     <>
-      {list.slice(0, 3).map((s, i) => (
-        <Regel key={`${s.kop}|${s.tekst}`} index={i} kop={s.kop} tekst={s.tekst} />
+      {rows.map((s, i) => (
+        <Regel key={`${s.kop}|${s.tekst}`} index={i} count={rows.length} kop={s.kop} tekst={s.tekst} mine={s === mine} />
       ))}
     </>
   )
