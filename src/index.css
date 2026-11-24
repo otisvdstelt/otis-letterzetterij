@@ -1024,15 +1024,13 @@
     height: 34%;
   }
 
-  .pers-podium[data-geschilderd='true'] .pers-hint {
-    top: auto;
-    right: 0.8rem;
-    bottom: 0.8rem;
+  .pers[data-geschilderd='true'] .pers-zij {
+    justify-items: start;
   }
 
-  .pers[data-geschilderd='true'] .pers-zij {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+  .pers-hint-onder {
+    rotate: 1.5deg;
+    font-size: 0.98rem;
   }
 
   .pers-zij {

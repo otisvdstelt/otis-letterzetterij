@@ -143,7 +143,7 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
             store.pull()
           }}
         />
-        {!hinted && (
+        {!hinted && !painted && (
           <p className="tag pers-hint" aria-hidden="true">
             {p.hint}
           </p>
@@ -156,6 +156,12 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
       </div>
 
       <div className="pers-zij">
+      {/* In 3D past de hint niet over het podium; hij staat eronder, met de drukker */}
+      {!hinted && painted && (
+        <p className="tag pers-hint-onder" aria-hidden="true">
+          {p.hint}
+        </p>
+      )}
       <Drukker />
       <div className="pers-knoppen">
         <button type="button" className="plaque" onClick={() => store.pull()}>
