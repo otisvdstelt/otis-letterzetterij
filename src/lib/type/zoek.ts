@@ -87,6 +87,14 @@ export function kan(font: Font, eis: Eis): boolean {
 /** Voldoet hij aan alles wat moet? */
 export const voldoet = (font: Font, eisen: readonly Eis[]) => eisen.every((e) => kan(font, e))
 
+/** Wat hij mist van je eisen, met het aantal gewichten erbij, zodat er staat "maar 2 gewichten" in plaats van alleen "nee" */
+export function mist(font: Font, eisen: readonly Eis[]): { eisen: Eis[]; gewichten: number } {
+  return { eisen: eisen.filter((e) => !kan(font, e)), gewichten: weightCount(font) }
+}
+
+/** Eerst wat voldoet, dan wat niet, elk in zijn eigen volgorde */
+export const voldoetEerst = <T extends Font>(fonts: readonly T[], eisen: readonly Eis[]): T[] => (eisen.length ? [...fonts.filter((f) => voldoet(f, eisen)), ...fonts.filter((f) => !voldoet(f, eisen))] : [...fonts])
+
 /** De richtingen waarin je verder kunt zoeken, vanaf een letter die je al hebt */
 export type Richting = 'groter-oog' | 'kleiner-oog' | 'smaller' | 'breder' | 'meer-contrast' | 'minder-contrast' | 'ronder' | 'strakker'
 export const RICHTINGEN: readonly Richting[] = ['groter-oog', 'kleiner-oog', 'smaller', 'breder', 'meer-contrast', 'minder-contrast', 'ronder', 'strakker']

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { alternatieven } from '../../content/alternatieven'
 import { parseCatalogue } from './catalogue'
-import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief, meetBouw } from './zoek'
+import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief, meetBouw, mist, voldoetEerst } from './zoek'
 import { BOUWLIJST } from './bouwlijst'
 
 const catalogue = parseCatalogue(JSON.parse(readFileSync(new URL('../../../public/data/fonts.json', import.meta.url), 'utf8')))
@@ -92,5 +92,20 @@ describe('de bouw naast de handgemaakte lijst', () => {
 
   it('geeft een mono geen bouw', () => {
     expect(bouw(font('jetbrains-mono'))).toBeNull()
+  })
+})
+
+describe('wat een letter mist', () => {
+  it('noemt de eisen die hij niet haalt, en hoeveel gewichten hij heeft', () => {
+    const abril = font('abril-fatface')
+    const m = mist(abril, ['gewichten', 'euro'])
+    expect(m.eisen).toContain('gewichten')
+    expect(m.gewichten).toBe(1)
+  })
+
+  it('zet wat voldoet bovenaan, in zijn eigen volgorde', () => {
+    const list = [font('abril-fatface'), font('inter'), font('pt-serif'), font('fraunces')]
+    const sorted = voldoetEerst(list, ['gewichten'])
+    expect(sorted.map((f) => f.id)).toEqual(['inter', 'fraunces', 'abril-fatface', 'pt-serif'])
   })
 })
