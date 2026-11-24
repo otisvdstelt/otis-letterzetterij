@@ -1,0 +1,48 @@
+[
+  { "kop": "fraunces", "tekst": "inter", "doel": ["website", "huisstijl"], "stemming": ["warm", "modern"], "waarom": "Een eigenwijze kop met zachte schreven, boven een broodtekst die nergens over zeurt." },
+  { "kop": "instrument-serif", "tekst": "instrument-sans", "doel": ["website", "huisstijl"], "stemming": ["modern", "statig"], "waarom": "Twee helften van dezelfde familie, getekend om naast elkaar te staan." },
+  { "kop": "dm-serif-display", "tekst": "dm-sans", "doel": ["website", "presentatie"], "stemming": ["statig", "modern"], "waarom": "Hoog contrast in de kop, een rustige broer eronder. Ze delen hun verhoudingen." },
+  { "kop": "young-serif", "tekst": "figtree", "doel": ["website"], "stemming": ["warm", "speels"], "waarom": "Een kop met dikke, vriendelijke schreven en een tekst die net zo rond is." },
+  { "kop": "bricolage-grotesque", "tekst": "literata", "doel": ["website", "boek"], "stemming": ["speels", "warm"], "waarom": "Een grillige kop boven een schreefletter die voor lang lezen gemaakt is." },
+  { "kop": "manrope", "tekst": "source-serif-4", "doel": ["website", "boek"], "stemming": ["modern"], "waarom": "Een strakke kop boven een schreefletter die je uren volhoudt." },
+  { "kop": "outfit", "tekst": "lora", "doel": ["website"], "stemming": ["warm", "modern"], "waarom": "Geometrisch in de kop, met een kalligrafische Lora om het warm te houden." },
+  { "kop": "space-grotesk", "tekst": "ibm-plex-serif", "doel": ["website", "huisstijl"], "stemming": ["technisch"], "waarom": "Een grotesk met eigenaardigheden, en een schreefletter die uit dezelfde werkplaats lijkt te komen." },
+  { "kop": "playfair-display", "tekst": "source-sans-3", "doel": ["website", "huisstijl"], "stemming": ["statig", "klassiek"], "waarom": "Het oude tijdschriftrecept: veel contrast in de kop, rust in de tekst." },
+  { "kop": "syne", "tekst": "work-sans", "doel": ["website", "affiche"], "stemming": ["speels", "modern"], "waarom": "Een kop die breed uitwaaiert, en een tekst die gewoon zijn werk doet." },
+
+  { "kop": "eb-garamond", "tekst": "eb-garamond", "doel": ["boek"], "stemming": ["klassiek", "statig"], "waarom": "Eén familie voor kop en tekst. Garamond draagt al vierhonderd jaar boeken." },
+  { "kop": "newsreader", "tekst": "newsreader", "doel": ["boek", "website"], "stemming": ["klassiek"], "waarom": "Gemaakt voor lang lezen op een scherm, met een optische maat die in de kop strakker wordt." },
+  { "kop": "vollkorn", "tekst": "vollkorn", "doel": ["boek"], "stemming": ["warm", "klassiek"], "waarom": "Stevig, donker op de bladzijde, en met een cursief die echt cursief is." },
+  { "kop": "alegreya", "tekst": "alegreya", "doel": ["boek"], "stemming": ["warm", "klassiek"], "waarom": "Een letter met een pen erachter. Hij leest als een verhaal." },
+  { "kop": "josefin-sans", "tekst": "libre-baskerville", "doel": ["boek", "huisstijl"], "stemming": ["statig", "klassiek"], "waarom": "Art deco op het titelblad, Baskerville op de bladzijde." },
+  { "kop": "cormorant-garamond", "tekst": "crimson-pro", "doel": ["boek"], "stemming": ["statig", "klassiek"], "waarom": "Cormorant is te fijn voor tekst en precies goed voor een kop. Crimson neemt het daarna over." },
+  { "kop": "grenze-gotisch", "tekst": "eb-garamond", "doel": ["boek", "affiche"], "stemming": ["klassiek", "statig"], "waarom": "Gotisch voor de kop, zoals de eerste drukkers deden, en Garamond om het te temperen." },
+  { "kop": "literata", "tekst": "literata", "doel": ["boek", "app"], "stemming": ["warm"], "waarom": "Getekend voor e-readers. Hij blijft rustig op elk scherm en op elke maat." },
+
+  { "kop": "abril-fatface", "tekst": "lato", "doel": ["affiche", "website"], "stemming": ["statig"], "waarom": "Een kop die van verre leesbaar is, en een tekst die er geen ruzie mee maakt." },
+  { "kop": "bebas-neue", "tekst": "karla", "doel": ["affiche"], "stemming": ["modern"], "waarom": "Smalle kapitalen die roepen, en een tekst die rustig zegt waar en wanneer." },
+  { "kop": "alfa-slab-one", "tekst": "work-sans", "doel": ["affiche"], "stemming": ["speels"], "waarom": "Een kop als een houten letter van de kermis, met een nuchtere tekst eronder." },
+  { "kop": "unifrakturmaguntia", "tekst": "cardo", "doel": ["affiche"], "stemming": ["klassiek", "statig"], "waarom": "Blackletter voor het concert in de kerk, Cardo voor het programma." },
+  { "kop": "shrikhand", "tekst": "nunito", "doel": ["affiche", "website"], "stemming": ["speels", "warm"], "waarom": "Een vette, schuine kop vol zon, en een ronde tekst die meelacht." },
+  { "kop": "big-shoulders-display", "tekst": "barlow", "doel": ["affiche", "presentatie"], "stemming": ["technisch", "statig"], "waarom": "Smal en hoog, als een spoorwegbord. Barlow komt uit dezelfde hoek." },
+  { "kop": "climate-crisis", "tekst": "inter", "doel": ["affiche"], "stemming": ["modern"], "waarom": "Een kop met een boodschap en een tekst die nergens van afleidt." },
+  { "kop": "monoton", "tekst": "outfit", "doel": ["affiche"], "stemming": ["speels"], "waarom": "Neon voor één woord, meer niet. Outfit doet de rest." },
+  { "kop": "dela-gothic-one", "tekst": "dm-sans", "doel": ["affiche"], "stemming": ["speels"], "waarom": "Zwaar en hoekig in de kop, licht en open in de tekst." },
+  { "kop": "anton", "tekst": "roboto-slab", "doel": ["affiche", "presentatie"], "stemming": ["modern", "technisch"], "waarom": "Een kop die de ruimte opvult en een slab die op een afstand overeind blijft." },
+
+  { "kop": "montserrat", "tekst": "open-sans", "doel": ["presentatie"], "stemming": ["modern"], "waarom": "Breed en duidelijk tot op de achterste rij. Ze verschillen genoeg in bouw." },
+  { "kop": "archivo-black", "tekst": "archivo", "doel": ["presentatie", "huisstijl"], "stemming": ["technisch", "modern"], "waarom": "Zwart en gewoon uit dezelfde familie: veel contrast zonder twee stemmen." },
+  { "kop": "poppins", "tekst": "lora", "doel": ["presentatie", "website"], "stemming": ["warm", "modern"], "waarom": "Een ronde kop en een schreefletter die op een scherm op afstand nog leest." },
+  { "kop": "atkinson-hyperlegible-next", "tekst": "atkinson-hyperlegible-next", "doel": ["presentatie", "app"], "stemming": ["technisch", "warm"], "waarom": "Gemaakt voor slechtzienden, en dus ook voor de achterste rij." },
+  { "kop": "sora", "tekst": "noticia-text", "doel": ["presentatie"], "stemming": ["modern"], "waarom": "Een kop van nu met een schreefletter die ook op een beamer niet dichtloopt." },
+
+  { "kop": "schibsted-grotesk", "tekst": "newsreader", "doel": ["huisstijl", "website"], "stemming": ["modern", "statig"], "waarom": "Een krantenkop en een krantentekst, allebei met genoeg gewichten voor een hele huisstijl." },
+  { "kop": "libre-franklin", "tekst": "libre-baskerville", "doel": ["huisstijl", "boek"], "stemming": ["klassiek"], "waarom": "Franklin en Baskerville kennen elkaar al eeuwen uit de drukkerij." },
+  { "kop": "roboto-slab", "tekst": "roboto", "doel": ["huisstijl", "app"], "stemming": ["modern", "technisch"], "waarom": "Dezelfde bouwtekening, de ene met schreven. Gewichten genoeg." },
+  { "kop": "ibm-plex-serif", "tekst": "ibm-plex-sans", "doel": ["huisstijl", "app"], "stemming": ["technisch"], "waarom": "Een hele superfamilie, met een mono erbij voor de code." },
+  { "kop": "besley", "tekst": "public-sans", "doel": ["huisstijl", "website"], "stemming": ["warm", "statig"], "waarom": "Een Clarendon met karakter, en een tekst die voor de overheid gemaakt is: helder en zonder franje." },
+
+  { "kop": "plus-jakarta-sans", "tekst": "public-sans", "doel": ["app"], "stemming": ["modern"], "waarom": "Twee schreefloze met genoeg verschil, allebei met tabelcijfers en een duidelijke Il1." },
+  { "kop": "red-hat-text", "tekst": "red-hat-text", "doel": ["app"], "stemming": ["modern", "technisch"], "waarom": "Eén letter voor de hele interface, met tabelcijfers en tekens die je niet verwart." },
+  { "kop": "fira-sans", "tekst": "fira-sans", "doel": ["app", "presentatie"], "stemming": ["technisch", "warm"], "waarom": "Gemaakt voor kleine schermen, met een Fira Code ernaast voor wie programmeert." }
+]
