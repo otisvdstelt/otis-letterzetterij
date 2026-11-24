@@ -44,10 +44,12 @@ interface VelProps {
   onWidow?: (widow: boolean) => void
   label?: string
   compact?: boolean
+  /** Een proef begint met de kop en de alinea; kaartjes en menubalken schuiven naar achteren */
+  start?: 'kop'
 }
 
 /** Het vel: het sjabloon van het doel, met jouw zin, in echte HTML-tekst */
-export function Vel({ zetsel, kop, tekst, scale, onWidow, label, compact }: VelProps) {
+export function Vel({ zetsel, kop, tekst, scale, onWidow, label, compact, start }: VelProps) {
   const ref = useRef<HTMLElement>(null)
   useFontFaces([kop, tekst])
 
@@ -71,7 +73,7 @@ export function Vel({ zetsel, kop, tekst, scale, onWidow, label, compact }: VelP
   }, [zetsel, kop, tekst, onWidow])
 
   return (
-    <article ref={ref} lang="nl" className="vel" data-sjabloon={zetsel.sjabloon} data-compact={compact} style={velStijl(zetsel, kop, tekst, scale)} aria-label={label ?? strings.vel.letters(kop.family, tekst.family)}>
+    <article ref={ref} lang="nl" className="vel" data-sjabloon={zetsel.sjabloon} data-compact={compact} data-start={start} style={velStijl(zetsel, kop, tekst, scale)} aria-label={label ?? strings.vel.letters(kop.family, tekst.family)}>
       <Sjabloon kind={zetsel.sjabloon} zin={zetsel.zin} eigen={zetsel.eigen} />
     </article>
   )
