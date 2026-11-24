@@ -11,11 +11,14 @@ import './index.css'
 import App from './App.tsx'
 import { paintPhase, readPhase } from './lib/air'
 import { readSharedLink } from './lib/route'
+import { readRoute } from './lib/type/share'
 
 // Gezet voor de eerste verf, zodat het papier nooit even de verkeerde kleur heeft
 paintPhase(readPhase())
 
 // Een gedeelde link, één keer, voor de eerste render
+// Wie met een gedeelde link binnenkomt, krijgt een welkom en geen zetboek
+const firstVisit = readRoute(window.location.pathname, window.location.hash).kind === 'drukkerij'
 const broken = readSharedLink()
 
 const queryClient = new QueryClient()
@@ -23,7 +26,7 @@ const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App broken={broken} />
+      <App broken={broken} firstVisit={firstVisit} />
     </QueryClientProvider>
   </StrictMode>,
 )
