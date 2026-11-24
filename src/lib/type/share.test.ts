@@ -57,6 +57,20 @@ describe('een vel als link', () => {
     expect(decoded!.zetsel).toEqual(rich())
   })
 
+  it('neemt jouw tekst mee zonder verlies: naam, alinea met regels, knop en menu', () => {
+    const z = { ...startZetsel('Kop'), eigen: { naam: 'Bakkerij De Korst', alinea: 'Regel één.\n\nRegel twee, met een é.', knop: 'Bestel', menu: 'Brood, Gebak' } }
+    expect(decodeVel(encodeVel(z))!.zetsel).toEqual(z)
+  })
+
+  it('leest versie 2 nog, zoals hij op 25 november 2026 gedeeld werd', () => {
+    // Deze code is bevroren. Verandert het formaat, dan moet deze test blijven slagen
+    const v2 =
+      'AgALeW91bmctc2VyaWYAB2ZpZ3RyZWUEAAQA2AQAAACQAwAAAKoBoAHiCUIABCwoI_z6849FJh5Ccm9vZCBtZXQgZWVuIGtvcnN0IGRpZSBrcmFha3QRQmFra2VyaWogRGUgS29yc3RmRWxrZSBvY2h0ZW5kIG9tIHZpamYgdXVyIGdhYXQgZGUgb3ZlbiBhYW4uCgpadXVyZGVzZW0sIHNwZWx0IGVuIGVlbiByb2dnZSBkaWUgamUgbmVyZ2VucyBhbmRlcnMgdmluZHQuEkJlc3RlbCB2b29yIG1vcmdlbhZCcm9vZCwgR2ViYWssIE92ZXIgb25z'
+    const decoded = decodeVel(v2)!.zetsel
+    expect(decoded).toMatchObject({ kop: 'young-serif', tekst: 'figtree', doel: 'huisstijl', zin: 'Brood met een korst die kraakt' })
+    expect(decoded.eigen).toEqual({ naam: 'Bakkerij De Korst', alinea: 'Elke ochtend om vijf uur gaat de oven aan.\n\nZuurdesem, spelt en een rogge die je nergens anders vindt.', knop: 'Bestel voor morgen', menu: 'Brood, Gebak, Over ons' })
+  })
+
   it('geeft null bij rommel en bij een versie die het niet kent', () => {
     expect(decodeVel('')).toBeNull()
     expect(decodeVel('!!!')).toBeNull()
@@ -64,7 +78,7 @@ describe('een vel als link', () => {
     const good = encodeVel(rich())
     expect(decodeVel(good.slice(0, good.length - 8))).toBeNull()
     const bytes = fromBase64Url(good)
-    bytes[0] = 2
+    bytes[0] = 9
     expect(decodeVel(toBase64Url(bytes))).toBeNull()
     expect(decodeVel(`${good}AA`)).toBeNull()
   })

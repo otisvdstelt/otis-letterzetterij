@@ -48,6 +48,19 @@ Een varint is zeven bits per byte, de laagste eerst, met de hoogste bit aan zola
 
 Een gewoon vel past in ongeveer 100 tekens, plus de zin.
 
+## Vel, versie 2
+
+Versie 2 is versie 1 (met versiebyte `2`), met na de zin nog vier teksten, elk als varint lengte en UTF-8:
+
+| Veld | Vorm |
+|---|---|
+| naam | de naam van je project, hooguit 40 tekens |
+| alinea | een alinea, hooguit 800 tekens, regeleinden mogen |
+| knop | de tekst op een knop, hooguit 40 tekens |
+| menu | een menu, de onderdelen met komma's ertussen, hooguit 80 tekens |
+
+Een lege tekst is lengte 0: dan zet het sjabloon zijn eigen voorbeeld. Een link van versie 1 opent met lege teksten. Nieuwe links zijn altijd versie 2.
+
 ## Waslijn, versie 1
 
 | Veld | Vorm |
@@ -58,7 +71,7 @@ Een gewoon vel past in ongeveer 100 tekens, plus de zin.
 
 ## Nieuwe versies
 
-Een nieuwe versie krijgt een nieuw versienummer en een eigen lezer. De oude lezers blijven staan. In `share.test.ts` staat een bevroren code van versie 1 die altijd gelezen moet blijven worden. Een lezer die een onbekende versie tegenkomt, of bytes over heeft, geeft `null` terug en struikelt niet.
+Een nieuwe versie krijgt een nieuw versienummer en een eigen lezer. De oude lezers blijven staan. In `share.test.ts` staan bevroren codes van versie 1 en versie 2 die altijd gelezen moeten blijven worden. Een lezer die een onbekende versie tegenkomt, of bytes over heeft, geeft `null` terug en struikelt niet.
 
 ## Een flesje uit de Kleurenalchemist
 

@@ -5,9 +5,9 @@ import { MOODS, type Mood } from './catalogue.ts'
 import { isHex } from './color.ts'
 import { fromBase64Url, Reader, toBase64Url, Writer } from './bytes.ts'
 import { GOALS, TEMPLATES } from './goals.ts'
-import { ALIGNS, cleanZin, isForeign, normalize, type RoleStyle, type Zetsel } from './zetsel.ts'
+import { ALIGNS, cleanZin, isForeign, leegEigen, normalize, type RoleStyle, type Zetsel } from './zetsel.ts'
 
-export const VEL_VERSION = 1
+export const VEL_VERSION = 2
 export const WASLIJN_VERSION = 1
 /** Hooguit zoveel vellen aan een gedeelde waslijn. Aan je eigen lijn hangen er zes */
 export const MAX_SHARED_SHEETS = 24
@@ -102,11 +102,25 @@ function writeVel(z: Zetsel, fallbackFor: FallbackFor, nameFor?: NameFor): Uint8
   w.hex(z.papier)
   if (z.tweedeInkt) w.hex(z.tweedeInkt)
   w.text(cleanZin(z.zin))
+  // Versie 2: jouw tekst naast de kop
+  w.text(z.eigen.naam)
+  w.text(z.eigen.alinea)
+  w.text(z.eigen.knop)
+  w.text(z.eigen.menu)
   return w.done()
 }
 
-/** Versie 1, zoals hierboven geschreven. Een nieuwe versie krijgt een eigen lezer, en deze blijft staan */
+/** Versie 1: alles behalve jouw eigen tekst. Die is dan leeg, en het sjabloon zet zijn voorbeeld */
 function readVelV1(r: Reader): { zetsel: Zetsel; replaced: Replaced } {
+  return readVelBody(r, false)
+}
+
+/** Versie 2: versie 1, met daarna de naam, de alinea, de knop en het menu */
+function readVelV2(r: Reader): { zetsel: Zetsel; replaced: Replaced } {
+  return readVelBody(r, true)
+}
+
+function readVelBody(r: Reader, withOwnText: boolean): { zetsel: Zetsel; replaced: Replaced } {
   const kop = readFont(r)
   const tekst = readFont(r)
   const doel = at(GOALS, r.byte())
@@ -127,6 +141,7 @@ function readVelV1(r: Reader): { zetsel: Zetsel; replaced: Replaced } {
   const papier = r.hex()
   const tweedeInkt = flags & 4 ? r.hex() : null
   const zin = r.text(400)
+  const eigen = withOwnText ? { naam: r.text(60), alinea: r.text(1000), knop: r.text(60), menu: r.text(120) } : leegEigen()
   if (![inkt, papier, tweedeInkt ?? '#000000'].every(isHex)) throw new RangeError('geen kleur')
   const zetsel: Zetsel = {
     kop: kop.id,
@@ -148,6 +163,7 @@ function readVelV1(r: Reader): { zetsel: Zetsel; replaced: Replaced } {
     papier,
     tweedeInkt,
     zin,
+    eigen,
   }
   const replaced: Replaced = {}
   if (kop.replaced) replaced.kop = kop.replaced
@@ -155,7 +171,7 @@ function readVelV1(r: Reader): { zetsel: Zetsel; replaced: Replaced } {
   return { zetsel: normalize(zetsel), replaced }
 }
 
-const READERS: Record<number, (r: Reader) => { zetsel: Zetsel; replaced: Replaced }> = { 1: readVelV1 }
+const READERS: Record<number, (r: Reader) => { zetsel: Zetsel; replaced: Replaced }> = { 1: readVelV1, 2: readVelV2 }
 
 function readVel(bytes: Uint8Array) {
   const r = new Reader(bytes)
