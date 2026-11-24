@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { EffectComposer } from '@react-three/postprocessing'
 import { use, useEffect, useRef, useState } from 'react'
 import { Vector3 } from 'three'
-import type { Phase } from '../lib/air'
+import { airMoving, type Phase } from '../lib/air'
 import { store, useLetters } from '../lib/store'
 import { PRESS, VIEWS } from '../lib/world/spec'
 import { lettering, PartsContext, useDrukkerijModel } from './three/assets'
@@ -37,15 +37,21 @@ const BUDGET = {
 
 /**
  * frameloop demand: er wordt alleen getekend als de store verandert, of zolang er iets beweegt (motion.wake).
- * Dit houdt de klok gaande zolang er iets onderweg is
+ * Dit houdt de klok gaande zolang er iets onderweg is, ook de schemering: anders bleef het licht halverwege hangen
+ * als je snel tussen dag en nacht wisselde
  */
-function Wakker() {
+function Wakker({ phase }: { phase: Phase }) {
   const invalidate = useThree((s) => s.invalidate)
+  const current = useRef(phase)
   useEffect(() => store.subscribe(() => invalidate()), [invalidate])
+  useEffect(() => {
+    current.current = phase
+    invalidate()
+  }, [phase, invalidate])
   useEffect(() => {
     let frame = 0
     const tick = () => {
-      if (motion.awake()) invalidate()
+      if (motion.awake() || airMoving(current.current)) invalidate()
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
@@ -101,7 +107,7 @@ export default function World({ phase, reducedMotion, modest, onReady, inset, on
     >
       <PerformanceMonitor bounds={() => [50, 62]} flipflops={3} onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))} onIncline={() => setDpr((d) => Math.min(budget.dpr[1], d + 0.25))} onFallback={() => setDpr(0.75)} />
       <PartsContext value={parts}>
-        <Wakker />
+        <Wakker phase={phase} />
         <CameraRig reducedMotion={reducedMotion} inset={inset} />
         {onLever && <LeverOnScreen onLever={onLever} />}
         <Atmosphere phase={phase} shadowSize={budget.shadow} />
