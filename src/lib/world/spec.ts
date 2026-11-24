@@ -70,8 +70,17 @@ export const ZETBANK = {
   height: 0.94,
 }
 
-/** Waar de drie paren op de zetbank liggen, van achter naar voor */
-export const zetbankRow = (i: number): Vec3 => [(ZETBANK.x0 + ZETBANK.x1) / 2, ZETBANK.height, ZETBANK.z0 + 0.17 + i * 0.2]
+/**
+ * Waar de regels op de zetbank liggen, van achter naar voor, op de treden van een rekje: elke regel achter de vorige
+ * staat een tree hoger, zodat ze vanaf de kast niet over elkaar vallen. `rise` is hoe hoog de tree onder de regel is
+ */
+export function zetbankRow(i: number, n = 3): { at: Vec3; rise: number } {
+  const front = ZETBANK.z1 - 0.25
+  const back = ZETBANK.z0 + 0.08
+  const step = n > 1 ? (front - back) / (n - 1) : 0
+  const rise = (n - 1 - i) * 0.1 + 0.055
+  return { at: [(ZETBANK.x0 + ZETBANK.x1) / 2, ZETBANK.height + rise, back + i * step], rise }
+}
 
 /** De winkelhaak op de voorkant van de zetbank */
 export const WINKELHAAK: Vec3 = [(ZETBANK.x0 + ZETBANK.x1) / 2 + 0.05, ZETBANK.height, ZETBANK.z1 - 0.07]
