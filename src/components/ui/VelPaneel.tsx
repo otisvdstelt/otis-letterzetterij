@@ -1,12 +1,13 @@
 import { useCallback } from 'react'
 import { strings } from '../../content/strings'
-import { currentScale, familyOf, lettersOf, store, useLetters } from '../../lib/store'
+import { codeOf, currentScale, familyOf, lettersOf, store, useLetters } from '../../lib/store'
 import { InktPapier } from './InktPapier'
 import { Leesbaar } from './Leesbaar'
 import { Meenemen } from './Meenemen'
 import { Tabs } from './Tabs'
 import { Vel } from './Vel'
-import { SjabloonKeuze, Fijnzetten, ZinVeld } from './Winkelhaak'
+import { Qr } from './Qr'
+import { SjabloonKeuze, Fijnzetten } from './Winkelhaak'
 import type { ReactNode } from 'react'
 
 /**
@@ -26,7 +27,12 @@ export function VelPaneel({ plakken }: { plakken?: ReactNode }) {
       label: strings.vel.tabs.vel,
       content: (
         <>
-          <ZinVeld />
+          <p className="klein-uitleg">
+            {strings.vel.tekstOpWerkbank}{' '}
+            <button type="button" className="quiet" onClick={() => store.look('werkbank')}>
+              {strings.vel.naarWerkbank}
+            </button>
+          </p>
           <SjabloonKeuze />
           <InktPapier plakken={plakken} />
           <Fijnzetten />
@@ -34,7 +40,22 @@ export function VelPaneel({ plakken }: { plakken?: ReactNode }) {
       ),
     },
     { id: 'leesbaar', label: strings.vel.tabs.leesbaar, content: <Leesbaar /> },
-    { id: 'meenemen', label: strings.vel.tabs.meenemen, content: <Meenemen /> },
+    {
+      id: 'meenemen',
+      label: strings.vel.tabs.meenemen,
+      content: (
+        <>
+          <Meenemen />
+          <div className="vel-qr">
+            <Qr text={`${window.location.origin}/vel/${codeOf(z)}`} label={strings.vel.qrLabel} />
+            <div>
+              <h3 className="hand">{strings.vel.qr}</h3>
+              <p className="klein-uitleg">{strings.vel.qrUitleg}</p>
+            </div>
+          </div>
+        </>
+      ),
+    },
   ]
 
   return (
@@ -55,6 +76,9 @@ export function VelPaneel({ plakken }: { plakken?: ReactNode }) {
       <div className="knoppenrij">
         <button type="button" className="inked" onClick={() => store.hang()}>
           {p.hang}
+        </button>
+        <button type="button" className="inked" title={strings.vel.andereUitleg} onClick={() => store.nextPair()}>
+          {strings.vel.andere}
         </button>
       </div>
       <Tabs tabs={tabs} label={strings.vel.tabsLabel} />
