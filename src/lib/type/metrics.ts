@@ -135,7 +135,9 @@ export function strokeContrast(glyph: GlyphLike | null): number {
   // Terug naar dezelfde maat in beide richtingen
   const thickUnits = (thick / cols) * w
   const thinUnits = (thin / rows) * h
-  return Math.round((thickUnits / thinUnits) * 100) / 100
+  // Sommige letters hebben het andersom (dik boven, dun opzij). Contrast is dik gedeeld door dun, welke kant ook op
+  const ratio = thickUnits / thinUnits
+  return Math.round(Math.max(ratio, 1 / ratio) * 100) / 100
 }
 
 /** Lijken deze tekens op elkaar? Elk teken op zijn eigen midden gezet, in hetzelfde vak van basislijn tot kop */

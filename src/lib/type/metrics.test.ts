@@ -63,6 +63,8 @@ describe('opmeten', () => {
   it('meet het contrast tussen dikke en dunne stok in de o', () => {
     expect(strokeContrast(fakeFont().glyphForCodePoint(code('o')))).toBeCloseTo(3, 0)
     expect(strokeContrast(glyph(rect(0, 0, 500, 500, [100, 100, 400, 400])))).toBeCloseTo(1, 0)
+    // Andersom: dik boven, dun opzij
+    expect(strokeContrast(glyph(rect(0, 0, 500, 500, [40, 120, 460, 380])))).toBeCloseTo(3, 0)
   })
 
   it('ziet dat een I, l en 1 als dezelfde stok niet te onderscheiden zijn', () => {
