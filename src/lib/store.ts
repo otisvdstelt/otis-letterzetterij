@@ -57,13 +57,24 @@ export interface State {
   surprises: number
   /** Wat het vel in de browser zag */
   sheet: { weduwe: boolean }
-  /** Waar de camera in de drukkerij naar kijkt */
+  /** Waar je bent in de drukkerij, en waar de camera naar kijkt: werkbank, kast, pers of de waslijn */
   view: View
+  /** De laatste stap (werkbank, kast of pers), om naar terug te gaan na de waslijn */
+  step: Step
+  /** Ligt het vel groot in beeld? Na het drukken wel, tot je het wegzet */
+  velOpen: boolean
+  /** Fijnzetten open: gewicht, spatiëring, korps en de rest. Standaard dicht */
+  fine: boolean
   /** Een laatje dat in de drukkerij is opengetrokken, zodat de kast in de papieren laag het ook opent */
   drawer: Drawer | null
 }
 
-export type View = 'pers' | 'kast' | 'waslijn'
+export type Step = 'werkbank' | 'kast' | 'pers'
+export type View = Step | 'waslijn'
+export const STEPS: readonly Step[] = ['werkbank', 'kast', 'pers']
+
+/** Oplossingen die iets onder fijnzetten veranderen. Kiest de drukker er een, dan gaat fijnzetten open, zodat je ziet wat er gebeurde */
+const FINE_FIXES = new Set(['zet-regel', 'zet-maat', 'zet-interlinie', 'mooi-afbreken', 'links-uitlijnen', 'echt-gewicht', 'cursief-uit', 'zwaarder', 'tabelcijfers-aan', 'zet-schaal'])
 
 const browser = typeof window !== 'undefined'
 
@@ -87,7 +98,10 @@ let state: State = {
   hinted: browser ? hintSeen() : false,
   surprises: 0,
   sheet: { weduwe: false },
-  view: 'pers',
+  view: 'werkbank',
+  step: 'werkbank',
+  velOpen: false,
+  fine: false,
   drawer: null,
 }
 
@@ -288,7 +302,7 @@ export const store = {
   fix(remark: Remark) {
     if (!remark.fix) return
     const label = oplossing(remark.fix.id, remark.fix.params, remark.id)
-    commit(remark.fix.zetsel, say(strings.nieuws.opgelost(label)))
+    commit(remark.fix.zetsel, { ...(FINE_FIXES.has(remark.fix.id) ? { fine: true } : {}), ...say(strings.nieuws.opgelost(label)) })
   },
 
   /** Wat de drukker zegt, als zin */
@@ -301,7 +315,7 @@ export const store = {
     const z = state.zetsel
     const recent = [z, ...state.recent.filter((r) => !sameSheet(r, z))].slice(0, RECENT)
     if (!state.hinted) keepHintSeen()
-    set({ printed: z, recent, pulls: state.pulls + 1, hinted: true, view: 'pers', ...say(strings.nieuws.gedrukt) })
+    set({ printed: z, recent, pulls: state.pulls + 1, hinted: true, view: 'pers', step: 'pers', velOpen: true, drawer: null, ...say(strings.nieuws.gedrukt) })
   },
 
   /** Hang een vel aan de waslijn: het net gedrukte, of wat er nu staat */
@@ -316,7 +330,7 @@ export const store = {
     }
     const waslijn = [...state.waslijn, z]
     const kept = keep(waslijn)
-    set({ waslijn, kept, view: 'waslijn', ...say(strings.nieuws.opgehangen(waslijn.length) + (kept ? '' : ` ${strings.waslijn.nietBewaard}`)) })
+    set({ waslijn, kept, ...say(strings.nieuws.opgehangen(waslijn.length) + (kept ? '' : ` ${strings.waslijn.nietBewaard}`)) })
   },
 
   unhang(index: number) {
@@ -328,7 +342,7 @@ export const store = {
 
   /** Een vel van de lijn of van eerder terug in de pers */
   continueFrom(z: Zetsel) {
-    commit(z, { compare: null, ...say(strings.nieuws.terug) })
+    commit(z, { compare: null, view: 'pers', step: 'pers', velOpen: true, ...say(strings.nieuws.terug) })
   },
 
   /** Vergelijken aan of uit, en een vel erbij of eraf (hooguit drie) */
@@ -353,7 +367,7 @@ export const store = {
 
   /** Een vel uit een gedeelde link. Het welkom komt erbij, en wat niet meeging staat erbij */
   openShared(zetsel: Zetsel, replaced: Replaced) {
-    set({ zetsel, replaced, welcome: { replaced }, past: [], ...say(strings.nieuws.welkom) })
+    set({ zetsel, replaced, welcome: { replaced }, past: [], printed: zetsel, view: 'pers', step: 'pers', velOpen: true, ...say(strings.nieuws.welkom) })
   },
 
   /** Weg met het welkom: hang het op, of zet verder */
@@ -390,12 +404,35 @@ export const store = {
 
   /** Kijk ergens anders in de drukkerij */
   look(view: View) {
-    if (view !== state.view) set({ view })
+    if (view === state.view) return
+    set({ view, ...(view === 'waslijn' ? {} : { step: view }), ...(view !== 'kast' ? { drawer: null } : {}), ...say(strings.nieuws.plek(view)) })
+  },
+
+  /** Een opdracht uit het zetboek: doel, gevoel, paar en zin in één keer, en meteen de pers over */
+  opdracht(op: { naam: string; doel: Goal; gevoel: Mood[]; kop: string; tekst: string; zin: string }) {
+    const kop = fontById(op.kop)
+    const tekst = fontById(op.tekst)
+    if (!kop || !tekst) return
+    let z = withGoal({ ...state.zetsel, klem: null, stemming: op.gevoel.slice(0, 2), zin: op.zin }, op.doel)
+    z = withFont(withFont(z, 'kop', kop), 'tekst', tekst)
+    commit(z)
+    this.pull()
+    set(say(strings.nieuws.zetboek(op.naam)))
+  },
+
+  /** Het vel groot in beeld, of weer weg */
+  showVel(open: boolean) {
+    if (open !== state.velOpen) set({ velOpen: open })
+  },
+
+  /** Fijnzetten open of dicht */
+  setFine(open: boolean) {
+    if (open !== state.fine) set({ fine: open })
   },
 
   /** Trek een laatje open, in 3D of in de kast; null schuift het weer dicht */
   openDrawer(drawer: Drawer | null) {
-    if (drawer !== state.drawer) set({ drawer, ...(drawer ? { view: 'kast' as const } : {}) })
+    if (drawer !== state.drawer) set({ drawer, ...(drawer ? { view: 'kast' as const, step: 'kast' as const } : {}) })
   },
 
   /**
