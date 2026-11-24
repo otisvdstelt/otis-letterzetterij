@@ -1,81 +1,78 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { useLayoutEffect, useRef } from 'react'
-import type { PerspectiveCamera } from 'three'
-import { air } from '../../lib/air'
-import { useLetters, type View } from '../../lib/store'
-import { VIEWS } from '../../lib/world/spec'
+import { useEffect, useRef } from 'react'
+import { Vector3, type PerspectiveCamera } from 'three'
+import { useLetters } from '../../lib/store'
+import { VIEWS, type Vec3 } from '../../lib/world/spec'
 import { motion } from './motion'
 
-/** Mist erin, camera verzetten, mist eraf. Zoals tussen de plekken in het portfolio */
-const FOG_IN = 0.85
-const FOG_OUT = 1.1
+/** Hoeveel ruimte de papieren panelen innemen, in px. De camera schuift zijn beeld zo, dat het onderwerp in de vrije ruimte staat */
+export interface Inset {
+  left: number
+  right: number
+  top: number
+  bottom: number
+}
+
+const DOLLY = 1.1
+const ease = (x: number) => (x >= 1 ? 1 : 1 - (1 - x) ** 3)
+const v = (p: Vec3) => new Vector3(p[0], p[1], p[2])
 
 /**
- * De camera kijkt naar de pers, de kast of de waslijn. Wisselen gaat met een bank mist die van links over het vel rolt.
- * Met minder beweging is het een snede
+ * De camera loopt mee door de drukkerij: werkbank, kast, pers en waslijn. Ze schuift er rustig heen, zonder mist,
+ * zodat je ziet waar je bent. Met minder beweging staat ze er meteen
  */
-export function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
+export function CameraRig({ reducedMotion, inset }: { reducedMotion: boolean; inset: Inset }) {
   const camera = useThree((s) => s.camera) as PerspectiveCamera
   const width = useThree((s) => s.size.width)
   const height = useThree((s) => s.size.height)
   const invalidate = useThree((s) => s.invalidate)
   const view = useLetters((s) => s.view)
-  const narrow = width / Math.max(1, height) < 1.35
-  const shown = useRef<View | null>(null)
-  const wipe = useRef<{ to: View; at: number; moved: boolean } | null>(null)
+  // De vorm van de vrije ruimte bepaalt of het beeld breed of smal is
+  const free = { w: Math.max(1, width - inset.left - inset.right), h: Math.max(1, height - inset.top - inset.bottom) }
+  const narrow = free.w / free.h < 1.2
+  const from = useRef<{ position: Vector3; target: Vector3; fov: number } | null>(null)
+  const goal = useRef({ position: new Vector3(), target: new Vector3(), fov: 40 })
+  const target = useRef(new Vector3())
+  const started = useRef(-1)
 
-  const place = (v: View) => {
-    const spot = narrow ? VIEWS[v].narrow : VIEWS[v].wide
-    camera.position.set(...spot.position)
-    camera.fov = spot.fov
-    camera.lookAt(...spot.target)
+  // Het beeld opzij schuiven: het midden van de vrije ruimte wordt het midden van de lens
+  useEffect(() => {
+    const dx = (inset.right - inset.left) / 2
+    const dy = (inset.bottom - inset.top) / 2
+    camera.setViewOffset(width, height, dx, dy, width, height)
     camera.updateProjectionMatrix()
-    shown.current = v
-  }
+    invalidate()
+  }, [camera, width, height, inset.left, inset.right, inset.top, inset.bottom, invalidate])
 
-  useLayoutEffect(() => {
-    // De eerste keer, en bij een andere vorm van het podium: meteen op zijn plek
-    if (shown.current === null || reducedMotion) {
-      place(view)
+  useEffect(() => {
+    const spot = narrow ? VIEWS[view].narrow : VIEWS[view].wide
+    goal.current = { position: v(spot.position), target: v(spot.target), fov: spot.fov }
+    if (from.current === null || reducedMotion) {
+      camera.position.copy(goal.current.position)
+      target.current.copy(goal.current.target)
+      camera.fov = spot.fov
+      camera.lookAt(target.current)
+      camera.updateProjectionMatrix()
+      from.current = { position: camera.position.clone(), target: target.current.clone(), fov: camera.fov }
+      started.current = -1
       invalidate()
       return
     }
-    if (shown.current === view) {
-      // Terug naar waar we al stonden, terwijl de mist nog onderweg was: dan gaat die overgang niet meer door
-      wipe.current = null
-      air.wipe.value = 0
-      air.reveal.value = 1
-      place(view)
-      invalidate()
-      return
-    }
-    wipe.current = { to: view, at: air.time.value, moved: false }
-    air.wipe.value = 1
-    motion.wake(FOG_IN + FOG_OUT + 0.2)
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, narrow, reducedMotion])
+    from.current = { position: camera.position.clone(), target: target.current.clone(), fov: camera.fov }
+    started.current = performance.now()
+    motion.wake(DOLLY + 0.2)
+  }, [view, narrow, reducedMotion, camera, invalidate])
 
   useFrame(() => {
-    const w = wipe.current
-    if (!w) return
-    const t = air.time.value - w.at
-    // Wakker blijven tot de mist weg is, hoe traag het apparaat ook tekent
+    if (started.current < 0 || !from.current) return
+    const t = ease((performance.now() - started.current) / (DOLLY * 1000))
+    camera.position.lerpVectors(from.current.position, goal.current.position, t)
+    target.current.lerpVectors(from.current.target, goal.current.target, t)
+    camera.fov = from.current.fov + (goal.current.fov - from.current.fov) * t
+    camera.lookAt(target.current)
+    camera.updateProjectionMatrix()
     motion.wake(0.2)
-    if (t < FOG_IN) {
-      air.wipe.value = 1
-      air.reveal.value = 1 - t / FOG_IN
-      return
-    }
-    if (!w.moved) {
-      place(w.to)
-      w.moved = true
-    }
-    air.wipe.value = 2
-    air.reveal.value = Math.min(1, (t - FOG_IN) / FOG_OUT)
-    if (air.reveal.value >= 1) {
-      wipe.current = null
-      air.wipe.value = 0
-    }
+    if (t >= 1) started.current = -1
   })
 
   return null
