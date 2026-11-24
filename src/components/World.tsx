@@ -71,7 +71,7 @@ export default function World({ phase, reducedMotion, modest, onReady }: WorldPr
       frameloop="demand"
       dpr={[1, dpr]}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
-      camera={{ fov: VIEWS.wide.fov, near: 0.1, far: 40, position: VIEWS.wide.position as unknown as [number, number, number] }}
+      camera={{ fov: VIEWS.pers.wide.fov, near: 0.1, far: 40, position: VIEWS.pers.wide.position as unknown as [number, number, number] }}
       onCreated={(state) => {
         state.gl.setClearColor(look.paper)
         if (import.meta.env.DEV) (window as unknown as { __drukkerij?: unknown }).__drukkerij = state
@@ -80,9 +80,9 @@ export default function World({ phase, reducedMotion, modest, onReady }: WorldPr
       <PerformanceMonitor bounds={() => [50, 62]} flipflops={3} onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))} onIncline={() => setDpr((d) => Math.min(budget.dpr[1], d + 0.25))} onFallback={() => setDpr(0.75)} />
       <PartsContext value={parts}>
         <Wakker />
-        <CameraRig />
+        <CameraRig reducedMotion={reducedMotion} />
         <Atmosphere phase={phase} shadowSize={budget.shadow} />
-        <Drukkerij />
+        <Drukkerij reducedMotion={reducedMotion} />
         <Reveal reducedMotion={reducedMotion} />
         <EffectComposer multisampling={0} enableNormalPass={false}>
           <InkPaper />
