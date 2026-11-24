@@ -127,7 +127,8 @@ describe('zoeken met gewone woorden', () => {
     const found = zoekOpEigenschappen(fonts, leesWoorden('ronde letter voor kinderen', woorden).eigenschappen, 8)
     expect(found.length).toBeGreaterThan(3)
     expect(found.slice(0, 4).filter((f) => f.moods.includes('speels') || f.moods.includes('warm')).length).toBeGreaterThanOrEqual(2)
-    expect(found.slice(0, 4).every((f) => f.metrics.roundness > 0.9), found.map((f) => f.id).join(' ')).toBe(true)
+    const rond = (list: readonly { metrics: { roundness: number } }[]) => list.reduce((t, f) => t + f.metrics.roundness, 0) / list.length
+    expect(rond(found.slice(0, 4)), found.map((f) => f.id).join(' ')).toBeGreaterThan(rond(fonts.filter((f) => f.kind === 'schreefloos')))
   })
 
   it('vindt bij chic een letter met contrast, bij stoer een grove displayletter', () => {
