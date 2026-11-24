@@ -2,6 +2,7 @@
 // Alles komt uit de metingen van het bouwscript: x-hoogte, breedte, contrast, rondheid, bereik en schriften.
 // Hier staan geen woorden: de knopjes en hun namen staan in strings.ts
 
+import { BOUWLIJST } from './bouwlijst.ts'
 import type { FontEntry, Kind } from './catalogue.ts'
 
 type Font = Pick<FontEntry, 'id' | 'kind' | 'category' | 'weights' | 'axes' | 'italic' | 'metrics' | 'coverage' | 'scripts'>
@@ -26,14 +27,27 @@ export function schreefvorm(font: Font): Schreef {
 }
 
 /**
- * Hoe een schreefloze gebouwd is. Een ronde o (bijna een cirkel) is geometrisch, zoals Futura of Jost.
- * Met wat contrast in de stokken is hij humanistisch, zoals Fira of Source Sans. De rest is grotesk, zoals Inter
+ * Hoe een schreefloze gebouwd is, gemeten. Een ronde o (bijna een cirkel) is geometrisch, zoals Futura of Jost.
+ * Een smalle o met wat contrast in de stokken is humanistisch, zoals Fira of Source Sans. De rest is grotesk, zoals Inter.
+ * Bijgesteld op de handgemaakte lijst: de grens voor rond lag eerst op 0,96 (Raleway viel erbuiten), contrast alleen
+ * maakte van Libre Franklin en Schibsted een humanist, en smalle en brede displayletters vielen er vanzelf naast.
+ * Zo meet hij 46 van de 56 goed; open of dichte vormen ziet hij niet, daarom gaat de lijst voor
  */
-export function bouw(font: Font): Bouw | null {
-  if (schreefvorm(font) !== 'geen' || font.kind === 'handschrift') return null
-  if (font.metrics.roundness >= 0.96) return 'geometrisch'
-  if (font.metrics.contrast >= 1.25) return 'humanistisch'
+export function meetBouw(font: Font): Bouw {
+  const { roundness, contrast, avgWidth } = font.metrics
+  if (font.category === 'handwriting') return 'humanistisch'
+  // Een brede, zware letter heeft vanzelf een brede o; dat maakt hem nog niet geometrisch (Archivo Black, Dela Gothic)
+  if (avgWidth > 0.5 && roundness > 1.02) return 'grotesk'
+  if (roundness >= 0.945) return 'geometrisch'
+  // Een smalle letter (Oswald, Anton) heeft vanzelf een smalle o; dat maakt hem nog niet humanistisch
+  if (roundness >= 0.8 && roundness < 0.9 && contrast >= 1.28) return 'humanistisch'
   return 'grotesk'
+}
+
+/** Hoe een schreefloze gebouwd is: uit de handgemaakte lijst als hij in de kast staat, anders gemeten */
+export function bouw(font: Font): Bouw | null {
+  if (schreefvorm(font) !== 'geen' || font.kind === 'handschrift' || font.kind === 'mono') return null
+  return BOUWLIJST[font.id.replace(/^magazijn:/, '')] ?? meetBouw(font)
 }
 
 /** Wat een letter moet kunnen, voor je project */

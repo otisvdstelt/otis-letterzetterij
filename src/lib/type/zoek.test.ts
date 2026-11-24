@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { alternatieven } from '../../content/alternatieven'
 import { parseCatalogue } from './catalogue'
-import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief } from './zoek'
+import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief, meetBouw } from './zoek'
+import { BOUWLIJST } from './bouwlijst'
 
 const catalogue = parseCatalogue(JSON.parse(readFileSync(new URL('../../../public/data/fonts.json', import.meta.url), 'utf8')))
 const fonts = catalogue.fonts
@@ -67,5 +68,29 @@ describe('iets als', () => {
 
   it('wijst alleen naar letters die in de kast staan', () => {
     for (const a of alternatieven) for (const id of a.ids) expect(fonts.some((f) => f.id === id), `${a.naam}: ${id}`).toBe(true)
+  })
+})
+
+describe('de bouw naast de handgemaakte lijst', () => {
+  const sans = catalogue.fonts.filter((f) => BOUWLIJST[f.id])
+
+  it('heeft elke schreefloze uit de kast in de lijst', () => {
+    const missing = catalogue.fonts.filter((f) => f.kind === 'schreefloos' && !BOUWLIJST[f.id]).map((f) => f.id)
+    expect(missing).toEqual([])
+  })
+
+  it('meet zonder de lijst minstens vier op de vijf goed', () => {
+    const wrong = sans.filter((f) => meetBouw(f) !== BOUWLIJST[f.id])
+    expect(1 - wrong.length / sans.length, wrong.map((f) => `${f.id}: ${meetBouw(f)}`).join(', ')).toBeGreaterThanOrEqual(0.8)
+  })
+
+  it('noemt Raleway geometrisch en Libre Franklin grotesk, ook gemeten', () => {
+    expect(meetBouw(font('raleway'))).toBe('geometrisch')
+    expect(meetBouw(font('libre-franklin'))).toBe('grotesk')
+    expect(bouw(font('raleway'))).toBe('geometrisch')
+  })
+
+  it('geeft een mono geen bouw', () => {
+    expect(bouw(font('jetbrains-mono'))).toBeNull()
   })
 })
