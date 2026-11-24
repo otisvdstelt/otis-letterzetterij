@@ -856,42 +856,32 @@
 
   /* ============================================================ de kast */
 
-  .laatje-paneel {
-    display: grid;
-    gap: 0.6rem;
-    padding: 1rem 0.9rem 1.1rem;
-    border-radius: 6px;
-    background: linear-gradient(var(--color-oak), var(--color-oak-deep));
-    color: #f3ead8;
-    box-shadow: var(--shadow-rest);
-  }
-
-  .laatje-paneel .paneel-uitleg,
-  .laatje-paneel .klein-uitleg,
-  .laatje-paneel .hand {
+  .kast[data-paneel='laatje'] .paneel-uitleg,
+  .kast[data-paneel='laatje'] .klein-uitleg,
+  .kast[data-paneel='laatje'] .hand {
     color: #e6dcc8;
   }
 
-  .laatje-paneel .field label {
+  .kast[data-paneel='laatje'] .field label {
     color: #e6dcc8;
   }
 
-  .laatje-paneel .field input {
+  .kast[data-paneel='laatje'] .field input {
     color: #f3ead8;
     border-bottom-color: rgb(243 234 216 / 0.4);
   }
 
-  .laatje-paneel .stemming {
+  .kast[data-paneel='laatje'] .stemming {
     border-color: rgb(243 234 216 / 0.45);
   }
 
-  .laatje-paneel .stemming[data-aan='true'] {
+  .kast[data-paneel='laatje'] .stemming[data-aan='true'] {
     border-color: #f3ead8;
     background: rgb(243 234 216 / 0.16);
   }
 
-  .laatje-paneel :focus-visible,
-  .laatje-paneel .stemming:has(input:focus-visible) {
+  .kast[data-paneel='laatje'] :focus-visible,
+  .kast[data-paneel='laatje'] .stemming:has(input:focus-visible) {
     outline-color: var(--color-gold);
   }
 
@@ -1013,7 +1003,7 @@
   }
 
   .letter-in-gebruik {
-    grid-column: 2;
+    grid-column: 1 / -1;
     font-family: var(--font-hand);
     font-size: 0.9rem;
     color: #8f4526;
@@ -1037,12 +1027,289 @@
     align-items: baseline;
   }
 
-  .laatje-paneel .magazijn .quiet {
+  .kast[data-paneel='laatje'] .magazijn .quiet {
     color: #e6dcc8;
   }
 
   .magazijn-letter {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Een regel in het laatje: jouw kop in die letter, groot, met de naam eronder en knopjes ernaast */
+  .letter-regel {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .letter-regel .letter {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .letter-proef {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: anywhere;
+  }
+
+  .kast[data-paneel='laatje'] .paneel-naam {
+    font-size: 1.15rem;
+    word-spacing: 0.3em;
+  }
+
+  .letter-knopjes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+  }
+
+  .letter-knopjes .quiet {
+    min-height: 2rem;
+    padding: 0 0.2rem;
+    color: #e6dcc8;
+    font-size: 0.85rem;
+  }
+
+  /* Haalt een letter je eisen niet, dan wordt hij grijs; pakken kan nog, voorstellen doet de drukker hem niet */
+  .letter-regel[data-grijs='true'] .letter {
+    filter: grayscale(1);
+    opacity: 0.55;
+  }
+
+  .richtingen {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .kast[data-paneel='laatje'] .gevoel {
+    border-color: rgb(243 234 216 / 0.45);
+    color: #f3ead8;
+  }
+
+  .kast[data-paneel='laatje'] .gevoel[aria-pressed='true'] {
+    border-color: #f3ead8;
+    background: rgb(243 234 216 / 0.16);
+  }
+
+  .kast-acties {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .half-wisselen {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .waarom-nu {
+    font-style: italic;
+  }
+
+  /* Opzij gelegd: dezelfde alinea op broodtekstmaat, onder elkaar */
+  .paneel.kast[data-paneel='opzij'] {
+    width: 21rem;
+  }
+
+  .opzij-lijst {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .opzij-letter {
+    display: grid;
+    gap: 0.35rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px dashed var(--color-rule);
+  }
+
+  .opzij-naam,
+  .opzij-proef {
+    margin: 0;
+  }
+
+  .opzij-letter .knoppenrij {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  /* Je tekst op de werkbank */
+  .jouw-tekst-meer {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .jouw-tekst-meer textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  /* De proefdruk: drie vellen naast elkaar, dezelfde tekst */
+  .proefdruk {
+    position: absolute;
+    top: var(--boven);
+    left: calc(var(--rand) + 14.6rem + var(--rand));
+    right: var(--rand);
+    bottom: calc(var(--strook) + 1.5rem);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 0.6rem;
+    padding: 0.8rem 1.2rem 1.2rem;
+    background: var(--color-canvas) var(--tooth);
+    border-radius: 3px 5px 4px 6px;
+    box-shadow: var(--shadow-rest);
+    color: var(--color-ink);
+    animation: vel-erin 520ms var(--ease-out-expo);
+  }
+
+  .proef-vellen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(14rem, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    gap: 1rem;
+    min-height: 0;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Eerst de knop, dan het vel, dat zelf scrolt: zo staat Deze altijd in beeld */
+  .proef-vel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    justify-items: center;
+    min-height: 0;
+  }
+
+  .proef-vel .vel-houder {
+    width: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /* De oogarts: twee kaartjes, geen namen */
+  .oogarts {
+    margin: auto;
+    width: min(60rem, calc(100vw - 2rem));
+    max-height: calc(100svh - 2rem);
+    padding: 1rem 1.3rem 1.4rem;
+    border: 0;
+    border-radius: 4px;
+    background: var(--color-canvas) var(--tooth);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-rest);
+  }
+
+  .oogarts::backdrop {
+    background: rgb(30 24 18 / 0.55);
+  }
+
+  .oogarts-ronde {
+    margin: 0 0 0.6rem;
+  }
+
+  .oogarts-kaartjes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+  }
+
+  .oogarts-kaart {
+    display: grid;
+    align-content: start;
+    gap: 0.8rem;
+    min-height: 14rem;
+    padding: 1.2rem 1.3rem;
+    border: 0;
+    background: #fcfaf3 var(--tooth);
+    color: #2c2823;
+    text-align: left;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+    transition: translate 200ms var(--ease-out-expo);
+  }
+
+  .oogarts-kaart:hover {
+    translate: 0 -3px;
+  }
+
+  .oogarts-kop {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .oogarts-kop.klein {
+    font-size: 1.6rem;
+  }
+
+  .oogarts-tekst {
+    font-size: 1.06rem;
+    line-height: 1.55;
+  }
+
+  .oogarts-deze {
+    justify-self: end;
+    align-self: end;
+    color: var(--color-rust);
+  }
+
+  /* De qr-code met de link naar het vel */
+  .vel-qr {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .vel-qr h3 {
+    margin: 0;
+  }
+
+  .qr {
+    flex: none;
+    width: 7.5rem;
+    height: 7.5rem;
+  }
+
+  .pers-zin {
+    margin: 0;
+    font-style: italic;
+  }
+
+  .naar-tekst {
+    justify-self: start;
+    padding-left: 0;
+  }
+
+  .kop-instellingen {
+    display: contents;
+  }
+
+  .colofon-schakelaars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .colofon-telefoon {
+    display: none;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 1023px) {
+    .colofon-telefoon {
+      display: flex;
+    }
   }
 
   /* ============================================================ het welkom */
@@ -1912,7 +2179,7 @@
   }
 
   .papier[data-laatje='true'] {
-    --links: calc(var(--rand) + 32.2rem);
+    --links: calc(var(--rand) + 21.6rem);
   }
 
   .papier[data-vel='true'] {
@@ -2012,10 +2279,9 @@
     gap: 0.6rem;
   }
 
-  /* Het open laatje, van eikenhout, naast het kastpaneel */
-  .paneel.laatje-paneel {
-    left: calc(var(--rand) + 14.6rem);
-    width: 17rem;
+  /* Het open laatje neemt de plek van de paren in: breder, van eikenhout */
+  .paneel.kast[data-paneel='laatje'] {
+    width: 21rem;
     background: linear-gradient(var(--color-oak), var(--color-oak-deep));
     color: #f3ead8;
   }
@@ -2029,14 +2295,14 @@
     display: flex;
   }
 
-  .laatje-paneel .paneel-naam,
-  .laatje-paneel .paneel-boven .quiet {
+  .kast[data-paneel='laatje'] .paneel-naam,
+  .kast[data-paneel='laatje'] .paneel-boven .quiet {
     color: #f3ead8;
   }
 
   /* Een papiertje op het hout houdt zijn eigen inkt */
-  .laatje-paneel .klem-knop,
-  .laatje-paneel .klem-knop .hand {
+  .kast[data-paneel='laatje'] .klem-knop,
+  .kast[data-paneel='laatje'] .klem-knop .hand {
     color: #2c2823;
   }
 
@@ -2419,7 +2685,7 @@
 
   @media (max-width: 1023px) {
     .papier {
-      --boven: 5.6rem;
+      --boven: 3.9rem;
       --links: 0px;
       --rechts: 0px;
       --vel: 100vw;
@@ -2433,7 +2699,14 @@
     }
 
     .kop .woordmerk {
-      font-size: 1.05rem;
+      font-size: 0.98rem;
+    }
+
+    /* Eén regel bovenin: geluid en het uur staan in het colofon, de rest wordt wat kleiner */
+    .papier .kop {
+      flex-wrap: nowrap;
+      gap: 0.3rem;
+      padding-inline: 0.6rem;
     }
 
     .kop-links,
@@ -2441,10 +2714,16 @@
       gap: 0.3rem;
     }
 
+    /* Geluid en het uur staan op een telefoon in het colofon, zodat de kop op één regel past */
+    .kop-instellingen {
+      display: none;
+    }
+
     .papier .schakelaar {
       min-height: 2.4rem;
-      padding: 0.25rem 0.55rem 0.3rem;
-      font-size: 0.95rem;
+      padding: 0.25rem 0.45rem 0.3rem;
+      font-size: 0.88rem;
+      white-space: nowrap;
     }
 
     .strook {
@@ -2467,7 +2746,8 @@
 
     /* Eén paneel tegelijk, van onder omhoog, boven het strookje */
     .paneel,
-    .paneel.laatje-paneel {
+    .paneel.kast[data-paneel='laatje'],
+    .paneel.kast[data-paneel='opzij'] {
       top: auto;
       left: 0.5rem;
       right: 0.5rem;
@@ -2476,9 +2756,24 @@
       max-height: 38svh;
     }
 
-    .papier[data-laatje='true'] .paneel.kast,
     .papier[data-vel='true'] .paneel {
       display: none;
+    }
+
+    /* Een open laatje mag hoger: de letters zelf moeten erin passen */
+    .paneel.kast[data-paneel='laatje'],
+    .paneel.kast[data-paneel='opzij'] {
+      max-height: 56svh;
+    }
+
+    .richtingen .gevoelens {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .richtingen .gevoel {
+      flex: none;
     }
 
     .toonbank {
@@ -2488,6 +2783,31 @@
       bottom: calc(var(--strook) + 0.5rem);
       width: auto;
       max-height: 50svh;
+    }
+
+    .proefdruk {
+      top: auto;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: calc(var(--strook) + 0.5rem);
+      height: 60svh;
+      grid-template-rows: auto auto minmax(0, 1fr);
+    }
+
+    .proef-vellen {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 82%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .proef-vel {
+      scroll-snap-align: start;
+    }
+
+    .papier[data-proef='true'] .paneel {
+      display: none;
     }
 
     .terug-naar-vel {
