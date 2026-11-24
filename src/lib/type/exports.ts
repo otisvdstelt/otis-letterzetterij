@@ -4,7 +4,7 @@
 
 import { nearestWeight, type FontEntry } from './catalogue.ts'
 import { GENERIC, variationSettings } from './fontface.ts'
-import type { Scale, LevelName } from './scale.ts'
+import type { Level, LevelName, Scale } from './scale.ts'
 import { fontsourceId, isOwn, type Role, type Zetsel } from './zetsel.ts'
 
 type Font = Pick<FontEntry, 'id' | 'family' | 'kind' | 'weights' | 'axes' | 'italic'>
@@ -80,17 +80,20 @@ const em = (v: number) => `${Math.round(v * 1000) / 1000}em`
 
 /** Tailwind v4: @theme met --font-display (kop), --font-sans (tekst) en de schaal als --text-* met interlinie en spatiëring */
 export function tailwindExport({ zetsel, kop, tekst, scale }: ExportInput): string {
-  const lines = ['@import "tailwindcss";', '', '@theme {', `  --font-display: ${exportStack(kop)};`, `  --font-sans: ${exportStack(tekst)};`]
-  if (tekst.kind === 'schreef') lines.push(`  --font-serif: ${exportStack(tekst)};`)
+  // Kop en tekst hebben een eigen naam; de algemene naam van Tailwind (sans, serif of mono) krijgt alleen de tekstletter
+  // die er echt bij hoort, zodat font-sans nooit een schreefletter is
+  const generic = tekst.kind === 'schreef' ? 'serif' : tekst.kind === 'mono' ? 'mono' : 'sans'
+  const lines = ['@import "tailwindcss";', '', '@theme {', `  --font-display: ${exportStack(kop)};`, `  --font-body: ${exportStack(tekst)};`, `  --font-${generic}: ${exportStack(tekst)};`]
   lines.push('')
-  for (const name of ORDER) {
-    const level = scale.levels[name]
-    const t = TAILWIND[name]
+  // De hele trap, zonder gat: 4xl is de stap tussen h1 en groot
+  const steps: [string, Omit<Level, 'name'>][] = ORDER.map((name) => [TAILWIND[name], scale.levels[name]])
+  steps.splice(ORDER.indexOf('groot'), 0, ['4xl', scale.tussen])
+  for (const [t, level] of steps) {
     lines.push(`  --text-${t}: ${level.size};`, `  --text-${t}--line-height: ${level.leading};`)
     if (level.tracking !== 0) lines.push(`  --text-${t}--letter-spacing: ${em(level.tracking)};`)
   }
   lines.push('', `  --tracking-caps: ${em(scale.capsTracking)};`, `  --container-regel: ${scale.measure.rem}rem;`, '}')
-  const body = [`  font-weight: ${zetsel.tekstStijl.weight};`]
+  const body = ['  font-family: var(--font-body);', `  font-weight: ${zetsel.tekstStijl.weight};`]
   if (zetsel.tabelcijfers) body.push('  font-variant-numeric: tabular-nums;')
   if (Object.keys(zetsel.tekstStijl.axes).length) body.push(`  font-variation-settings: ${variationSettings(zetsel.tekstStijl.axes)};`)
   const heading = [`  font-family: var(--font-display);`, `  font-weight: ${zetsel.kopStijl.weight};`]
@@ -181,13 +184,15 @@ export interface SelfHost {
   bytes: number
 }
 
-/** Zelf hosten: de @font-face-regels en de bestanden, alleen voor de gewichten die je gebruikt */
-export function selfHost({ zetsel, kop, tekst }: { zetsel: Zetsel; kop: HostFont; tekst: HostFont }): SelfHost {
+/** Zelf hosten: de @font-face-regels en de bestanden, alleen voor de gewichten die je gebruikt. Met alleenLatin ook alleen de latin-subset */
+export function selfHost({ zetsel, kop, tekst, alleenLatin = false }: { zetsel: Zetsel; kop: HostFont; tekst: HostFont; alleenLatin?: boolean }): SelfHost {
   const roles: [HostFont, Role][] = kop.id === tekst.id ? [[tekst, 'tekst'], [kop, 'kop']] : [[kop, 'kop'], [tekst, 'tekst']]
   const seen = new Map<string, SelfHost['files'][number] & { rule: string }>()
   for (const [font, role] of roles) {
     for (const face of usedFaces(font, zetsel, role)) {
       if (seen.has(face.file)) continue
+      // Alleen latin scheelt kilobytes, maar Ĳ, ĳ en de Poolse en Turkse letters zitten in latin-ext
+      if (alleenLatin && face.subset !== 'latin') continue
       const name = `${fontsourceIdOf(font)}-${face.file.split('/').pop()}`
       const weight = Array.isArray(face.weight) ? `${face.weight[0]} ${face.weight[1]}` : String(face.weight)
       const range = font.unicodeRange[face.subset]

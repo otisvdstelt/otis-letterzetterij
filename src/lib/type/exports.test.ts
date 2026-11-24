@@ -18,20 +18,35 @@ function input(z: Zetsel): ExportInput {
 const base = startZetsel('Het vel kwam warm uit de pers')
 
 describe('Tailwind v4', () => {
-  it('zet de letters als --font-display en --font-sans, met de Fontsource-naam', () => {
+  it('zet de letters als --font-display en --font-body, met de Fontsource-naam', () => {
     const css = tailwindExport(input(base))
     expect(css).toContain('@theme {')
     expect(css).toContain('--font-display: "Fraunces Variable", serif;')
+    expect(css).toContain('--font-body: "Inter Variable", sans-serif;')
     expect(css).toContain('--font-sans: "Inter Variable", sans-serif;')
+    expect(css).toContain('font-family: var(--font-body);')
+  })
+
+  it('geeft een schreefletter als tekst nooit aan --font-sans', () => {
+    const css = tailwindExport(input(withFont(base, 'tekst', font('manuale'))))
+    expect(css).not.toContain('--font-sans')
+    expect(css).toContain('--font-serif: "Manuale Variable", serif;')
   })
 
   it('zet de hele schaal als --text-* met interlinie', () => {
     const css = tailwindExport(input(base))
-    for (const t of ['sm', 'base', 'lg', 'xl', '2xl', '3xl', '5xl']) {
+    for (const t of ['sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl']) {
       expect(css).toMatch(new RegExp(`--text-${t}: clamp\\(`))
       expect(css).toContain(`--text-${t}--line-height:`)
     }
     expect(css).toContain('--tracking-caps: 0.06em;')
+  })
+
+  it('heeft geen gat in de trap: 4xl ligt tussen 3xl en 5xl', () => {
+    const css = tailwindExport(input(base))
+    const px = (t: string) => Number(new RegExp(`--text-${t}: clamp\\([^,]+, [^,]+, ([\\d.]+)rem\\)`).exec(css)?.[1])
+    expect(px('4xl')).toBeGreaterThan(px('3xl'))
+    expect(px('4xl')).toBeLessThan(px('5xl'))
   })
 
   it('geeft een schreefletter als tekst ook --font-serif', () => {
@@ -128,6 +143,13 @@ describe('zelf hosten', () => {
     expect(names.some((n) => n.includes('pt-serif-latin-400-normal'))).toBe(true)
     expect(names.some((n) => n.includes('pt-serif-latin-700-normal'))).toBe(true)
     expect(names.every((n) => !n.includes('-300-'))).toBe(true)
+  })
+
+  it('neemt met alleen latin minder bestanden, en geen latin-ext', () => {
+    const alles = selfHost({ zetsel: base, kop: font('fraunces'), tekst: font('inter') })
+    const latin = selfHost({ zetsel: base, kop: font('fraunces'), tekst: font('inter'), alleenLatin: true })
+    expect(latin.files.every((f) => f.name.includes('-latin-') && !f.name.includes('latin-ext'))).toBe(true)
+    expect(latin.bytes).toBeLessThan(alles.bytes)
   })
 
   it('zet elk bestand één keer, ook als kop en tekst dezelfde letter zijn', () => {
