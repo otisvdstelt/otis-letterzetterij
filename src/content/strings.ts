@@ -505,6 +505,11 @@ export const strings = {
     groet: 'De drukker',
   },
 
+  onderblad: {
+    open: 'het vel, schuif omhoog',
+    dicht: 'schuif het vel omlaag',
+  },
+
   // ------------------------------------------------------------------ de waslijn
   waslijn: {
     kop: 'De waslijn',

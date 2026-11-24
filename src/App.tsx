@@ -9,6 +9,7 @@ import { Kast } from './components/ui/Kast'
 import { Leesbaar } from './components/ui/Leesbaar'
 import { Meenemen } from './components/ui/Meenemen'
 import { Nieuws } from './components/ui/Nieuws'
+import { Onderblad } from './components/ui/Onderblad'
 import { Pers } from './components/ui/Pers'
 import { Tabs } from './components/ui/Tabs'
 import { Vel } from './components/ui/Vel'
@@ -79,6 +80,8 @@ export default function App({ broken = false }: { broken?: boolean }) {
   // Tot de drukkerij er is, staat de getekende pers in het midden
   const [worldReady, setWorldReady] = useState(false)
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  // Op een telefoon schuift het vel van onder omhoog, met de tabbladen erin
+  const compact = useMediaQuery('(max-width: 1023px)')
   const [modest] = useState(isModest)
   const fail = useCallback(() => {
     setPainted(false)
@@ -145,12 +148,19 @@ export default function App({ broken = false }: { broken?: boolean }) {
               )
             }
           />
-          <HetVel />
+          {!compact && <HetVel />}
           <Waslijn />
         </div>
-        <aside className="rechts paper" aria-label={strings.vel.tabsLabel}>
-          <Tabs tabs={tabs} label={strings.vel.tabsLabel} />
-        </aside>
+        {compact ? (
+          <Onderblad label={strings.vel.label}>
+            <HetVel />
+            <Tabs tabs={tabs} label={strings.vel.tabsLabel} />
+          </Onderblad>
+        ) : (
+          <aside className="rechts paper" aria-label={strings.vel.tabsLabel}>
+            <Tabs tabs={tabs} label={strings.vel.tabsLabel} />
+          </aside>
+        )}
       </main>
       <Nieuws />
       <Inktrol />

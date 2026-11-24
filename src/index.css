@@ -406,6 +406,20 @@
     color: var(--color-rule);
   }
 
+  /* Op een telefoon passen de drie schakelaars naast elkaar, net */
+  @media (max-width: 640px) {
+    .kop-schakelaars {
+      justify-content: flex-start;
+      gap: 0.35rem;
+    }
+
+    .schakelaar {
+      gap: 0.3rem;
+      padding: 0.3rem 0.55rem 0.35rem;
+      font-size: 0.95rem;
+    }
+  }
+
   .colofon {
     margin: auto;
     width: min(40rem, calc(100vw - 2rem));
@@ -1762,6 +1776,71 @@
 
   .vergelijk-naam {
     margin: 0;
+  }
+
+  /* ============================================================ het onderblad (telefoon) */
+
+  .onderblad {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 88dvh;
+    padding: 0 max(0.8rem, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(0.8rem, env(safe-area-inset-left));
+    /* Ingeklapt steekt alleen de greep en de bovenkant van het vel uit */
+    translate: 0 calc(88dvh - 11.5rem);
+    transition: translate 420ms var(--ease-out-expo);
+  }
+
+  .onderblad[data-open='true'] {
+    translate: 0 0;
+  }
+
+  .onderblad::before {
+    border-radius: 14px 16px 0 0;
+  }
+
+  .onderblad-greep {
+    display: grid;
+    justify-items: center;
+    gap: 0.2rem;
+    min-height: 3rem;
+    padding: 0.5rem 0 0.3rem;
+    border: 0;
+    background: none;
+    color: var(--color-ink-soft);
+    touch-action: none;
+  }
+
+  .onderblad-streep {
+    width: 3rem;
+    height: 0.3rem;
+    border-radius: 1rem;
+    background: var(--color-rule);
+  }
+
+  .onderblad-inhoud {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 1.5rem;
+  }
+
+  .onderblad[data-open='false'] .onderblad-inhoud {
+    overflow: hidden;
+  }
+
+  /* Ruimte onderaan de pagina, zodat het blad niets van de waslijn bedekt */
+  @media (max-width: 1023px) {
+    .drukkerij-pagina {
+      padding-bottom: 12.5rem;
+    }
   }
 
   /* ============================================================ het rechterpaneel */
