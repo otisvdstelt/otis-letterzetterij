@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { opmerking, strings } from '../../content/strings'
+import { strings, waaromZin } from '../../content/strings'
+import { waaromPaar } from '../../lib/type/paar'
 import { checkInk } from '../../lib/type/contrast'
 import { cssExport, figmaExport, npmExport, selfHost, tailwindExport, type ExportInput, type SelfHost } from '../../lib/type/exports'
 import { fileUrl } from '../../lib/type/fontface'
@@ -29,17 +30,16 @@ function Code({ titel, uitleg, code, what }: { titel: string; uitleg: string; co
 }
 
 /** Het briefje van de drukker: waarom dit werkt, in een paar zinnen */
-function briefje(input: ExportInput, remarks: Remark[], waarom: string | null): string {
+function briefje(input: ExportInput, remarks: Remark[], waarom: string | null, paar: string): string {
   const b = strings.briefje
   const z = input.zetsel
   const ink = checkInk(z.inkt, z.papier, z.maat, z.tekstStijl.weight)
-  const praise = remarks.find((r) => r.id === 'lof-paar')
   const left = remarks.filter((r) => r.tone !== 'lof').length
   return [
     b.aanhef,
     '',
     b.paar(input.kop.family, input.tekst.family),
-    waarom ?? (praise ? opmerking(praise.id, praise.params, praise.variant) : ''),
+    waarom ?? paar,
     b.schaal(z.ratio, z.maat, z.doel),
     b.regel(z.regel),
     b.inkt(ink.ratio, ink.level),
@@ -93,7 +93,7 @@ export function Meenemen() {
   const link = `${window.location.origin}/vel/${codeOf(z)}`
   const own = isOwn(z.kop) || isOwn(z.tekst)
   const book = suggestions.find((s) => s.kop === z.kop && s.tekst === z.tekst && s.reason.kind === 'zetboek')
-  const note = briefje(input, remarks, book?.reason.kind === 'zetboek' ? book.reason.waarom : null)
+  const note = briefje(input, remarks, book?.reason.kind === 'zetboek' ? book.reason.waarom : null, waaromZin(waaromPaar(letters.kop, letters.tekst)))
   const fonts = [...new Map([letters.kop, letters.tekst].map((f) => [f.id, f])).values()]
   const host = selfHost({ zetsel: z, kop: letters.kop, tekst: letters.tekst })
 
