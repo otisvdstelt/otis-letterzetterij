@@ -109,3 +109,19 @@ Wat ik zelf gekozen heb, met de reden erbij. Nieuwste onderaan.
 - **Wakker blijven tot het af is.** Animaties lopen op de klok van de drukkerij (`air.time`), en die loopt per beeld hooguit 0,1 seconde verder. Op een traag apparaat duurt een animatie dus langer dan de echte klok zegt. Eerst sliep de drukkerij in voordat het vel omhoog was of de mist weg was. Nu houdt elke animatie hem wakker tot hij klaar is. Twee wissels kort na elkaar lieten een oude mist-overgang naar de verkeerde plek doorlopen; een nieuwe keuze annuleert die nu.
 - **Minder beweging**: geen rol, geen zakkende degel en geen opstijgend vel. Het vel staat er meteen, de drukker staat stil, de vellen waaien niet, en wisselen is een snede in plaats van mist. Dezelfde stappen, zonder de beweging.
 - **`afdruk.ts` heet `drukwerk.ts`**, omdat macOS geen verschil ziet tussen `afdruk.ts` en `Afdruk.tsx`.
+
+## Fase 7: koppeling en eigen fonts
+
+- **Een flesje plakken** gaat bij Inkt en papier. Plakken leest de link meteen, Enter of de knop doet hetzelfde. Een flesje zet inkt, papier en tweede inkt in één stap (en is dus ook in één stap ongedaan te maken). Een plank geeft de flesjes om uit te kiezen, met hun kleuren erbij. Een fout zegt wat er misging: geen flesjeslink, een link die afgeknipt is of uit een nieuwere Kleurenalchemist komt, of een lege plank.
+- **Een eigen fontbestand** leg je op de werkbank: slepen (ergens op de pagina loslaten mag ook) of kiezen. fontkit wordt pas geladen als iemand een font aanbiedt. Het bestand wordt gelezen, gemeten met dezelfde code als de kast (`lib/type/eigen.ts`), en met de `FontFace`-API uit een ArrayBuffer geladen. Daarna ligt het in de rol die je aan het zetten bent, met een klem erop, want het is jouw letter. Onder de knop staat dat het op je apparaat blijft. Het nieuws zegt het nog een keer. Hooguit 12 MB.
+- **De soort van een eigen font** wordt geraden: mono als alle tekens even breed zijn, schreef vanaf een stokcontrast van 1,75, anders schreefloos. Een keuzelijst eronder laat je het zelf zetten, en de drukker rekent er meteen mee.
+- **Een eigen font doet overal mee**: in het vel, bij de drukker (met zijn gemeten x-hoogte, contrast, Il1/O0 en tabelcijfers), in het voorstel als geklemde letter, als loden letters in de pers (uit het geheugen, niet van het netwerk), en op de afdruk. De export heeft geen npm-regel voor een eigen font; die host je zelf.
+- **In een deellink** gaat de naam mee, plus de letter uit de kast die er het meest op lijkt (`closestFont`: dezelfde soort, het kleinste verschil in karakter). De ontvanger ziet die vervanger, en het welkom zegt welk font niet meeging.
+- **De vijf scenario's** zijn in de browser doorlopen, met een script dat de stappen doet zoals een mens ze zou doen:
+  1. Website en warm, een voorstel, een eigen kop, Meenemen: de Tailwind-export heeft `@theme` met de fonts, de schaal in `clamp()` met interlinie, en de npm-regels. Geen verzoek buiten de site.
+  2. Inter uit de kast als tekst, met een klem erop: Fraunces (uit het zetboek), Libre Baskerville en Domine, elk met een reden.
+  3. Een `.woff2` op de werkbank: het vel staat in die letter, er gaat geen enkel verzoek buiten de site, Meenemen zegt dat het font niet meegaat, en de ontvanger ziet een vervanger met uitleg.
+  4. Affiche met een flesjeslink: inkt `#0c2600`, papier `#eff4da`, tweede inkt `#a6662e`, en de check zegt 14,4:1, AAA.
+  5. Drie vellen aan de lijn, naast elkaar, het beste terug in de pers en gedeeld: de ontvanger ziet precies hetzelfde vel (dezelfde tekst, dezelfde letters, dezelfde maten) en krijgt een welkom.
+
+  De twee dingen die in die ronde fout gingen, zaten in de test zelf (een `data:`-adres als host geteld, en een verkeerd geschat contrast). In de drukkerij hoefde niets te veranderen.
