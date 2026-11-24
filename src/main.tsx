@@ -10,16 +10,20 @@ import '@fontsource/yomogi/latin-400.css'
 import './index.css'
 import App from './App.tsx'
 import { paintPhase, readPhase } from './lib/air'
+import { readSharedLink } from './lib/route'
 
 // Gezet voor de eerste verf, zodat het papier nooit even de verkeerde kleur heeft
 paintPhase(readPhase())
+
+// Een gedeelde link, één keer, voor de eerste render
+const broken = readSharedLink()
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <App broken={broken} />
     </QueryClientProvider>
   </StrictMode>,
 )
