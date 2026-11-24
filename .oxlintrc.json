@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "vitest"],
+  "ignorePatterns": ["public/draco/**", "public/fonts/**", "dist/**"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "vitest/valid-expect": ["warn", { "maxArgs": 2 }]
+  },
+  "overrides": [
+    {
+      "files": ["src/components/three/**"],
+      "rules": {
+        "react/immutability": "off",
+        "react/refs": "off"
+      }
+    }
+  ]
+}
