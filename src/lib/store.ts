@@ -11,7 +11,7 @@ import type { Goal, Template } from './type/goals'
 import { closestFont, parsePairings, surprise as surprisePair, suggest, type Suggestion } from './type/pairing'
 import { remarks as remarksOf, type Remark } from './type/printer'
 import { rankPairs } from './type/pairing'
-import { begin as beginOogarts, kies as kiesOogarts, klaar as oogartsKlaar, type Oogarts } from './type/oogarts'
+import { begin as beginOogarts, kies as kiesOogarts, klaar as oogartsKlaar, nogKeer as nogKeerOogarts, stapelOpGevoel, type Oogarts } from './type/oogarts'
 import { afstand, voldoet, type Eis } from './type/zoek'
 import { buildScale, type Scale } from './type/scale'
 import { encodeVel, type Replaced } from './type/share'
@@ -30,6 +30,14 @@ const fontAfstand = (a: string, b: string) => {
   const fb = fontById(b)
   return fa && fb ? afstand(fa, fb) : 0
 }
+/** Hoeveel van je gevoelens een letter heeft. De oogarts legt die eerst op de stapel */
+const gevoelVan = (moods: readonly string[]) => (id: string) => {
+  const f = fontById(id)
+  return f ? f.moods.filter((m) => moods.includes(m)).length : 0
+}
+
+/** Hoe vaak je bij de oogarts nog ongeveer moet kiezen */
+export const oogartsNog = (s: State = state) => (s.oogarts ? nogKeerOogarts(s.oogarts.staat, fontAfstand) : 0)
 const PAST = 25
 const RECENT = 5
 
@@ -555,7 +563,7 @@ export const store = {
   startOogarts() {
     const z = state.zetsel
     const ranked = rankPairs(eligibleFonts(), pairings, { goal: z.doel, moods: z.stemming })
-    const kops = [...new Set(ranked.map((r) => r.kop))].slice(0, 16)
+    const kops = stapelOpGevoel(ranked.map((r) => r.kop), gevoelVan(z.stemming))
     set({ oogarts: { fase: 'kop', staat: beginOogarts(kops, fontAfstand), kop: null } })
   },
 
@@ -572,7 +580,7 @@ export const store = {
     if (o.fase === 'kop') {
       const z = state.zetsel
       const ranked = rankPairs(eligibleFonts(), pairings, { goal: z.doel, moods: z.stemming, clamp: { role: 'kop', id: won } })
-      const teksts = [...new Set(ranked.map((r) => r.tekst))].slice(0, 16)
+      const teksts = stapelOpGevoel(ranked.map((r) => r.tekst), gevoelVan(z.stemming))
       set({ oogarts: { fase: 'tekst', staat: beginOogarts(teksts, fontAfstand), kop: won } })
       return
     }
