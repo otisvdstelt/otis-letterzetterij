@@ -990,6 +990,51 @@
     color: var(--color-ink);
   }
 
+  /* Met de drukkerij in 3D is het podium een raam over de hele breedte van de kolom */
+  .pers[data-geschilderd='true'] {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+  }
+
+  .pers-podium[data-geschilderd='true'] {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 52vh;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .pers-wereld {
+    position: absolute;
+    inset: 0;
+  }
+
+  .pers-podium[data-geschilderd='true'] .pers-tekening {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(70%, 26rem);
+    translate: -50% -50%;
+  }
+
+  .pers-podium[data-geschilderd='true'] .pers-hendel {
+    left: 50%;
+    top: 22%;
+    width: 22%;
+    height: 34%;
+  }
+
+  .pers-podium[data-geschilderd='true'] .pers-hint {
+    top: auto;
+    right: 0.8rem;
+    bottom: 0.8rem;
+  }
+
+  .pers[data-geschilderd='true'] .pers-zij {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
   .pers-zij {
     display: grid;
     gap: 0.7rem;

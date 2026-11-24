@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { strings } from '../../content/strings'
 import { fontStack } from '../../lib/type/fontface'
 import { familyOf, lettersOf, store, useLetters } from '../../lib/store'
@@ -15,7 +15,7 @@ const PIVOT = { x: 236, y: 96 }
  * De handpers, getekend. Sleep de hendel omlaag of druk op Enter: de degel zakt, en het vel komt eruit.
  * Hij staat in het midden tot de drukkerij in 3D er is, zodat het midden nooit leeg is
  */
-export function Pers({ painted = false }: { painted?: boolean }) {
+export function Pers({ painted = false, ready = false, stage }: { painted?: boolean; ready?: boolean; stage?: ReactNode }) {
   const pulls = useLetters((s) => s.pulls)
   const hinted = useLetters((s) => s.hinted)
   const printed = useLetters((s) => s.printed)
@@ -28,6 +28,7 @@ export function Pers({ painted = false }: { painted?: boolean }) {
   const [dragging, setDragging] = useState(false)
   const drawing = useRef<SVGSVGElement>(null)
   const dragged = useRef(false)
+  const startY = useRef(0)
   const p = strings.pers
 
   const [pressing, setPressing] = useState(false)
@@ -45,7 +46,8 @@ export function Pers({ painted = false }: { painted?: boolean }) {
 
   const angleFrom = (event: PointerEvent) => {
     const svg = drawing.current
-    if (!svg) return 0
+    // Zonder tekening (de drukkerij in 3D): hoe ver je omlaag sleept
+    if (!svg) return Math.max(0, Math.min(DOWN, (event.clientY - startY.current) * 0.45))
     const box = svg.getBoundingClientRect()
     const scale = box.width / 400
     const dx = event.clientX - (box.left + PIVOT.x * scale)
@@ -58,6 +60,7 @@ export function Pers({ painted = false }: { painted?: boolean }) {
   const down = (event: PointerEvent<HTMLButtonElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId)
     dragged.current = false
+    startY.current = event.clientY
     setDragging(true)
   }
   const move = (event: PointerEvent<HTMLButtonElement>) => {
@@ -80,8 +83,14 @@ export function Pers({ painted = false }: { painted?: boolean }) {
       <h2 id="pers-kop" className="sr-only">
         {p.trek}
       </h2>
-      <div className="pers-podium">
-        {!painted && (
+      <div className="pers-podium" data-geschilderd={painted} data-klaar={ready}>
+        {painted && (
+          <div className="pers-wereld" aria-hidden="true">
+            {stage}
+          </div>
+        )}
+        {/* De getekende pers staat er tot de drukkerij in 3D klaar is. Zo is het midden nooit leeg */}
+        {(!painted || !ready) && (
           <svg ref={drawing} className="pers-tekening" viewBox="0 0 400 250" role="img" aria-label={p.tekeningLabel}>
             <ellipse cx="200" cy="236" rx="170" ry="10" fill="currentColor" opacity="0.12" filter="url(#bleed)" />
             <g filter="url(#wobble)" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
