@@ -87,6 +87,8 @@ export interface State {
   kastPaneel: 'paren' | 'opzij'
   /** Half wisselen: deze rol blijft staan, de drukker zoekt de andere erbij */
   houd: Role | null
+  /** Het paar van toen je ging half wisselen: dat stelt de drukker niet nog eens voor */
+  houdVan: { kop: string; tekst: string } | null
   /** De drie paren naast elkaar gedrukt, om op het oog te kiezen */
   proef: boolean
   /** De oogarts: deze of deze, eerst voor de kop en dan voor de tekst */
@@ -133,6 +135,7 @@ let state: State = {
   shortlist: [],
   kastPaneel: 'paren',
   houd: null,
+  houdVan: null,
   proef: false,
   oogarts: null,
   drawer: null,
@@ -223,7 +226,7 @@ export function currentSuggestions(s: State = state): Suggestion[] {
   // Een klem gaat voor; anders houdt half wisselen de ene rol vast
   const held = z.klem ?? s.houd
   const clamp = held ? { role: held, id: z[held] } : null
-  const exclude = s.houd && !z.klem ? [{ kop: z.kop, tekst: z.tekst }] : []
+  const exclude = s.houd && s.houdVan && !z.klem ? [s.houdVan] : []
   const key = JSON.stringify([z.doel, z.stemming, clamp, exclude])
   if (suggestCache && suggestCache.key === key && suggestCache.fonts === fonts) return suggestCache.list
   const list = s.catalogue ? suggest(fonts, pairings, { goal: z.doel, moods: z.stemming, clamp, exclude }) : []
@@ -523,7 +526,7 @@ export const store = {
 
   /** Half wisselen: hou de kop of de tekst vast en laat de drukker de andere erbij zoeken. null stopt ermee */
   hold(role: Role | null) {
-    set({ houd: role, ...(role ? say(strings.nieuws.houd(familyOf(state.zetsel[role]), role)) : {}) })
+    set({ houd: role, houdVan: role ? { kop: state.zetsel.kop, tekst: state.zetsel.tekst } : null, ...(role ? say(strings.nieuws.houd(familyOf(state.zetsel[role]), role)) : {}) })
   },
 
   /** Andere letters: het volgende paar van de drukker, meteen op het vel en door de pers */
