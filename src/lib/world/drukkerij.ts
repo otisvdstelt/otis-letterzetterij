@@ -5,7 +5,7 @@
 import type { BufferGeometry } from 'three'
 import { box, blob, cyl, extrude, join, lathe, limb, part, put, ring, roughen, slab, type Part, type Tint } from './kit.ts'
 import { seeded } from './noise.ts'
-import { BENCH, DRAWER_HEIGHT, DRUKKER, KAST, LAMP, PRESS, ROOM, WASLIJN, WINDOW, ZETBOEK, drawerAt, lineAt } from './spec.ts'
+import { BENCH, DRAWER_HEIGHT, DRUKKER, KAST, LAMP, PRESS, ROOM, WASLIJN, WINDOW, WINKELHAAK, ZETBANK, ZETBOEK, drawerAt, lineAt } from './spec.ts'
 
 const C = {
   oak: '#6b4a33',
@@ -207,8 +207,6 @@ function bench(): Part[] {
   pieces.push(slab(1.85, 2.0, height, height + 0.025, -0.72, -0.62, C.ironLight))
   pieces.push(slab(2.55, 2.95, height, height + 0.02, -0.75, -0.6, C.iron))
   for (let i = 0; i < 5; i++) pieces.push(slab(2.58, 2.58 + 0.12 + random() * 0.2, height + 0.02, height + 0.035, -0.74 + i * 0.026, -0.72 + i * 0.026, C.lead))
-  // De winkelhaak, het bakje waarin de zetter een regel zet
-  pieces.push(slab(2.05, 2.35, height, height + 0.015, -0.68, -0.6, C.brass), slab(2.05, 2.065, height, height + 0.04, -0.68, -0.6, C.brass))
 
   // Het zetboek, open, met zijn draaipunt in de rug
   const { at, rot, width, depth } = ZETBOEK
@@ -221,6 +219,24 @@ function bench(): Part[] {
   const zetboek = part('zetboek', [put(join(book), { at, rot: [0, rot, 0] })], 'paint', at)
 
   return [part('bank', pieces), zetboek]
+}
+
+/** De zetbank: een smalle schuine tafel tussen de kast en de pers, met drie lege galeien en de winkelhaak */
+function zetbank(): Part[] {
+  const { x0, x1, z0, z1, height } = ZETBANK
+  const pieces: BufferGeometry[] = [roughen(slab(x0, x1, height - 0.05, height, z0, z1, C.oak), 0.004, 8)]
+  for (const x of [x0 + 0.06, x1 - 0.06]) for (const z of [z0 + 0.06, z1 - 0.06]) pieces.push(box(0.06, height - 0.05, 0.06, C.oakDeep, { at: [x, 0, z] }))
+  pieces.push(slab(x0 + 0.06, x1 - 0.06, 0.2, 0.24, z0 + 0.05, z1 - 0.05, C.oakDeep))
+  // Drie galeien: ijzeren bakjes waar een regel lood in ligt
+  for (let i = 0; i < 3; i++) {
+    const z = z0 + 0.17 + i * 0.2
+    pieces.push(slab(x0 + 0.04, x1 - 0.04, height, height + 0.008, z - 0.07, z + 0.07, C.ironLight))
+    pieces.push(slab(x0 + 0.04, x1 - 0.04, height, height + 0.022, z - 0.075, z - 0.065, C.iron))
+  }
+  // De winkelhaak: een koperen bakje met een kop aan één kant
+  const [wx, wy, wz] = WINKELHAAK
+  pieces.push(slab(wx - 0.18, wx + 0.18, wy, wy + 0.012, wz - 0.04, wz + 0.04, C.brass), slab(wx - 0.18, wx - 0.165, wy, wy + 0.045, wz - 0.04, wz + 0.04, C.brass), slab(wx - 0.18, wx + 0.18, wy, wy + 0.03, wz - 0.045, wz - 0.035, C.brass))
+  return [part('zetbank', pieces)]
 }
 
 /** De waslijn: een touw met twee haken, licht doorhangend */
@@ -345,5 +361,5 @@ function drukker(): Part[] {
 
 /** De hele drukkerij, stuk voor stuk */
 export function buildDrukkerij(): Part[] {
-  return [...room(), ...press(), ...kast(), ...bench(), ...line(), ...lamp(), ...drukker()]
+  return [...room(), ...press(), ...kast(), ...zetbank(), ...bench(), ...line(), ...lamp(), ...drukker()]
 }

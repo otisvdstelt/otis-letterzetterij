@@ -61,6 +61,21 @@ export const BENCH = {
   height: 0.92,
 }
 
+/** De zetbank tussen de kast en de pers: hier legt de drukker drie paren klaar, en hier staat de winkelhaak */
+export const ZETBANK = {
+  x0: -2.08,
+  x1: -1.32,
+  z0: -1.05,
+  z1: -0.3,
+  height: 0.94,
+}
+
+/** Waar de drie paren op de zetbank liggen, van achter naar voor */
+export const zetbankRow = (i: number): Vec3 => [(ZETBANK.x0 + ZETBANK.x1) / 2, ZETBANK.height, ZETBANK.z0 + 0.17 + i * 0.2]
+
+/** De winkelhaak op de voorkant van de zetbank */
+export const WINKELHAAK: Vec3 = [(ZETBANK.x0 + ZETBANK.x1) / 2 + 0.05, ZETBANK.height, ZETBANK.z1 - 0.07]
+
 export const ZETBOEK = { at: [2.2, BENCH.height + 0.035, -0.95] as Vec3, rot: -0.12, width: 0.62, depth: 0.42 }
 
 /** De waslijn hangt van de pers naar de rechtermuur, met plek voor zes vellen */
@@ -100,17 +115,21 @@ export interface View {
   fov: number
 }
 
-export const VIEWS: Record<'pers' | 'kast' | 'waslijn', { wide: View; narrow: View }> = {
-  pers: {
-    wide: { position: [0.35, 2.35, 6.3], target: [0.15, 1.25, -0.5], fov: 36 },
-    narrow: { position: [0.3, 2.1, 5.4], target: [0.25, 1.2, -0.4], fov: 46 },
+export const VIEWS: Record<'werkbank' | 'kast' | 'pers' | 'waslijn', { wide: View; narrow: View }> = {
+  werkbank: {
+    wide: { position: [2.75, 2.25, 2.9], target: [2.7, 0.95, -0.95], fov: 40 },
+    narrow: { position: [2.45, 2.3, 3.1], target: [2.6, 0.9, -0.9], fov: 52 },
   },
   kast: {
-    wide: { position: [-2.0, 1.85, 2.4], target: [-3.05, 0.95, -1.8], fov: 40 },
-    narrow: { position: [-2.3, 1.8, 2.6], target: [-3.05, 0.95, -1.8], fov: 50 },
+    wide: { position: [-2.0, 1.95, 2.35], target: [-2.55, 0.95, -1.25], fov: 42 },
+    narrow: { position: [-2.3, 2.1, 3.2], target: [-2.6, 0.9, -1.2], fov: 56 },
+  },
+  pers: {
+    wide: { position: [0.3, 2.05, 4.7], target: [0.15, 1.2, -0.35], fov: 38 },
+    narrow: { position: [0.3, 2.2, 5.6], target: [0.2, 1.15, -0.3], fov: 52 },
   },
   waslijn: {
-    wide: { position: [2.0, 2.15, 0.8], target: [2.0, 2.35, -1.55], fov: 42 },
-    narrow: { position: [2.0, 2.1, 1.4], target: [2.0, 2.3, -1.55], fov: 54 },
+    wide: { position: [2.1, 2.2, 1.35], target: [2.1, 2.35, -1.55], fov: 48 },
+    narrow: { position: [2.3, 2.2, 3.0], target: [2.3, 2.35, -1.55], fov: 62 },
   },
 }
