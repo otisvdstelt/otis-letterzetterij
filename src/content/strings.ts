@@ -217,6 +217,8 @@ export const strings = {
     ongedaan: 'Ongedaan maken',
     ongedaanKort: 'terug',
     tekeningLabel: 'Een handpers met een vel papier erop',
+    uitzicht: 'Kijk naar',
+    plekken: { kast: 'de kast', pers: 'de pers', waslijn: 'de waslijn' },
   },
 
   // ------------------------------------------------------------------ de winkelhaak

@@ -1028,6 +1028,13 @@
     justify-items: start;
   }
 
+  .uitzicht {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-self: center;
+  }
+
   .pers-hint-onder {
     rotate: 1.5deg;
     font-size: 0.98rem;

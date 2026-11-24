@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { strings } from '../../content/strings'
 import { fontStack } from '../../lib/type/fontface'
-import { familyOf, lettersOf, store, useLetters } from '../../lib/store'
+import { lever as hand } from '../../lib/lever'
+import { familyOf, lettersOf, store, useLetters, type View } from '../../lib/store'
 import { useMediaQuery } from '../../hooks/useLayout'
 import { Drukker } from './Drukker'
 
@@ -22,6 +23,7 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
   const zetsel = useLetters((s) => s.zetsel)
   const letters = useLetters((s) => lettersOf(s.zetsel, s))
   const recent = useLetters((s) => s.recent)
+  const view = useLetters((s) => s.view)
   const canUndo = useLetters((s) => s.past.length > 0)
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [angle, setAngle] = useState(0)
@@ -66,11 +68,14 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
   const move = (event: PointerEvent<HTMLButtonElement>) => {
     if (!dragging) return
     dragged.current = true
-    setAngle(angleFrom(event))
+    const next = angleFrom(event)
+    setAngle(next)
+    hand.set(next / DOWN, true)
   }
   const up = () => {
     if (!dragging) return
     setDragging(false)
+    hand.set(0, false)
     if (angle >= PULL_AT) store.pull()
     setAngle(0)
   }
@@ -132,6 +137,7 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
           onPointerUp={up}
           onPointerCancel={() => {
             setDragging(false)
+            hand.set(0, false)
             setAngle(0)
           }}
           onClick={() => {
@@ -155,6 +161,16 @@ export function Pers({ painted = false, ready = false, stage }: { painted?: bool
         )}
       </div>
 
+      {painted && (
+        <div className="uitzicht" role="radiogroup" aria-label={p.uitzicht}>
+          {(['kast', 'pers', 'waslijn'] as View[]).map((v) => (
+            <label key={v} className="stemming" data-aan={view === v}>
+              <input type="radio" name="uitzicht" checked={view === v} onChange={() => store.look(v)} />
+              {p.plekken[v]}
+            </label>
+          ))}
+        </div>
+      )}
       <div className="pers-zij">
       {/* In 3D past de hint niet over het podium; hij staat eronder, met de drukker */}
       {!hinted && painted && (
