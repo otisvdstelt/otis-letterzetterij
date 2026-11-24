@@ -26,18 +26,22 @@ export function Pers({ painted = false }: { painted?: boolean }) {
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [angle, setAngle] = useState(0)
   const [dragging, setDragging] = useState(false)
-  const [pressing, setPressing] = useState(false)
   const drawing = useRef<SVGSVGElement>(null)
   const dragged = useRef(false)
   const p = strings.pers
 
+  const [pressing, setPressing] = useState(false)
   // Na het trekken zakt de degel even, en veert de hendel terug
-  useEffect(() => {
-    if (pulls === 0) return
+  const [seenPulls, setSeenPulls] = useState(pulls)
+  if (pulls !== seenPulls) {
+    setSeenPulls(pulls)
     setPressing(true)
+  }
+  useEffect(() => {
+    if (!pressing) return
     const timer = window.setTimeout(() => setPressing(false), reduced ? 10 : 650)
     return () => window.clearTimeout(timer)
-  }, [pulls, reduced])
+  }, [pressing, reduced])
 
   const angleFrom = (event: PointerEvent) => {
     const svg = drawing.current

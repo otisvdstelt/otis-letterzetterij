@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 import { strings } from '../../content/strings'
 import { normalizeHex } from '../../lib/type/color'
 import { checkInk, formatRatio } from '../../lib/type/contrast'
@@ -10,8 +10,8 @@ const t = strings.inkt
 /** Een eigen kleur als hex. Pas als het een kleur is, gaat hij door */
 function EigenKleur({ value, what, onChange }: { value: string; what: string; onChange: (hex: string) => void }) {
   const id = useId()
-  const [draft, setDraft] = useState(value)
-  useEffect(() => setDraft(value), [value])
+  // Een concept alleen zolang je typt; daarna weer gewoon de kleur zelf
+  const [draft, setDraft] = useState<string | null>(null)
   return (
     <span className="eigen-kleur">
       <label htmlFor={id} className="sr-only">
@@ -22,14 +22,14 @@ function EigenKleur({ value, what, onChange }: { value: string; what: string; on
         type="text"
         inputMode="text"
         spellCheck={false}
-        value={draft}
+        value={draft ?? value}
         size={8}
         onChange={(e) => {
           setDraft(e.target.value)
           const hex = normalizeHex(e.target.value)
           if (hex) onChange(hex)
         }}
-        onBlur={() => setDraft(value)}
+        onBlur={() => setDraft(null)}
       />
     </span>
   )
