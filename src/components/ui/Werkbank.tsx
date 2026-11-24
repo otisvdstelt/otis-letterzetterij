@@ -4,6 +4,8 @@ import { MOODS } from '../../lib/type/catalogue'
 import { GOALS } from '../../lib/type/goals'
 import { ROLES } from '../../lib/type/zetsel'
 import { familyOf, store, useLetters } from '../../lib/store'
+import { Eisen } from './Eisen'
+import { JouwTekst } from './JouwTekst'
 import { Woord } from './Woord'
 
 const w = strings.werkbank
@@ -35,6 +37,8 @@ export function Werkbank({ eigen }: { eigen?: ReactNode }) {
         {strings.stappen.namen.werkbank}
       </h2>
 
+      <JouwTekst />
+
       <fieldset className="werkbank-deel">
         <legend>{w.doelKort}</legend>
         <div className="doelen" role="radiogroup" aria-label={w.doelKort}>
@@ -57,6 +61,8 @@ export function Werkbank({ eigen }: { eigen?: ReactNode }) {
           ))}
         </div>
       </fieldset>
+
+      <Eisen />
 
       <div className="werkbank-deel">
         <button type="button" className="quiet jouw-letter" aria-expanded={letter} disabled={!catalogue} onClick={() => setLetter(!letter)}>

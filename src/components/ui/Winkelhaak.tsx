@@ -115,13 +115,13 @@ function RolInstellingen({ role }: { role: Role }) {
 }
 
 /** Je zin, in de winkelhaak. Hij komt als grote kop op het vel en als lood in de pers */
-export function ZinVeld({ titel = false }: { titel?: boolean }) {
+export function ZinVeld({ titel = false, label }: { titel?: boolean; label?: string }) {
   const z = useLetters((s) => s.zetsel)
   const zinId = useId()
   const count = [...z.zin].length
   return (
     <div className="field zin-veld">
-      <label htmlFor={zinId}>{titel ? <Woord uitleg={w.uitleg.winkelhaak}>{w.zin}</Woord> : w.zin}</label>
+      <label htmlFor={zinId}>{titel ? <Woord uitleg={w.uitleg.winkelhaak}>{label ?? w.zin}</Woord> : (label ?? w.zin)}</label>
       <textarea id={zinId} rows={2} maxLength={MAX_ZIN * 2} value={z.zin} onChange={(e) => store.update({ zin: e.target.value }, 'zin')} aria-describedby={`${zinId}-uitleg`} />
       <p id={`${zinId}-uitleg`} className="klein-uitleg">
         {w.zinUitleg} <span className="teller">{w.teller(count, MAX_ZIN)}</span>
