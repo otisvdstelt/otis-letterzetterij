@@ -232,12 +232,14 @@ export function zoekOpEigenschappen<T extends Font>(fonts: readonly T[], eigensc
   }
   // Handschrift en displayletters meten vreemd (een krul is ook rond); ze doen alleen mee als je om dat laatje vraagt
   const laatjes = eigenschappen.flatMap((e) => (e.soort === 'laatje' ? [e.kind] : []))
+  // Twee gevoelens in één zoekopdracht wegen samen even zwaar als één, anders verdringt het gevoel de vorm
+  const gevoelGewicht = 1.5 / Math.max(1, eigenschappen.filter((e) => e.soort === 'gevoel').length)
   const score = (f: Font) =>
     (f.kind === 'display' && !laatjes.includes('display') ? -0.75 : 0) +
     eigenschappen.reduce((s, e) => {
       switch (e.soort) {
         case 'gevoel':
-          return s + (f.moods.includes(e.gevoel) ? 1.5 : 0)
+          return s + (f.moods.includes(e.gevoel) ? gevoelGewicht : 0)
         case 'laatje':
           return s + (f.kind === e.kind ? 1.5 : -0.5)
         case 'bouw':
@@ -245,7 +247,7 @@ export function zoekOpEigenschappen<T extends Font>(fonts: readonly T[], eigensc
         case 'schreef':
           return s + (schreefvorm(f) === e.schreef ? 1 : 0)
         case 'maat':
-          return s + maat[e.maat](f) * 0.6
+          return s + maat[e.maat](f) * 0.9
       }
     }, 0)
   return fonts
