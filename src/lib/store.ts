@@ -119,7 +119,7 @@ export function fallbackFor(id: string): string {
   return closestFont(kast, own)?.id ?? 'source-serif-4'
 }
 
-export const codeOf = (z: Zetsel) => encodeVel(z, fallbackFor)
+export const codeOf = (z: Zetsel) => encodeVel(z, fallbackFor, (id) => familyOf(id))
 
 type Letters = { kop: FontEntry; tekst: FontEntry }
 let lettersCache: { fonts: FontEntry[]; pairs: Map<string, Letters | null> } | null = null
@@ -198,7 +198,7 @@ function commit(next: Zetsel, extra: Partial<State> = {}, coalesce?: string) {
 }
 
 function keep(waslijn: readonly Zetsel[]) {
-  return keepWaslijn(waslijn, fallbackFor)
+  return keepWaslijn(waslijn, fallbackFor, (id) => familyOf(id))
 }
 
 const sameSheet = (a: Zetsel, b: Zetsel) => codeOf(a) === codeOf(b)
@@ -407,6 +407,14 @@ export const store = {
     const own = [...state.own.filter((f) => f.id !== font.id), font]
     set({ own })
     commit({ ...withFont(state.zetsel, role, font), klem: role }, say(strings.nieuws.eigen(font.family, role)))
+  },
+
+  /** Een letter uit het magazijn: hij komt in de rol die je nu zet. Zonder klem, want het is niet jouw letter maar een gok */
+  addArchive(font: FontEntry) {
+    const role = state.role
+    const own = [...state.own.filter((f) => f.id !== font.id), font]
+    set({ own })
+    commit(withFont(state.zetsel, role, font), say(strings.nieuws.gepakt(font.family, role)))
   },
 
   /** Zeg wat voor letter een eigen font is, als de drukker het verkeerd raadde */

@@ -3,7 +3,7 @@ import { strings } from '../../content/strings'
 import { familyName } from '../../lib/type/fontface'
 import { FONT_FILE, MAX_FONT_BYTES, ownEntry, type FontInfo } from '../../lib/type/eigen'
 import { KINDS, type Kind } from '../../lib/type/catalogue'
-import { store, useLetters } from '../../lib/store'
+import { isOwn, store, useLetters } from '../../lib/store'
 
 const e = strings.eigen
 
@@ -40,7 +40,7 @@ export function EigenFont() {
   const [over, setOver] = useState(false)
   const own = useLetters((s) => s.own)
   const z = useLetters((s) => s.zetsel)
-  const current = own.filter((f) => f.id === z.kop || f.id === z.tekst)
+  const current = own.filter((f) => isOwn(f.id) && (f.id === z.kop || f.id === z.tekst))
 
   const handle = async (file: File | undefined) => {
     if (!file) return

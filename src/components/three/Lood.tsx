@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ExtrudeGeometry, ShapePath, type BufferGeometry } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { nearestWeight, type FontEntry } from '../../lib/type/catalogue'
+import { fileUrl } from '../../lib/type/fontface'
 import { leadLine, leadText, type LeadLine } from '../../lib/type/lood'
 import { isOwn } from '../../lib/type/zetsel'
 import { loadFont, ownFonts } from '../../lib/fontFile'
@@ -61,7 +62,7 @@ const cache = new Map<string, Promise<BufferGeometry | null>>()
 function cast(font: FontEntry, weight: number, text: string): Promise<BufferGeometry | null> {
   const own = isOwn(font.id)
   const w = String(nearestWeight({ weights: Object.keys(font.woff).map(Number), axes: null }, weight))
-  const url = own ? `eigen:${font.id}` : `${import.meta.env.BASE_URL}${font.woff[w] ?? Object.values(font.woff)[0]}`
+  const url = own ? `eigen:${font.id}` : fileUrl(font.woff[w] ?? Object.values(font.woff)[0], import.meta.env.BASE_URL)
   const key = `${url}|${text}`
   let pending = cache.get(key)
   if (!pending) {
