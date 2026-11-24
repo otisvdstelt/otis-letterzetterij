@@ -61,8 +61,8 @@ describe('gewichten', () => {
   })
 
   it('struikelt niet over rommel', () => {
-    expect(() => parseCatalogue({ fonts: [] })).toThrow()
-    expect(() => parseCatalogue(null)).toThrow()
+    expect(() => parseCatalogue({ fonts: [] })).toThrow('kast')
+    expect(() => parseCatalogue(null)).toThrow('kast')
     expect(parseCatalogue({ fonts: [{ id: 'x' }, catalogue.fonts[0]] }).fonts).toHaveLength(1)
   })
 })
