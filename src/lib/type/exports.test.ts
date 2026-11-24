@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { parseCatalogue } from './catalogue'
-import { cssExport, exportFamily, figmaExport, npmExport, tailwindExport, type ExportInput } from './exports'
+import { cssExport, exportFamily, figmaExport, npmExport, selfHost, tailwindExport, type ExportInput } from './exports'
 import { familyName, fontFaceCss, fontStack } from './fontface'
 import { buildScale } from './scale'
 import { startZetsel, withFont, withStyle, type Zetsel } from './zetsel'
@@ -109,5 +109,30 @@ describe('@font-face', () => {
     expect(familyName('inter')).toBe('lz-inter')
     expect(fontStack(font('eb-garamond'))).toBe("'lz-eb-garamond', serif")
     expect(exportFamily(font('pt-serif'))).toBe('PT Serif')
+  })
+})
+
+describe('zelf hosten', () => {
+  it('neemt bij een variabele letter één bestand per subset, en de cursief alleen voor de tekst', () => {
+    const host = selfHost({ zetsel: base, kop: font('fraunces'), tekst: font('inter') })
+    const names = host.files.map((f) => f.name)
+    expect(names.filter((n) => n.startsWith('fraunces-')).every((n) => n.includes('normal'))).toBe(true)
+    expect(names.some((n) => n.startsWith('inter-') && n.includes('italic'))).toBe(true)
+    expect(host.css).toMatch(/src: url("./fonts/inter-latin-(wght|standard)-normal.woff2") format("woff2");/)
+    expect(host.bytes).toBeGreaterThan(50_000)
+  })
+
+  it('neemt bij een statische letter alleen de gewichten die je gebruikt', () => {
+    const z = withFont(withFont(base, 'kop', font('abril-fatface')), 'tekst', font('pt-serif'))
+    const names = selfHost({ zetsel: z, kop: font('abril-fatface'), tekst: font('pt-serif') }).files.map((f) => f.name)
+    expect(names.some((n) => n.includes('pt-serif-latin-400-normal'))).toBe(true)
+    expect(names.some((n) => n.includes('pt-serif-latin-700-normal'))).toBe(true)
+    expect(names.every((n) => !n.includes('-300-'))).toBe(true)
+  })
+
+  it('zet elk bestand één keer, ook als kop en tekst dezelfde letter zijn', () => {
+    const z = withFont(withFont(base, 'kop', font('inter')), 'tekst', font('inter'))
+    const files = selfHost({ zetsel: z, kop: font('inter'), tekst: font('inter') }).files
+    expect(new Set(files.map((f) => f.name)).size).toBe(files.length)
   })
 })

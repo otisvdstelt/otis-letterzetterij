@@ -162,3 +162,52 @@ export function figmaExport({ zetsel, kop, tekst, scale }: ExportInput): string 
   }
   return JSON.stringify({ letterzetterij: tokens }, null, 2)
 }
+
+type HostFont = Font & Pick<FontEntry, 'faces' | 'unicodeRange' | 'license'>
+
+/** Alleen de bestanden die je echt gebruikt: bij een variabele letter het ene bestand (en de cursief voor de tekst), bij een statische per gewicht */
+export function usedFaces(font: HostFont, z: Zetsel, role: Role): HostFont['faces'] {
+  const style = styleOf(z, role)
+  const italic = font.italic && (role === 'tekst' || style.italic)
+  const weights = new Set(weightsFor(font, z, role))
+  return font.faces.filter((face) => (face.style === 'normal' || italic) && (Array.isArray(face.weight) || weights.has(face.weight)))
+}
+
+export interface SelfHost {
+  /** @font-face-regels die naar fonts/<bestand> wijzen */
+  css: string
+  /** Welke bestanden erbij horen: waar ze hier staan, en hoe ze in de zip heten */
+  files: { from: string; name: string; bytes: number }[]
+  bytes: number
+}
+
+/** Zelf hosten: de @font-face-regels en de bestanden, alleen voor de gewichten die je gebruikt */
+export function selfHost({ zetsel, kop, tekst }: { zetsel: Zetsel; kop: HostFont; tekst: HostFont }): SelfHost {
+  const roles: [HostFont, Role][] = kop.id === tekst.id ? [[tekst, 'tekst'], [kop, 'kop']] : [[kop, 'kop'], [tekst, 'tekst']]
+  const seen = new Map<string, SelfHost['files'][number] & { rule: string }>()
+  for (const [font, role] of roles) {
+    for (const face of usedFaces(font, zetsel, role)) {
+      if (seen.has(face.file)) continue
+      const name = `${fontsourceIdOf(font)}-${face.file.split('/').pop()}`
+      const weight = Array.isArray(face.weight) ? `${face.weight[0]} ${face.weight[1]}` : String(face.weight)
+      const range = font.unicodeRange[face.subset]
+      const rule = [
+        '@font-face {',
+        `  font-family: "${exportFamily(font)}";`,
+        `  font-style: ${face.style};`,
+        `  font-weight: ${weight};`,
+        '  font-display: swap;',
+        `  src: url("./fonts/${name}") format("woff2");`,
+        range ? `  unicode-range: ${range};` : '',
+        '}',
+      ]
+        .filter(Boolean)
+        .join('\n')
+      seen.set(face.file, { from: face.file, name, bytes: face.bytes ?? 0, rule })
+    }
+  }
+  const list = [...seen.values()]
+  return { css: list.map((f) => f.rule).join('\n\n'), files: list.map(({ from, name, bytes }) => ({ from, name, bytes })), bytes: list.reduce((s, f) => s + f.bytes, 0) }
+}
+
+const fontsourceIdOf = (font: Font) => font.id.replace(/^magazijn:/, '')
