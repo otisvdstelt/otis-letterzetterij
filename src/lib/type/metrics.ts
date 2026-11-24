@@ -52,6 +52,8 @@ export interface Metrics {
   avgWidth: number
   /** Dikke stok gedeeld door dunne, gemeten in de o. Rond 1 bij een schreefloze, 3 of meer bij een Bodoni */
   contrast: number
+  /** Hoe rond de o is: breedte gedeeld door hoogte. Rond 1 bij een geometrische letter als Futura, lager bij een grotesk */
+  roundness: number
 }
 
 export interface Coverage {
@@ -69,6 +71,11 @@ export interface Coverage {
   distinctIl1: boolean
   /** O en 0 lijken niet op elkaar */
   distinctO0: boolean
+  /** Het euroteken */
+  euro: boolean
+  /** Genoeg voor Pools en voor Turks */
+  polish: boolean
+  turkish: boolean
 }
 
 /** "Aa" als pad, op een em van 1000, met de basislijn op y = 0 */
@@ -92,6 +99,9 @@ const SAMPLE =
 
 /** De accenten die in het Nederlands voorkomen */
 const DUTCH = 'áéíóúàèëïöüâêîôûçñÉËÏÖÜ'
+
+const POLISH = 'ąęłńśźżĄĘŁŃŚŹŻ'
+const TURKISH = 'ğışİŞĞ'
 
 const IL1 = ['I', 'l', '1']
 const O0 = ['O', '0']
@@ -208,6 +218,10 @@ export function measure(given: readonly FontLike[]): Measured {
       lineGap: perEm(main.lineGap, em),
       avgWidth: count ? perEm(total / count, em) : 0.5,
       contrast: strokeContrast(glyphOf(fonts, 'o')),
+      roundness: (() => {
+        const box = boxOfGlyph(glyphOf(fonts, 'o'))
+        return box && box.maxY > box.minY ? Math.round(((box.maxX - box.minX) / (box.maxY - box.minY)) * 1000) / 1000 : 0.9
+      })(),
     },
     coverage: {
       features,
@@ -219,6 +233,9 @@ export function measure(given: readonly FontLike[]): Measured {
       dutch: [...DUTCH].every((ch) => has(code(ch))),
       distinctIl1: lookalike(fonts, IL1) < LOOKALIKE,
       distinctO0: lookalike(fonts, O0) < LOOKALIKE,
+      euro: has(0x20ac),
+      polish: [...POLISH].every((ch) => has(code(ch))),
+      turkish: [...TURKISH].every((ch) => has(code(ch))),
     },
     specimen: specimenOf(fonts),
     axes,

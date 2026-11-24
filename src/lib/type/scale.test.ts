@@ -3,7 +3,7 @@ import { GOAL_SPECS, GOALS } from './goals'
 import { buildScale, charsPerLine, fluid, headingLeading, LEVELS, opticalBoost, sizeAt, VIEWPORT } from './scale'
 import { startZetsel, withGoal } from './zetsel'
 
-const metrics = (xHeight: number, avgWidth = 0.46) => ({ metrics: { xHeight, capHeight: 0.7, ascent: 1, descent: 0.25, lineGap: 0, avgWidth, contrast: 1.5 } })
+const metrics = (xHeight: number, avgWidth = 0.46) => ({ metrics: { xHeight, capHeight: 0.7, ascent: 1, descent: 0.25, lineGap: 0, avgWidth, contrast: 1.5, roundness: 0.9 } })
 const plain = metrics(0.5)
 
 /** Wat de clamp() in de browser zou geven op deze breedte */
