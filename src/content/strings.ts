@@ -148,8 +148,46 @@ export const strings = {
   },
   drukkerStil: {
     label: 'De drukker',
-    praat: 'drukker praat',
+    praat: 'praat',
     stil: 'zwijgt',
+  },
+
+  // ------------------------------------------------------------------ de drie stappen en het strookje
+  stappen: {
+    namen: { werkbank: 'werkbank', kast: 'kast', pers: 'pers' } as Record<string, string>,
+    /** Wat er in het strookje staat als de drukker niks te zeggen heeft: in één zin wat je doet */
+    zin: {
+      werkbank: 'Zeg waar het voor is, kies een gevoel, of leg je eigen letter neer. Dan naar de kast.',
+      kast: 'Ik heb drie paren klaargelegd. Pak er een, of trek zelf een laatje open.',
+      pers: 'Zet je zin in de winkelhaak en trek de pers over.',
+    } as Record<string, string>,
+    verder: { werkbank: 'Naar de kast', kast: 'Naar de pers', pers: 'Trek de pers over' } as Record<string, string>,
+    terug: 'terug',
+    terugNaar: (stap: string) => `Terug naar de ${({ werkbank: 'werkbank', kast: 'kast', pers: 'pers' } as Record<string, string>)[stap] ?? stap}`,
+    ongedaan: 'ongedaan maken',
+    waslijnZin: (n: number) => (n === 0 ? 'Nog niks aan de lijn. Druk een vel en hang het op.' : 'Tik een vel aan om het terug te halen, of vergelijk ze naast elkaar.'),
+    naarPers: 'Terug naar de pers',
+    drukkerZegt: 'De drukker zegt',
+    stapLabel: 'Waar je bent',
+  },
+
+  // ------------------------------------------------------------------ het zetboek bij de start
+  zetboek: {
+    knop: 'zetboek',
+    kop: 'Het zetboek',
+    intro: 'Weet je nog niet waar je begint? Sla een opdracht open. De drukker zet hem en trekt meteen de pers over. Daarna pas je alles aan.',
+    druk: 'Druk dit',
+    zelf: 'Sluit het boek, ik begin zelf',
+    sluit: 'sluit het boek',
+    opdrachten: [
+      { id: 'portfolio', naam: 'Rustige portfoliosite', uitleg: 'Iets rustigs voor je eigen werk. Warm, niks schreeuwt.', doel: 'website', gevoel: ['warm'], kop: 'fraunces', tekst: 'inter', zin: 'Ik maak dingen die je kunt lezen' },
+      { id: 'boekhandel', naam: 'Boekhandel om de hoek', uitleg: 'Een site die ruikt naar papier en oud hout.', doel: 'website', gevoel: ['klassiek', 'warm'], kop: 'libre-baskerville', tekst: 'source-sans-3', zin: 'Nieuw binnen deze week, en drie oude favorieten' },
+      { id: 'festival', naam: 'Festivalaffiche', uitleg: 'Groot, hard en van de overkant van de straat te lezen.', doel: 'affiche', gevoel: ['speels'], kop: 'bebas-neue', tekst: 'karla', zin: 'Zomerfeest in de oude drukkerij' },
+      { id: 'bakker', naam: 'Huisstijl voor een bakker', uitleg: 'Ambachtelijk, warm, en genoeg gewichten voor menu en zak.', doel: 'huisstijl', gevoel: ['warm', 'klassiek'], kop: 'young-serif', tekst: 'figtree', zin: 'Bakkerij De Korst, sinds 1931' },
+      { id: 'app', naam: 'App in het donker', uitleg: 'Een rustige interface, met cijfers die recht staan.', doel: 'app', gevoel: ['technisch'], kop: 'red-hat-text', tekst: 'red-hat-text', zin: 'Je hebt drie nieuwe bestellingen' },
+      { id: 'scriptie', naam: 'Scriptie', uitleg: 'Lang lezen, met voetnoten en cursief.', doel: 'boek', gevoel: ['klassiek'], kop: 'eb-garamond', tekst: 'eb-garamond', zin: 'Over het zetten van letters in de twintigste eeuw' },
+      { id: 'presentatie', naam: 'Lezing in een zaal', uitleg: 'Achterin moet het ook leesbaar zijn.', doel: 'presentatie', gevoel: ['modern'], kop: 'atkinson-hyperlegible-next', tekst: 'atkinson-hyperlegible-next', zin: 'Wat ik leerde van veertig jaar drukken' },
+    ] as { id: string; naam: string; uitleg: string; doel: Goal; gevoel: Mood[]; kop: string; tekst: string; zin: string }[],
   },
 
   // ------------------------------------------------------------------ de werkbank
@@ -157,6 +195,8 @@ export const strings = {
     kop: 'Op de werkbank',
     uitleg: 'Drie dingen, in elke volgorde. De drukker kijkt mee.',
     letterKop: 'Jouw letter',
+    letterKnop: 'Ik heb al een letter',
+    letterDicht: 'toch niet',
     letterUitleg: 'Staat er al een letter vast, zoals je merkletter? Pak hem uit de kast en zet er een klem op.',
     geenKlem: 'Nog niks vastgezet.',
     klemOp: (naam: string, rol: Role) => `${naam} zit vast als ${ROLNAAM[rol]}.`,
@@ -164,6 +204,7 @@ export const strings = {
     zetKlem: (rol: Role) => `Klem op de ${ROLNAAM[rol]}`,
     doelKop: 'Waar is het voor?',
     stemmingKop: 'Hoe moet het voelen?',
+    doelKort: 'Waar is het voor?',
     stemmingUitleg: 'Eén of twee. De drukker ordent ermee, maar het verplicht niks.',
   },
   doelen: DOELEN,
@@ -234,6 +275,10 @@ export const strings = {
   // ------------------------------------------------------------------ de kast
   kast: {
     kop: 'De letterkast',
+    paren: 'Drie paren op de zetbank',
+    zelf: 'Of trek zelf een laatje open',
+    sluitLaatje: 'schuif dicht',
+    laatjeKop: (naam: string) => `Laatje ${naam}`,
     uitleg: 'Trek een laatje open. Een letter gaat naar de kop of naar de tekst, wat je hieronder kiest.',
     laatjes: { schreef: 'Schreef', schreefloos: 'Schreefloos', display: 'Display', handschrift: 'Handschrift', mono: 'Mono', huis: 'Huis' } satisfies Record<Drawer, string>,
     laatjeUitleg: {
@@ -357,6 +402,10 @@ export const strings = {
   // ------------------------------------------------------------------ het vel
   vel: {
     label: 'Het vel',
+    zetWeg: 'zet weg',
+    terug: 'het vel',
+    fijnzetten: 'Fijnzetten',
+    fijnUitleg: 'Gewicht, spatiëring, korps, interlinie, regel en de rest.',
     tabs: { vel: 'Vel', leesbaar: 'Leesbaar', meenemen: 'Meenemen' },
     tabsLabel: 'Over het vel',
     sjablonen: { website: 'website', boek: 'boekpagina', affiche: 'affiche', dia: 'dia', briefpapier: 'visitekaartje en briefpapier', app: 'appscherm' } satisfies Record<Template, string>,
@@ -565,6 +614,8 @@ export const strings = {
     gedownload: (wat: string) => `${wat} is gedownload.`,
     overgenomen: (n: number) => `De vellen hangen aan je lijn. Er hangen er nu ${inWoorden(n)}.`,
     welkom: 'Er is een vel voor je gezet.',
+    plek: (plek: string) => ({ werkbank: 'Je staat aan de werkbank.', kast: 'Je staat bij de letterkast.', pers: 'Je staat bij de pers.', waslijn: 'Je kijkt naar de waslijn.' })[plek] ?? '',
+    zetboek: (naam: string) => `${naam} is gezet en gedrukt.`,
     drukkerStil: (stil: boolean) => (stil ? 'De drukker houdt zijn mond.' : 'De drukker praat weer mee.'),
     eigen: (naam: string, rol: Role) => `${naam} ligt op de werkbank, met een klem erop, als ${ROLNAAM[rol]}. Het bestand blijft op je apparaat.`,
     soort: (naam: string, soort: string) => `${naam} telt nu als ${soort}.`,
@@ -581,6 +632,8 @@ export const strings = {
     wieKop: 'Wie',
     wie: 'Gemaakt door Otis van der Stelt. Het hoort bij mijn portfolio, en het is het zusje van de Kleurenalchemist: dezelfde hand, een andere werkplaats.',
     portfolio: 'Naar het portfolio',
+    drukkerKop: 'De drukker',
+    drukkerUitleg: 'Hij zegt wat hem opvalt, onderin. Wil je dat niet, zet hem dan stil. Bij Leesbaar staat het dan nog steeds.',
     privacyKop: 'Privacy',
     privacy:
       'Er is geen backend, er zijn geen analytics en geen cookies. Alle letters in de kast staan op deze site zelf: er gaat geen verzoek naar Google. Alleen het magazijn haalt letters bij jsDelivr, en dat pas als je daar ja op zegt. Een eigen fontbestand verlaat je apparaat nooit. Je waslijn en je keuze voor dag of nacht staan alleen in je eigen browser. Een deellink bevat het zetsel en je zin, niet meer.',
