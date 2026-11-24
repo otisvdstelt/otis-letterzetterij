@@ -127,7 +127,7 @@ async function build(item: CaseItem): Promise<Built> {
         body ??= await take(`${CDN}/${item.id}:vf@latest/${name}`, name)
         if (!body) continue
         const wght = api.axes.wght
-        faces.push({ style, subset, weight: wght ? [Number(wght.min), Number(wght.max)] : 400, file: `${dir}/${name}` })
+        faces.push({ style, subset, weight: wght ? [Number(wght.min), Number(wght.max)] : 400, file: `${dir}/${name}`, bytes: body.length })
         if (style === 'normal') measureFiles.push(body)
       }
     }
@@ -143,7 +143,7 @@ async function build(item: CaseItem): Promise<Built> {
           const name = `${subset}-${weight}-${style}.woff2`
           const body = await take(`${CDN}/${item.id}@${version}/${name}`, name)
           if (!body) continue
-          faces.push({ style, subset, weight, file: `${dir}/${name}` })
+          faces.push({ style, subset, weight, file: `${dir}/${name}`, bytes: body.length })
         }
       }
     }
@@ -189,6 +189,7 @@ async function build(item: CaseItem): Promise<Built> {
     faces,
     unicodeRange: Object.fromEntries(subsets.map((s) => [s, meta.unicodeRange[s]])),
     woff,
+    scripts: meta.subsets.filter((sub) => !sub.startsWith('latin')),
     metrics: measured.metrics,
     coverage: measured.coverage,
   }

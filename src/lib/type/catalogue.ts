@@ -26,6 +26,8 @@ export interface Face {
   subset: Subset
   /** Pad vanaf de root van de site, bijvoorbeeld fonts/inter/5.3.0/latin-wght-normal.woff2 */
   file: string
+  /** Hoe groot het bestand is, in bytes */
+  bytes?: number
 }
 
 export interface Axis {
@@ -55,6 +57,8 @@ export interface FontEntry {
   unicodeRange: Partial<Record<Subset, string>>
   /** Een .woff per gewicht voor de letters in 3D (drei Text leest geen woff2) */
   woff: Record<string, string>
+  /** Welke schriften Fontsource van deze letter heeft (greek, cyrillic, vietnamese…). Alleen latin staat hier lokaal */
+  scripts?: string[]
   metrics: Metrics
   coverage: Coverage
 }
