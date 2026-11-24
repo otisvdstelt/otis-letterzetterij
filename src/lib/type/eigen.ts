@@ -70,3 +70,43 @@ export function ownEntry(font: FontInfo, fileName: string): FontEntry {
     coverage: measured.coverage,
   }
 }
+
+/** Een regel uit het magazijn: id, naam, categorie, gewichten, cursief, variabel, licentie */
+export type ArchiveItem = [id: string, family: string, category: string, weights: string, italic: 0 | 1, variable: 0 | 1, license: string]
+
+const KIND_OF: Record<string, Kind> = { serif: 'schreef', 'sans-serif': 'schreefloos', display: 'display', handwriting: 'handschrift', monospace: 'mono' }
+
+/** De latin-tekens, zoals Fontsource ze afbakent */
+export const LATIN_RANGE =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD'
+
+/**
+ * Een letter uit het magazijn als letter in de kast: gemeten uit zijn bestand, met de adressen erbij waar hij vandaan kwam.
+ * Die adressen geeft het magazijn mee; hier staat er geen
+ */
+export function archiveEntry(font: FontLike, item: ArchiveItem, files: { woff2: string; woff: string; weight: number }): FontEntry {
+  const [id, family, category, , , , license] = item
+  const measured = measure([font])
+  const axes = Object.keys(measured.axes).length ? measured.axes : null
+  const kind = KIND_OF[category] ?? 'schreefloos'
+  return {
+    id: `magazijn:${id}`,
+    family,
+    drawer: kind,
+    kind,
+    moods: [],
+    category,
+    license,
+    version: 'latest',
+    // Alleen wat er echt geladen is. Een ander gewicht zou de browser verzinnen, en dat moet de drukker kunnen zeggen
+    weights: axes?.wght ? [axes.wght.min, axes.wght.max] : [files.weight],
+    // De cursief halen we niet op: één bestand per letter is genoeg om te proberen
+    italic: false,
+    axes,
+    faces: [{ style: 'normal', subset: 'latin', weight: axes?.wght ? [axes.wght.min, axes.wght.max] : 400, file: files.woff2 }],
+    unicodeRange: { latin: LATIN_RANGE },
+    woff: { [String(files.weight)]: files.woff },
+    metrics: measured.metrics,
+    coverage: measured.coverage,
+  }
+}

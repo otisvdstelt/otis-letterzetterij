@@ -68,6 +68,12 @@ const clampTo = (v: number, [min, max]: readonly [number, number]) => Math.min(m
 const round = (v: number, digits: number) => Math.round(v * 10 ** digits) / 10 ** digits
 
 export const isOwn = (id: string) => id.startsWith('eigen:')
+/** Een letter uit het magazijn: wel van Fontsource, maar niet in de kast. Hij heet magazijn:<id> */
+export const isArchive = (id: string) => id.startsWith('magazijn:')
+/** Gaat deze letter niet mee in een link? Eigen fonts nooit, en magazijnletters ook niet: de ontvanger heeft ze niet */
+export const isForeign = (id: string) => isOwn(id) || isArchive(id)
+/** De Fontsource-id, ook van een magazijnletter */
+export const fontsourceId = (id: string) => (isArchive(id) ? id.slice('magazijn:'.length) : id)
 
 export const plainStyle = (weight = 400): RoleStyle => ({ weight, italic: false, tracking: 0, axes: {} })
 

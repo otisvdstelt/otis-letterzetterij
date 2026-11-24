@@ -5,7 +5,7 @@
 import { nearestWeight, type FontEntry } from './catalogue.ts'
 import { GENERIC, variationSettings } from './fontface.ts'
 import type { Scale, LevelName } from './scale.ts'
-import { isOwn, type Role, type Zetsel } from './zetsel.ts'
+import { fontsourceId, isOwn, type Role, type Zetsel } from './zetsel.ts'
 
 type Font = Pick<FontEntry, 'id' | 'family' | 'kind' | 'weights' | 'axes' | 'italic'>
 
@@ -37,7 +37,8 @@ export const exportStack = (font: Font) => `"${exportFamily(font)}", ${GENERIC[f
 /** Het npm-pakket bij Fontsource */
 export function packageName(font: Font): string | null {
   if (isOwn(font.id)) return null
-  return font.axes?.wght ? `@fontsource-variable/${font.id}` : `@fontsource/${font.id}`
+  const id = fontsourceId(font.id)
+  return font.axes?.wght ? `@fontsource-variable/${id}` : `@fontsource/${id}`
 }
 
 /** Welke gewichten een rol echt gebruikt: zijn eigen gewicht, en voor de tekst ook een vet voor <strong> */

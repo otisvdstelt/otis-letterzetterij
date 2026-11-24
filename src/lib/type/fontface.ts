@@ -19,6 +19,9 @@ export const GENERIC: Record<Kind, string> = {
 /** Wat je in font-family zet */
 export const fontStack = (font: Pick<FontEntry, 'id' | 'kind'>) => `'${familyName(font.id)}', ${GENERIC[font.kind]}`
 
+/** Een bestand van deze site (een pad), of een heel adres (alleen het magazijn, na toestemming) */
+export const fileUrl = (file: string, base = '/') => (/^https?:\/\//.test(file) ? file : `${base}${file}`)
+
 const weightOf = (face: Face) => (Array.isArray(face.weight) ? `${face.weight[0]} ${face.weight[1]}` : String(face.weight))
 
 /** Alle @font-face-regels voor een letter. `base` is waar de site staat ('/' of import.meta.env.BASE_URL) */
@@ -32,7 +35,7 @@ export function fontFaceCss(font: Pick<FontEntry, 'id' | 'faces' | 'unicodeRange
         `  font-style: ${face.style};`,
         `  font-weight: ${weightOf(face)};`,
         '  font-display: swap;',
-        `  src: url('${base}${face.file}') format('woff2');`,
+        `  src: url('${fileUrl(face.file, base)}') format('woff2');`,
         range ? `  unicode-range: ${range};` : '',
         '}',
       ]
