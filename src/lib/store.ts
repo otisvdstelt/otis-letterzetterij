@@ -113,11 +113,19 @@ export function fallbackFor(id: string): string {
 
 export const codeOf = (z: Zetsel) => encodeVel(z, fallbackFor)
 
-/** De kop- en tekstletter van een zetsel, als ze er zijn */
-export function lettersOf(z: Zetsel, s: State = state): { kop: FontEntry; tekst: FontEntry } | null {
-  const kop = fontById(z.kop, s)
-  const tekst = fontById(z.tekst, s)
-  return kop && tekst ? { kop, tekst } : null
+type Letters = { kop: FontEntry; tekst: FontEntry }
+let lettersCache: { fonts: FontEntry[]; pairs: Map<string, Letters | null> } | null = null
+/** De kop- en tekstletter van een zetsel, als ze er zijn. Steeds hetzelfde object voor hetzelfde paar, zodat een hook niet blijft tekenen */
+export function lettersOf(z: Pick<Zetsel, 'kop' | 'tekst'>, s: State = state): Letters | null {
+  const fonts = allFonts(s)
+  if (!lettersCache || lettersCache.fonts !== fonts) lettersCache = { fonts, pairs: new Map() }
+  const key = `${z.kop}|${z.tekst}`
+  if (!lettersCache.pairs.has(key)) {
+    const kop = fontById(z.kop, s)
+    const tekst = fontById(z.tekst, s)
+    lettersCache.pairs.set(key, kop && tekst ? { kop, tekst } : null)
+  }
+  return lettersCache.pairs.get(key) ?? null
 }
 
 let scaleCache: { zetsel: Zetsel; fonts: FontEntry[]; scale: Scale | null } | null = null
