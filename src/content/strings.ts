@@ -252,6 +252,12 @@ export const strings = {
     bouw: { geometrisch: 'geometrisch', humanistisch: 'humanistisch', grotesk: 'grotesk' } as Record<string, string>,
   },
 
+  // ------------------------------------------------------------------ de zetbank in 3D
+  zetbank: {
+    met: (tekst: string) => `met ${tekst}`,
+    jouw: (tekst: string) => `jouw keuze · met ${tekst}`,
+  },
+
   // ------------------------------------------------------------------ opzij gelegd
   opzij: {
     knop: (n: number) => `Opzij gelegd (${n})`,
