@@ -6,8 +6,10 @@ import { Header } from './components/ui/Header'
 import { Inktrol, Rollend } from './components/ui/Inktrol'
 import { KastPaneel } from './components/ui/Kast'
 import { Nieuws } from './components/ui/Nieuws'
+import { Oogarts } from './components/ui/Oogarts'
 import { PersPaneel } from './components/ui/PersPaneel'
 import { Hendel, PersTekening } from './components/ui/PersTekening'
+import { Proefdruk } from './components/ui/Proefdruk'
 import { Strook } from './components/ui/Strook'
 import { VelPaneel } from './components/ui/VelPaneel'
 import { Waslijn } from './components/ui/Waslijn'
@@ -72,14 +74,15 @@ function useInset(compact: boolean): Inset {
   const height = useSyncExternalStore(subscribeResize, () => window.innerHeight)
   const view = useLetters((s) => s.view)
   const velOpen = useLetters((s) => s.velOpen)
-  const drawer = useLetters((s) => s.drawer)
+  const breed = useLetters((s) => s.drawer !== null || s.kastPaneel === 'opzij')
+  const proef = useLetters((s) => s.proef)
   if (compact) {
     // Op een telefoon staat de drukkerij bovenin, en schuiven de panelen van onder omhoog
-    return { left: 0, right: 0, top: 5.5 * REM, bottom: height * (velOpen && view !== 'waslijn' ? 0.55 : 0.46) }
+    return { left: 0, right: 0, top: 3.9 * REM, bottom: height * ((velOpen || proef) && view !== 'waslijn' ? 0.55 : view === 'kast' && breed ? 0.62 : 0.46) }
   }
   const gutter = Math.min(2, Math.max(1, (width * 0.025) / REM)) * REM
-  const left = view === 'waslijn' ? 0 : gutter + (view === 'kast' && drawer ? 21 : 14) * REM
-  const right = velOpen && view !== 'waslijn' ? gutter + Math.min(36 * REM, width * 0.4) : 0
+  const left = view === 'waslijn' ? 0 : gutter + (view === 'kast' && breed ? 21 : 14) * REM
+  const right = (velOpen || proef) && view !== 'waslijn' ? gutter + Math.min(36 * REM, width * 0.4) : 0
   return { left, right, top: 4.5 * REM, bottom: (view === 'waslijn' ? 14 : 7.5) * REM }
 }
 
@@ -97,8 +100,9 @@ export default function App({ broken = false, firstVisit = true }: { broken?: bo
   const view = useLetters((s) => s.view)
   const step = useLetters((s) => s.step)
   const velOpen = useLetters((s) => s.velOpen)
-  const drawer = useLetters((s) => s.drawer)
+  const breed = useLetters((s) => s.drawer !== null || s.kastPaneel === 'opzij')
   const printed = useLetters((s) => s.printed !== null)
+  const proef = useLetters((s) => s.proef)
   const inset = useInset(compact)
   useAddress()
 
@@ -126,11 +130,12 @@ export default function App({ broken = false, firstVisit = true }: { broken?: bo
   }, [])
 
   const atLine = view === 'waslijn'
-  const showVel = velOpen && !atLine
+  const showProef = proef && !atLine
+  const showVel = velOpen && !atLine && !showProef
   const drawn = !painted || !worldReady
 
   return (
-    <div className="papier" data-wereld={painted} data-uitzicht={view} data-vel={showVel} data-laatje={step === 'kast' && drawer !== null}>
+    <div className="papier" data-wereld={painted} data-uitzicht={view} data-vel={showVel || showProef} data-proef={showProef} data-laatje={step === 'kast' && breed}>
       <PaperFilters />
       {/* De drukkerij is alleen weergave: alles wat je ermee kunt, staat ook in de papieren laag */}
       {painted && (
@@ -157,12 +162,14 @@ export default function App({ broken = false, firstVisit = true }: { broken?: bo
         <Welkom />
         <Strook />
         {showVel && <VelPaneel plakken={<FlesjePlakken />} />}
-        {!showVel && !atLine && printed && (
+        {showProef && <Proefdruk />}
+        {!showVel && !showProef && !atLine && printed && (
           <button type="button" className="slip paper hand terug-naar-vel" onClick={() => store.showVel(true)}>
             {strings.vel.terug} →
           </button>
         )}
       </main>
+      <Oogarts />
       <Nieuws />
       <Inktrol />
     </div>
