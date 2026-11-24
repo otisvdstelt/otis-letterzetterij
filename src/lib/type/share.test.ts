@@ -42,6 +42,13 @@ describe('een vel als link', () => {
     expect(encodeVel(z, () => 'libre-baskerville')).not.toContain('eigen')
   })
 
+  it('noemt een magazijnletter bij zijn naam, met een vervanger', () => {
+    const z = { ...startZetsel('x'), kop: 'magazijn:abril-fatface' }
+    const decoded = decodeVel(encodeVel(z, () => 'playfair-display', () => 'Abril Fatface'))!
+    expect(decoded.zetsel.kop).toBe('playfair-display')
+    expect(decoded.replaced).toEqual({ kop: 'Abril Fatface' })
+  })
+
   it('leest versie 1 nog, zoals hij op 24 november 2026 gedeeld werd', () => {
     // Deze code is bevroren. Verandert het formaat, dan moet deze test blijven slagen
     const v1 = 'AQAIZnJhdW5jZXMABWludGVyAgIEAgIC0AUBJwFvcHN6oAuQAwAAALQBkQHADCoABQwmAO_02qZmLjRJSnMgZW4gd2VkZXIgZGllbmVuZGUsIGRlIHBlcnMgZ2FhdCBvbSBhY2h0IHV1ciBhYW4u'

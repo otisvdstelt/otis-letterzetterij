@@ -1,7 +1,7 @@
 // Wat op dit apparaat bewaard blijft: de waslijn, en of de hint bij de hendel al gezien is.
 // Alleen in localStorage, met try/catch eromheen: opslag kan geweigerd of leeg zijn
 
-import { decodeWaslijn, encodeWaslijn, type FallbackFor } from './type/share'
+import { decodeWaslijn, encodeWaslijn, type FallbackFor, type NameFor } from './type/share'
 import type { Zetsel } from './type/zetsel'
 
 const WASLIJN_KEY = 'letterzetterij-waslijn'
@@ -19,10 +19,10 @@ export function readWaslijn(): Zetsel[] {
 }
 
 /** Bewaar de waslijn. Lukt dat niet, dan blijft hij hangen zolang de pagina open is */
-export function keepWaslijn(sheets: readonly Zetsel[], fallbackFor: FallbackFor): boolean {
+export function keepWaslijn(sheets: readonly Zetsel[], fallbackFor: FallbackFor, nameFor?: NameFor): boolean {
   try {
     if (sheets.length === 0) window.localStorage.removeItem(WASLIJN_KEY)
-    else window.localStorage.setItem(WASLIJN_KEY, encodeWaslijn(sheets, fallbackFor))
+    else window.localStorage.setItem(WASLIJN_KEY, encodeWaslijn(sheets, fallbackFor, nameFor))
     return true
   } catch {
     return false

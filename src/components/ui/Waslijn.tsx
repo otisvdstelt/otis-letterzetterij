@@ -75,7 +75,7 @@ export function Waslijn() {
   const sheets = visiting ?? own
   const comparing = compare !== null
   const chosen = (compare ?? []).filter((i) => i < sheets.length)
-  const link = sheets.length ? `${window.location.origin}/waslijn/${encodeWaslijn(sheets, fallbackFor)}` : ''
+  const link = sheets.length ? `${window.location.origin}/waslijn/${encodeWaslijn(sheets, fallbackFor, (id) => familyOf(id))}` : ''
   return (
     <section className="waslijn" aria-labelledby="waslijn-kop">
       <div className="waslijn-boven">

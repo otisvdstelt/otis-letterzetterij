@@ -5,7 +5,7 @@ import { MOODS, type Mood } from './catalogue.ts'
 import { isHex } from './color.ts'
 import { fromBase64Url, Reader, toBase64Url, Writer } from './bytes.ts'
 import { GOALS, TEMPLATES } from './goals.ts'
-import { ALIGNS, cleanZin, isOwn, normalize, type RoleStyle, type Zetsel } from './zetsel.ts'
+import { ALIGNS, cleanZin, isForeign, normalize, type RoleStyle, type Zetsel } from './zetsel.ts'
 
 export const VEL_VERSION = 1
 export const WASLIJN_VERSION = 1
@@ -16,6 +16,8 @@ const CLAMPS = [null, 'kop', 'tekst'] as const
 
 /** Een eigen font gaat niet mee: de link noemt zijn naam en een nette vervanger uit de kast */
 export type FallbackFor = (ownId: string) => string
+/** De naam die de ontvanger te zien krijgt voor een letter die niet meegaat */
+export type NameFor = (id: string) => string
 
 /** Wat er bij het lezen vervangen is: de naam van het eigen font dat niet meeging, per rol */
 export interface Replaced {
@@ -23,12 +25,12 @@ export interface Replaced {
   tekst?: string
 }
 
-const ownName = (id: string) => id.slice('eigen:'.length)
+const plainName = (id: string) => id.slice(id.indexOf(':') + 1)
 
-function writeFont(w: Writer, id: string, fallbackFor: FallbackFor) {
-  if (isOwn(id)) {
+function writeFont(w: Writer, id: string, fallbackFor: FallbackFor, nameFor: NameFor = plainName) {
+  if (isForeign(id)) {
     w.byte(1)
-    w.text(ownName(id).slice(0, 60))
+    w.text(nameFor(id).slice(0, 60))
     w.text(fallbackFor(id))
   } else {
     w.byte(0)
@@ -78,11 +80,11 @@ const at = <T>(list: readonly T[], i: number): T => {
   return list[i]
 }
 
-function writeVel(z: Zetsel, fallbackFor: FallbackFor): Uint8Array {
+function writeVel(z: Zetsel, fallbackFor: FallbackFor, nameFor?: NameFor): Uint8Array {
   const w = new Writer()
   w.byte(VEL_VERSION)
-  writeFont(w, z.kop, fallbackFor)
-  writeFont(w, z.tekst, fallbackFor)
+  writeFont(w, z.kop, fallbackFor, nameFor)
+  writeFont(w, z.tekst, fallbackFor, nameFor)
   w.byte(index(GOALS, z.doel))
   w.byte(z.stemming.length)
   for (const m of z.stemming) w.byte(index(MOODS, m))
@@ -167,8 +169,8 @@ function readVel(bytes: Uint8Array) {
 /** Een eigen font zonder vervanger: dan de tekstletter uit de kast die het meest gewoon is */
 const noFallback: FallbackFor = () => 'source-serif-4'
 
-export function encodeVel(z: Zetsel, fallbackFor: FallbackFor = noFallback): string {
-  return toBase64Url(writeVel(z, fallbackFor))
+export function encodeVel(z: Zetsel, fallbackFor: FallbackFor = noFallback, nameFor?: NameFor): string {
+  return toBase64Url(writeVel(z, fallbackFor, nameFor))
 }
 
 /** Lees een vel uit een link. Klopt er iets niet, of is het een versie die we niet kennen: null */
@@ -180,11 +182,11 @@ export function decodeVel(code: string): { zetsel: Zetsel; replaced: Replaced } 
   }
 }
 
-export function encodeWaslijn(sheets: readonly Zetsel[], fallbackFor: FallbackFor = noFallback): string {
+export function encodeWaslijn(sheets: readonly Zetsel[], fallbackFor: FallbackFor = noFallback, nameFor?: NameFor): string {
   const w = new Writer()
   w.byte(WASLIJN_VERSION)
   w.varint(sheets.length)
-  for (const z of sheets) w.raw(writeVel(z, fallbackFor))
+  for (const z of sheets) w.raw(writeVel(z, fallbackFor, nameFor))
   return toBase64Url(w.done())
 }
 
