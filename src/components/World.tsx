@@ -79,18 +79,16 @@ export default function World({ phase, reducedMotion, modest, onReady, inset, on
   // Haalt het apparaat de 50 beelden per seconde niet, dan gaan er pixels af. Gaat het weer goed, dan komen ze terug
   const [dpr, setDpr] = useState(budget.dpr[1])
 
-  useEffect(() => {
-    onReady()
-    return () => {
+  useEffect(
+    () => () => {
       document.body.style.cursor = ''
-    }
-    // De drukkerij komt één keer binnen
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    },
+    [],
+  )
 
   return (
     <Canvas
-      shadows="percentage"
+      shadows={modest ? false : 'percentage'}
       flat
       frameloop="demand"
       dpr={[1, dpr]}
@@ -108,7 +106,7 @@ export default function World({ phase, reducedMotion, modest, onReady, inset, on
         {onLever && <LeverOnScreen onLever={onLever} />}
         <Atmosphere phase={phase} shadowSize={budget.shadow} />
         <Drukkerij reducedMotion={reducedMotion} />
-        <Reveal reducedMotion={reducedMotion} />
+        <Reveal reducedMotion={reducedMotion} onShown={onReady} />
         <EffectComposer multisampling={0} enableNormalPass={false}>
           <InkPaper />
         </EffectComposer>

@@ -20,7 +20,7 @@ function Laatje({ index, reducedMotion }: { index: number; reducedMotion: boolea
   const [x, y, z] = drawerAt(index)
 
   useFrame((_, delta) => {
-    const want = open ? 0.26 : hover.current ? 0.06 : 0
+    const want = open ? 0.45 : hover.current ? 0.06 : 0
     out.current = reducedMotion ? want : out.current + (want - out.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 9))
     if (group.current) group.current.position.z = out.current
     if (Math.abs(want - out.current) > 0.002) motion.wake(0.1)

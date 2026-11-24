@@ -117,11 +117,11 @@ export interface View {
 
 export const VIEWS: Record<'werkbank' | 'kast' | 'pers' | 'waslijn', { wide: View; narrow: View }> = {
   werkbank: {
-    wide: { position: [2.75, 2.25, 2.9], target: [2.7, 0.95, -0.95], fov: 40 },
+    wide: { position: [2.25, 2.25, 2.9], target: [2.2, 0.95, -0.95], fov: 40 },
     narrow: { position: [2.45, 2.3, 3.1], target: [2.6, 0.9, -0.9], fov: 52 },
   },
   kast: {
-    wide: { position: [-2.0, 1.95, 2.35], target: [-2.55, 0.95, -1.25], fov: 42 },
+    wide: { position: [-1.9, 1.85, 1.95], target: [-2.35, 0.95, -1.05], fov: 42 },
     narrow: { position: [-2.3, 2.1, 3.2], target: [-2.6, 0.9, -1.2], fov: 56 },
   },
   pers: {

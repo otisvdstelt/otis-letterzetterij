@@ -11,7 +11,10 @@ import { FACES, PAGE_INK } from './look'
 import { paint, toonGradient } from './materials'
 import { motion } from './motion'
 
-const ROW = { width: ZETBANK.x1 - ZETBANK.x0 - 0.14, body: 0.07 }
+const ROW = { width: ZETBANK.x1 - ZETBANK.x0 - 0.12, body: 0.09 }
+
+/** De regels staan schuin tegen een latje, met het beeld naar je toe, zodat je ze vanaf de kast kunt lezen */
+const TILT = 0.6
 
 /** Eén paar van de drukker: de kop in lood, leesbaar, met de tekstletter op een kaartje ervoor. Erop tikken zet het op het vel */
 function Regel({ index, kop, tekst }: { index: number; kop: string; tekst: string }) {
@@ -46,7 +49,8 @@ function Regel({ index, kop, tekst }: { index: number; kop: string; tekst: strin
   const [x, y, z] = zetbankRow(index)
   return (
     <group
-      position={[x, y + 0.01, z]}
+      position={[x, y + 0.03 + (2 - index) * 0.04, z]}
+      rotation={[TILT, 0, 0]}
       onClick={(event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation()
         store.take({ kop, tekst })
@@ -65,7 +69,7 @@ function Regel({ index, kop, tekst }: { index: number; kop: string; tekst: strin
     >
       <mesh ref={group} geometry={geometry ?? undefined} material={paint} castShadow receiveShadow visible={geometry !== null} />
       {tekstFont && (
-        <Text font={FACES.hand} fontSize={0.026} anchorX="center" anchorY="middle" color={PAGE_INK} position={[0, 0.002, 0.06]} rotation={[-Math.PI / 2, 0, 0]}>
+        <Text font={FACES.hand} fontSize={0.034} anchorX="center" anchorY="middle" color={PAGE_INK} position={[0, 0.002, 0.072]} rotation={[-Math.PI / 2, 0, 0]}>
           {`met ${tekstFont.family}`}
         </Text>
       )}
