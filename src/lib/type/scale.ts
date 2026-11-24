@@ -38,6 +38,8 @@ export interface Scale {
   measure: { chars: number; rem: number }
   /** Hoeveel groter de koppen zijn gezet omdat hun x-hoogte klein is (1 = niet) */
   optical: number
+  /** De stap tussen h1 en groot (stap 5). Het vel gebruikt hem niet, Tailwind wel: daar is hij text-4xl */
+  tussen: Omit<Level, 'name'>
 }
 
 type Metrics = Pick<FontEntry, 'metrics'>
@@ -102,20 +104,17 @@ export function buildScale(z: Pick<Zetsel, 'doel' | 'maat' | 'interlinie' | 'rat
   const ratioMin = 1 + (ratio - 1) * 0.8
   const optical = opticalBoost(kop, tekst)
 
-  const levels = Object.fromEntries(
-    LEVELS.map((name) => {
-      const step = STEPS[name]
-      const isHeading = step > 0
-      const boost = isHeading ? optical : 1
-      const max = round(baseMax * ratio ** step * boost, 2)
-      const min = round(Math.min(max, baseMin * ratioMin ** step * boost), 2)
-      const leading = isHeading ? headingLeading(max) : step < 0 ? round(Math.max(1.35, z.interlinie - 0.1), 2) : z.interlinie
-      const tracking = round(trackingFor(max) + (isHeading ? z.kopStijl.tracking : 0), 3)
-      const level: Level = { name, step, role: isHeading ? 'kop' : 'tekst', min, max, size: fluid(min, max), leading, tracking }
-      return [name, level]
-    }),
-  ) as Record<LevelName, Level>
+  const levelAt = (step: number): Omit<Level, 'name'> => {
+    const isHeading = step > 0
+    const boost = isHeading ? optical : 1
+    const max = round(baseMax * ratio ** step * boost, 2)
+    const min = round(Math.min(max, baseMin * ratioMin ** step * boost), 2)
+    const leading = isHeading ? headingLeading(max) : step < 0 ? round(Math.max(1.35, z.interlinie - 0.1), 2) : z.interlinie
+    const tracking = round(trackingFor(max) + (isHeading ? z.kopStijl.tracking : 0), 3)
+    return { step, role: isHeading ? 'kop' : 'tekst', min, max, size: fluid(min, max), leading, tracking }
+  }
+  const levels = Object.fromEntries(LEVELS.map((name) => [name, { name, ...levelAt(STEPS[name]) }])) as Record<LevelName, Level>
 
   const width = measurePx(z.regel, tekst, baseMax)
-  return { ratio, levels, capsTracking: 0.06, measure: { chars: z.regel, rem: round(width / 16, 2) }, optical }
+  return { ratio, levels, capsTracking: 0.06, measure: { chars: z.regel, rem: round(width / 16, 2) }, optical, tussen: levelAt(5) }
 }
