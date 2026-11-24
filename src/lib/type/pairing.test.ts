@@ -110,6 +110,19 @@ describe('het voorstel van de drukker', () => {
     for (const s of warm) expect([...font(s.kop).moods, ...font(s.tekst).moods]).toContain('warm')
   })
 
+  it('telt bij een paar uit het zetboek de stemming van het zetboek, niet die van de losse letters', () => {
+    const book = new Map(pairings.map((p) => [`${p.kop}|${p.tekst}`, p]))
+    const first = suggest(catalogue.fonts, pairings, { goal: 'boek', moods: ['klassiek'] })[0]
+    // Komt het eerste paar niet uit het zetboek, dan telden de letters zelf: dat is ook goed
+    expect(book.get(`${first.kop}|${first.tekst}`)?.stemming ?? ['klassiek']).toContain('klassiek')
+  })
+
+  it('geeft bij een ander gevoel een ander eerste paar', () => {
+    const first = (moods: ('klassiek' | 'speels' | 'technisch')[]) => suggest(catalogue.fonts, pairings, { goal: 'boek', moods })[0]
+    const firsts = new Set([first(['klassiek']), first(['speels']), first(['technisch'])].map((s) => `${s.kop}|${s.tekst}`))
+    expect(firsts.size).toBe(3)
+  })
+
   it('geeft voor hetzelfde zetsel altijd hetzelfde voorstel', () => {
     const a = suggest(catalogue.fonts, pairings, { goal: 'boek', moods: ['klassiek'] })
     const b = suggest(catalogue.fonts, pairings, { goal: 'boek', moods: ['klassiek'] })

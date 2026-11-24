@@ -283,7 +283,9 @@ export function rankPairs(fonts: readonly Font[], pairings: readonly Pairing[], 
     const book = curated.get(key(kop.id, tekst.id))
     // Het zetboek is met de hand gekozen en weegt mee; voor dit doel nog wat meer
     const bonus = book ? 0.6 + (book.doel.includes(goal) ? 0.6 : 0) : 0
-    const score = total + bonus + 1.2 * moodMatch(kop, tekst, moods)
+    // Een paar uit het zetboek heeft zijn eigen stemming: die telt, niet wat de twee letters los van elkaar zijn
+    const mood = book && book.stemming.length && moods.length ? moods.filter((m) => book.stemming.includes(m)).length / moods.length : moodMatch(kop, tekst, moods)
+    const score = total + bonus + 1.2 * mood
     const reason: Reason = book
       ? { kind: 'zetboek', waarom: book.waarom }
       : {
