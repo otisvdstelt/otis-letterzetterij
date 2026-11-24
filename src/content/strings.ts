@@ -5,6 +5,7 @@ import type { Drawer, Mood } from '../lib/type/catalogue'
 import type { Level } from '../lib/type/contrast'
 import type { Goal, Template } from '../lib/type/goals'
 import type { Note } from '../lib/type/pairing'
+import type { PaarUitleg } from '../lib/type/paar'
 import type { FixId, Params, RemarkId } from '../lib/type/printer'
 import type { Align, Role } from '../lib/type/zetsel'
 
@@ -188,6 +189,121 @@ export const strings = {
       { id: 'scriptie', naam: 'Scriptie', uitleg: 'Lang lezen, met voetnoten en cursief.', doel: 'boek', gevoel: ['klassiek'], kop: 'eb-garamond', tekst: 'eb-garamond', zin: 'Over het zetten van letters in de twintigste eeuw' },
       { id: 'presentatie', naam: 'Lezing in een zaal', uitleg: 'Achterin moet het ook leesbaar zijn.', doel: 'presentatie', gevoel: ['modern'], kop: 'atkinson-hyperlegible-next', tekst: 'atkinson-hyperlegible-next', zin: 'Wat ik leerde van veertig jaar drukken' },
     ] as { id: string; naam: string; uitleg: string; doel: Goal; gevoel: Mood[]; kop: string; tekst: string; zin: string }[],
+  },
+
+  // ------------------------------------------------------------------ jouw tekst
+  jouwTekst: {
+    kop: 'Begin met jouw tekst',
+    uitleg: 'Een kop, en wat je verder hebt. Elk sjabloon zet jouw tekst, niet de mijne.',
+    zin: 'Je kop',
+    meer: 'Meer tekst',
+    minder: 'Minder tekst',
+    naam: 'Naam van je project',
+    alinea: 'Een alinea',
+    alineaUitleg: 'Meer alinea\'s? Zet er een lege regel tussen.',
+    knop: 'Tekst op een knop',
+    menu: 'Een menu, met komma\'s',
+    linkUitleg: 'Je tekst gaat mee in de deellink.',
+  },
+
+  // ------------------------------------------------------------------ eisen vooraf
+  eisen: {
+    knop: 'Wat moet het kunnen?',
+    uitleg: 'Een letter die het niet kan, gaat grijs in de kast, en ik leg hem nooit voor.',
+    namen: {
+      euro: '€',
+      ij: 'Ĳ en ĳ',
+      accenten: 'accenten',
+      pools: 'Pools',
+      turks: 'Turks',
+      grieks: 'Grieks',
+      cyrillisch: 'Cyrillisch',
+      tabelcijfers: 'tabelcijfers',
+      cursief: 'cursief',
+      gewichten: 'minstens 4 gewichten',
+    } as Record<string, string>,
+    kanNiet: (wat: string) => `kan geen ${wat}`,
+    grijs: 'voldoet niet aan je eisen',
+  },
+
+  // ------------------------------------------------------------------ zoeken in de kast
+  zoeken: {
+    richtingen: {
+      'groter-oog': 'groter oog',
+      'kleiner-oog': 'kleiner oog',
+      breder: 'breder',
+      smaller: 'smaller',
+      'meer-contrast': 'meer contrast',
+      'minder-contrast': 'minder contrast',
+      ronder: 'ronder',
+      strakker: 'strakker',
+    } as Record<string, string>,
+    vanaf: (naam: string) => `Vanaf ${naam}:`,
+    richtingKop: (wat: string, naam: string) => `${wat.charAt(0).toUpperCase() + wat.slice(1)} dan ${naam}`,
+    lijktOp: 'lijkt op',
+    lijktOpKop: (naam: string) => `Lijkt op ${naam}`,
+    lijktOpLabel: (naam: string) => `Letters die op ${naam} lijken`,
+    ietsAls: (naam: string) => `Iets als ${naam}`,
+    ietsAlsUitleg: 'Een gratis broertje: zelfde bouw, zelfde gevoel, vrij te gebruiken.',
+    opzij: 'opzij',
+    opzijLabel: (naam: string, op: boolean) => (op ? `${naam} niet meer opzij` : `Leg ${naam} opzij`),
+    terug: '← paren',
+    schreef: { geen: 'schreefloos', slab: 'slab', wig: 'wig', haarlijn: 'haarlijn' } as Record<string, string>,
+    bouw: { geometrisch: 'geometrisch', humanistisch: 'humanistisch', grotesk: 'grotesk' } as Record<string, string>,
+  },
+
+  // ------------------------------------------------------------------ opzij gelegd
+  opzij: {
+    knop: (n: number) => `Opzij gelegd (${n})`,
+    kop: 'Opzij gelegd',
+    uitleg: 'Zelfde alinea, op broodtekstmaat, onder elkaar. Maak er je paar van.',
+    leeg: 'Nog niks opzij. Leg in een laatje een letter opzij om hem hier te vergelijken.',
+    alsKop: 'als kop',
+    alsTekst: 'als tekst',
+    weg: 'weg',
+  },
+
+  // ------------------------------------------------------------------ proefdruk en oogarts
+  proef: {
+    knop: 'Druk alle drie naast elkaar',
+    kop: 'Proefdruk',
+    uitleg: 'Drie paren, dezelfde tekst. Kies door te kijken.',
+    deze: 'Deze',
+    dezeLabel: (kop: string, tekst: string) => `Kies ${kop} met ${tekst}`,
+    sluit: 'weg',
+  },
+  oogarts: {
+    knop: 'Kies op het oog',
+    kop: 'Deze of deze?',
+    uitleg: (fase: string) => (fase === 'kop' ? 'Welke kop vind je beter? Kijk, en kies. Namen komen straks.' : 'En welke tekst leest het fijnst onder je kop?'),
+    ronde: (n: number, over: number) => `Ronde ${n} · nog ${over} op de stapel`,
+    deze: 'Deze',
+    dezeLabel: (kant: string) => `Deze, de ${kant}`,
+    kanten: ['linker', 'rechter'],
+    stop: 'Stop maar',
+    fase: { kop: 'De kop', tekst: 'De tekst' } as Record<string, string>,
+  },
+  halfWisselen: {
+    houdKop: 'Houd de kop',
+    houdTekst: 'Houd de tekst',
+    los: 'laat los',
+    uitleg: 'Eén blijft staan, de drukker zoekt de ander erbij.',
+  },
+  waarom: {
+    gemeen: {
+      familie: 'één familie',
+      'x-hoogte': 'een verwante x-hoogte',
+      breedte: 'dezelfde breedte',
+      bouw: 'dezelfde bouw',
+      stemming: 'dezelfde stemming',
+    } as Record<string, string>,
+    verschil: {
+      schreef: 'schreven',
+      contrast: 'contrast',
+      breedte: 'breedte',
+      rondheid: 'rondheid',
+      gewicht: 'gewicht',
+    } as Record<string, string>,
   },
 
   // ------------------------------------------------------------------ de werkbank
@@ -403,6 +519,13 @@ export const strings = {
   vel: {
     label: 'Het vel',
     zetWeg: 'zet weg',
+    andere: 'Andere letters',
+    andereUitleg: 'Het volgende paar van de drukker, meteen gedrukt.',
+    qr: 'Op je eigen telefoon',
+    qrUitleg: 'Scan en je ziet dit vel op je telefoon.',
+    qrLabel: 'QR-code met de link naar dit vel',
+    tekstOpWerkbank: 'Je tekst zet je op de werkbank.',
+    naarWerkbank: '← naar je tekst',
     terug: 'het vel',
     fijnzetten: 'Fijnzetten',
     fijnUitleg: 'Gewicht, spatiëring, korps, interlinie, regel en de rest.',
@@ -538,6 +661,13 @@ export const strings = {
     deel: 'deel',
     zelfKopieren: 'Kopiëren mocht niet. Selecteer het zelf:',
     geenNpm: 'Eigen fonts hebben geen npm-pakket. Die host je zelf.',
+    zelfHosten: 'Zelf hosten',
+    zelfHostenUitleg: (kb: number, n: number) => `Alleen de gewichten die je gebruikt: ${n} ${n === 1 ? 'bestand' : 'bestanden'}, samen ${kb} kB.`,
+    bestand: (naam: string, kb: number) => `${naam} · ${kb} kB`,
+    zip: 'Download alles als zip',
+    zipUitleg: 'De fonts, de @font-face-regels, de Tailwind- en CSS-export en de licenties, in één map.',
+    zipBezig: 'wordt ingepakt',
+    zipLeesmij: (kop: string, tekst: string) => `Letterzetterij\n\n${kop === tekst ? kop : `${kop} met ${tekst}`}.\n\nZet de map fonts/ naast je CSS en laad letters.css. Daarin staan de @font-face-regels, alleen voor de gewichten die je gebruikt.\ntailwind.css is de @theme voor Tailwind v4, schaal.css de schaal als gewone CSS.\n\nDe letters vallen onder hun eigen licentie: zie LICENTIES.txt.\n`,
     licenties: 'Licenties',
     licentieRegel: (naam: string, licentie: string) => `${naam}: ${licentie}`,
     bron: 'Lettertypes van Google Fonts, via Fontsource, onder hun eigen open licenties (meestal OFL).',
@@ -616,6 +746,13 @@ export const strings = {
     welkom: 'Er is een vel voor je gezet.',
     plek: (plek: string) => ({ werkbank: 'Je staat aan de werkbank.', kast: 'Je staat bij de letterkast.', pers: 'Je staat bij de pers.', waslijn: 'Je kijkt naar de waslijn.' })[plek] ?? '',
     zetboek: (naam: string) => `${naam} is gezet en gedrukt.`,
+    eerstePaar: (kop: string, tekst: string) => `Je koos zelf nog niks, dus ik nam het eerste paar: ${kop} met ${tekst}.`,
+    eisen: (n: number) => (n === 0 ? 'Geen eisen meer. De hele kast doet weer mee.' : `${hoofdletter(inWoorden(n))} ${n === 1 ? 'eis' : 'eisen'}. Wat niet voldoet, gaat grijs.`),
+    opStapel: (naam: string, n: number) => `${naam} ligt opzij. Er liggen er nu ${inWoorden(n)}.`,
+    vanStapel: (naam: string) => `${naam} ligt niet meer opzij.`,
+    stapelVol: 'Er liggen al zes letters opzij. Haal er eerst een weg.',
+    houd: (naam: string, rol: Role) => `${naam} blijft de ${ROLNAAM[rol]}. Ik zoek er drie andere ${rol === 'kop' ? 'teksten' : 'koppen'} bij.`,
+    proef: 'Drie paren naast elkaar gedrukt, met jouw tekst.',
     drukkerStil: (stil: boolean) => (stil ? 'De drukker houdt zijn mond.' : 'De drukker praat weer mee.'),
     eigen: (naam: string, rol: Role) => `${naam} ligt op de werkbank, met een klem erop, als ${ROLNAAM[rol]}. Het bestand blijft op je apparaat.`,
     soort: (naam: string, soort: string) => `${naam} telt nu als ${soort}.`,
@@ -674,4 +811,16 @@ export const opmerkingVarianten = (id: RemarkId, params: Params) => OPMERKINGEN[
 export function oplossing(id: FixId, params: Params, remark?: RemarkId): string {
   if (remark === 'geen-cursief' && id === 'wissel-tekst') return `Pak de cursief erbij: ${params.naam}`
   return OPLOSSINGEN[id](params)
+}
+
+const en = (list: string[]) => (list.length <= 1 ? (list[0] ?? '') : `${list.slice(0, -1).join(', ')} en ${list.at(-1)}`)
+
+/** Waarom dit paar, in één zin: wat ze delen en waar ze verschillen */
+export function waaromZin(u: PaarUitleg): string {
+  const gemeen = u.gemeen.map((g) => strings.waarom.gemeen[g])
+  const verschil = u.verschil.map((v) => strings.waarom.verschil[v])
+  if (gemeen.length && verschil.length) return `Ze delen ${en(gemeen)}, en verschillen in ${en(verschil)}.`
+  if (gemeen.length) return `Ze delen ${en(gemeen)}.`
+  if (verschil.length) return `Ze verschillen in ${en(verschil)}.`
+  return ''
 }
