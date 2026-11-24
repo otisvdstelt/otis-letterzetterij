@@ -15,7 +15,6 @@ export function Strook() {
   const sheets = useLetters((s) => (s.visiting ?? s.waslijn).length)
   const list = useLetters(currentRemarks)
   const canUndo = useLetters((s) => s.past.length > 0)
-  const catalogue = useLetters((s) => s.catalogue)
   const t = strings.stappen
   const root = useRef<HTMLElement>(null)
 
@@ -47,11 +46,11 @@ export function Strook() {
             {t.terugNaar(step)}
           </button>
         ) : next ? (
-          <button type="button" className="plaque" disabled={!catalogue} onClick={() => store.look(next)}>
+          <button type="button" className="plaque" onClick={() => store.look(next)}>
             {t.verder[step]}
           </button>
         ) : (
-          <button type="button" className="plaque" disabled={!catalogue} onClick={() => store.pull()}>
+          <button type="button" className="plaque" onClick={() => store.pull()}>
             {t.verder.pers}
           </button>
         )}
@@ -61,7 +60,7 @@ export function Strook() {
           </button>
         ) : (
           !waslijn && (
-            <button type="button" className="inked" data-tone="rust" disabled={!catalogue} onClick={() => store.surprise()}>
+            <button type="button" className="inked" data-tone="rust" onClick={() => store.surprise()}>
               {strings.voorstel.verras}
             </button>
           )
