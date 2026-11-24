@@ -1,20 +1,27 @@
 import { strings } from '../../content/strings'
 import type { Template } from '../../lib/type/goals'
+import type { EigenTekst } from '../../lib/type/zetsel'
 
 /**
  * De zes sjablonen. Elk heeft koppen op meerdere niveaus, broodtekst, een citaat en een klein bijschrift,
  * zodat de hele schaal te zien is. Jouw zin is de grote kop
  */
-export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
+export function Sjabloon({ kind, zin, eigen }: { kind: Template; zin: string; eigen?: EigenTekst }) {
   const t = strings.zetsel
+  // Jouw tekst gaat voor. Alinea's worden gescheiden door een lege regel; zijn er meer plekken dan alinea's, dan begint hij weer vooraan
+  const paras = eigen?.alinea.trim() ? eigen.alinea.split(/\n\s*\n/).map((x) => x.replace(/\s+/g, ' ').trim()).filter(Boolean) : null
+  const p = (i: number, fallback: string) => (paras ? paras[i % paras.length] : fallback)
+  const merk = (fallback: string) => eigen?.naam.trim() || fallback
+  const knop = (fallback: string) => eigen?.knop.trim() || fallback
+  const menu = eigen?.menu.trim() ? eigen.menu.split(',').map((x) => x.trim()).filter(Boolean).slice(0, 5) : t.website.menu
   switch (kind) {
     case 'website':
       return (
         <div className="sj sj-website">
           <nav className="sj-nav" aria-hidden="true">
-            <span className="sj-merk">{t.website.merk}</span>
+            <span className="sj-merk">{merk(t.website.merk)}</span>
             <span className="sj-menu">
-              {t.website.menu.map((m) => (
+              {menu.map((m) => (
                 <span key={m}>{m}</span>
               ))}
             </span>
@@ -22,13 +29,13 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
           <header className="sj-held">
             <h1 className="lv-h1">{zin}</h1>
             <p className="lv-tekst sj-intro" data-weduwe>
-              {t.website.intro}
+              {p(0, t.website.intro)}
             </p>
-            <span className="sj-knop">{t.website.knop}</span>
+            <span className="sj-knop">{knop(t.website.knop)}</span>
           </header>
           <h2 className="lv-h2 tweede">{t.website.h2}</h2>
           <p className="lv-tekst" data-weduwe>
-            {t.website.alinea}
+            {p(1, t.website.alinea)}
           </p>
           <figure className="sj-citaat">
             <blockquote className="lv-h4">{t.website.citaat}</blockquote>
@@ -36,7 +43,7 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
           </figure>
           <h3 className="lv-h3 tweede">{t.website.h3}</h3>
           <p className="lv-tekst">
-            {t.website.alinea2} <strong>{t.website.merk}</strong>.
+            {p(2, t.website.alinea2)} <strong>{merk(t.website.merk)}</strong>.
           </p>
           <p className="lv-klein sj-bijschrift">{t.website.bijschrift}</p>
         </div>
@@ -48,9 +55,9 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
           <p className="lv-klein kapitalen tweede">{t.boek.hoofdstuk}</p>
           <h1 className="lv-h2">{zin}</h1>
           <p className="lv-tekst sj-eerste" data-weduwe>
-            {t.boek.alinea}
+            {p(0, t.boek.alinea)}
           </p>
-          <p className="lv-tekst sj-inspring">{t.boek.alinea2}</p>
+          <p className="lv-tekst sj-inspring">{p(1, t.boek.alinea2)}</p>
           <blockquote className="lv-tekst sj-citaat cursief">{t.boek.citaat}</blockquote>
           <h3 className="lv-h4 tweede">{t.boek.h3}</h3>
           <p className="lv-klein sj-noot">{t.boek.noot}</p>
@@ -62,11 +69,11 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
         <div className="sj sj-affiche">
           <p className="lv-h4 kapitalen tweede">{t.affiche.boven}</p>
           <h1 className="lv-groot">{zin}</h1>
-          <h2 className="lv-h3">{t.affiche.plaats}</h2>
+          <h2 className="lv-h3">{merk(t.affiche.plaats)}</h2>
           <p className="lv-tekst cijfers">{t.affiche.tijd}</p>
           <h3 className="lv-h4 tweede">{t.affiche.h2}</h3>
           <p className="lv-tekst" data-weduwe>
-            {t.affiche.alinea}
+            {p(0, t.affiche.alinea)}
           </p>
           <blockquote className="lv-tekst cursief">{t.affiche.citaat}</blockquote>
           <p className="lv-klein cijfers">{t.affiche.bijschrift}</p>
@@ -79,8 +86,8 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
           <h1 className="lv-h1">{zin}</h1>
           <h2 className="lv-h3 tweede">{t.dia.h2}</h2>
           <ul className="lv-tekst sj-punten">
-            {t.dia.punten.map((p) => (
-              <li key={p}>{p}</li>
+            {(paras ?? t.dia.punten).slice(0, 4).map((punt, i) => (
+              <li key={i}>{punt}</li>
             ))}
           </ul>
           <blockquote className="lv-h4 cursief">{t.dia.citaat}</blockquote>
@@ -91,7 +98,7 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
       return (
         <div className="sj sj-brief">
           <div className="sj-kaartje">
-            <p className="lv-h3 sj-woordmerk">{t.briefpapier.merk}</p>
+            <p className="lv-h3 sj-woordmerk">{merk(t.briefpapier.merk)}</p>
             <p className="lv-h4">{t.briefpapier.naam}</p>
             <p className="lv-klein kapitalen tweede">{t.briefpapier.functie}</p>
             <p className="lv-klein cijfers sj-contact">
@@ -101,13 +108,13 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
             </p>
           </div>
           <div className="sj-brief-vel">
-            <p className="lv-h4 sj-woordmerk">{t.briefpapier.merk}</p>
+            <p className="lv-h4 sj-woordmerk">{merk(t.briefpapier.merk)}</p>
             <p className="lv-klein cijfers">{t.briefpapier.datum}</p>
             <h1 className="lv-h3">{zin}</h1>
             <p className="lv-klein kapitalen tweede">{t.briefpapier.betreft}</p>
             <p className="lv-tekst">{t.briefpapier.aanhef}</p>
             <p className="lv-tekst" data-weduwe>
-              {t.briefpapier.alinea}
+              {p(0, t.briefpapier.alinea)}
             </p>
             <blockquote className="lv-tekst cursief">{t.briefpapier.citaat}</blockquote>
             <p className="lv-tekst">
@@ -123,7 +130,7 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
       return (
         <div className="sj sj-app">
           <div className="sj-balk">
-            <span className="lv-h4">{t.app.balk}</span>
+            <span className="lv-h4">{merk(t.app.balk)}</span>
           </div>
           <h1 className="lv-h2">{zin}</h1>
           <h2 className="lv-h3 tweede">{t.app.h3}</h2>
@@ -139,7 +146,7 @@ export function Sjabloon({ kind, zin }: { kind: Template; zin: string }) {
               <strong>{t.app.totaal[1]}</strong>
             </li>
           </ul>
-          <span className="sj-knop">{t.app.knop}</span>
+          <span className="sj-knop">{knop(t.app.knop)}</span>
           <p className="lv-klein cijfers sj-tekens">{t.app.tekens}</p>
           <blockquote className="lv-tekst cursief">{t.app.citaat}</blockquote>
           <p className="lv-klein">{t.app.bijschrift}</p>
