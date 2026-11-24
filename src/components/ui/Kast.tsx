@@ -25,6 +25,8 @@ export function Kast({ failed }: { failed: boolean }) {
   const catalogue = useLetters((s) => s.catalogue)
   const role = useLetters((s) => s.role)
   const z = useLetters((s) => s.zetsel)
+  // Een laatje dat in de drukkerij is opengetrokken, staat hier ook open
+  const pulled = useLetters((s) => s.drawer)
   const specimens = useSpecimens()
   const wide = useMediaQuery('(min-width: 1024px)')
   const [query, setQuery] = useState('')
@@ -45,6 +47,7 @@ export function Kast({ failed }: { failed: boolean }) {
 
   const searching = query.trim().length > 0
   const toggle = (drawer: Drawer, isOpen: boolean) => {
+    if (!isOpen && pulled === drawer) store.openDrawer(null)
     const next = new Set(open)
     if (isOpen) next.add(drawer)
     else next.delete(drawer)
@@ -76,7 +79,7 @@ export function Kast({ failed }: { failed: boolean }) {
         const fonts = byDrawer.get(drawer) ?? []
         if (fonts.length === 0) return null
         return (
-          <details key={drawer} className="laatje" open={searching || open.has(drawer)} onToggle={(e) => !searching && toggle(drawer, e.currentTarget.open)}>
+          <details key={drawer} className="laatje" open={searching || open.has(drawer) || pulled === drawer} onToggle={(e) => !searching && toggle(drawer, e.currentTarget.open)}>
             <summary>
               <span className="laatje-naam">{k.laatjes[drawer]}</span>
               <span className="laatje-aantal">{k.aantal(fonts.length)}</span>
