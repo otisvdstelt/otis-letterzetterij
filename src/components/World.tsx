@@ -1,13 +1,14 @@
 import { PerformanceMonitor } from '@react-three/drei'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { EffectComposer } from '@react-three/postprocessing'
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
+import { Vector3 } from 'three'
 import type { Phase } from '../lib/air'
-import { store } from '../lib/store'
-import { VIEWS } from '../lib/world/spec'
+import { store, useLetters } from '../lib/store'
+import { PRESS, VIEWS } from '../lib/world/spec'
 import { lettering, PartsContext, useDrukkerijModel } from './three/assets'
 import { Atmosphere } from './three/Atmosphere'
-import { CameraRig } from './three/CameraRig'
+import { CameraRig, type Inset } from './three/CameraRig'
 import { Drukkerij } from './three/Drukkerij'
 import { InkPaper } from './three/InkPaper'
 import { look } from './three/look'
@@ -20,7 +21,13 @@ export interface WorldProps {
   /** Een telefoon of een zuinig apparaat krijgt minder pixels en kleinere schaduwen */
   modest: boolean
   onReady: () => void
+  /** Hoeveel ruimte de papieren panelen innemen, zodat de camera het onderwerp in de vrije ruimte zet */
+  inset: Inset
+  /** Waar de hendel van de pers op het scherm staat, zodat je hem in de papieren laag kunt pakken */
+  onLever?: (at: { x: number; y: number } | null) => void
 }
+
+export type { Inset }
 
 // Wat elk soort apparaat moet tekenen
 const BUDGET = {
@@ -47,8 +54,25 @@ function Wakker() {
   return null
 }
 
+/** Meet waar het handvat van de hendel op het scherm staat, na elke camerabeweging */
+function LeverOnScreen({ onLever }: { onLever: (at: { x: number; y: number } | null) => void }) {
+  const camera = useThree((s) => s.camera)
+  const size = useThree((s) => s.size)
+  const view = useLetters((s) => s.view)
+  const last = useRef('')
+  useFrame(() => {
+    const p = new Vector3(...PRESS.lever.tip).project(camera)
+    const at = view === 'pers' && p.z < 1 ? { x: Math.round(((p.x + 1) / 2) * size.width), y: Math.round(((1 - p.y) / 2) * size.height) } : null
+    const key = JSON.stringify(at)
+    if (key === last.current) return
+    last.current = key
+    onLever(at)
+  })
+  return null
+}
+
 /** De drukkerij in 3D. Alleen weergave: hij leest de store en stuurt intenties terug */
-export default function World({ phase, reducedMotion, modest, onReady }: WorldProps) {
+export default function World({ phase, reducedMotion, modest, onReady, inset, onLever }: WorldProps) {
   const parts = useDrukkerijModel()
   use(lettering)
   const budget = modest ? BUDGET.modest : BUDGET.full
@@ -71,7 +95,7 @@ export default function World({ phase, reducedMotion, modest, onReady }: WorldPr
       frameloop="demand"
       dpr={[1, dpr]}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
-      camera={{ fov: VIEWS.pers.wide.fov, near: 0.1, far: 40, position: VIEWS.pers.wide.position as unknown as [number, number, number] }}
+      camera={{ fov: VIEWS.werkbank.wide.fov, near: 0.1, far: 40, position: VIEWS.werkbank.wide.position as unknown as [number, number, number] }}
       onCreated={(state) => {
         state.gl.setClearColor(look.paper)
         if (import.meta.env.DEV) (window as unknown as { __drukkerij?: unknown }).__drukkerij = state
@@ -80,7 +104,8 @@ export default function World({ phase, reducedMotion, modest, onReady }: WorldPr
       <PerformanceMonitor bounds={() => [50, 62]} flipflops={3} onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))} onIncline={() => setDpr((d) => Math.min(budget.dpr[1], d + 0.25))} onFallback={() => setDpr(0.75)} />
       <PartsContext value={parts}>
         <Wakker />
-        <CameraRig reducedMotion={reducedMotion} />
+        <CameraRig reducedMotion={reducedMotion} inset={inset} />
+        {onLever && <LeverOnScreen onLever={onLever} />}
         <Atmosphere phase={phase} shadowSize={budget.shadow} />
         <Drukkerij reducedMotion={reducedMotion} />
         <Reveal reducedMotion={reducedMotion} />
