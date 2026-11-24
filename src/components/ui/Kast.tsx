@@ -2,7 +2,7 @@ import { useId, useMemo, useState, type KeyboardEvent } from 'react'
 import { strings } from '../../content/strings'
 import { DRAWERS, type Drawer, type FontEntry } from '../../lib/type/catalogue'
 import { ROLES } from '../../lib/type/zetsel'
-import { store, useLetters } from '../../lib/store'
+import { familyOf, store, useLetters } from '../../lib/store'
 import { useSpecimens } from '../../hooks/useCatalogue'
 import { Magazijn } from './Magazijn'
 import { Specimen } from './Specimen'
@@ -33,9 +33,14 @@ export function KastPaneel({ failed }: { failed: boolean }) {
   const open = useLetters((s) => s.drawer)
   return (
     <section className="paneel kast" aria-labelledby="kast-kop">
-      <h2 id="kast-kop" className="paneel-naam">
-        {strings.stappen.namen.kast}
-      </h2>
+      <div className="paneel-boven">
+        <h2 id="kast-kop" className="paneel-naam">
+          {strings.stappen.namen.kast}
+        </h2>
+        <button type="button" className="quiet" onClick={() => store.look('werkbank')}>
+          ← {strings.stappen.namen.werkbank}
+        </button>
+      </div>
       {failed && <p className="hand">{strings.laden.kastMislukt}</p>}
       <Voorstel />
       <h3 className="voorstel-kop">{k.zelf}</h3>
@@ -91,6 +96,13 @@ export function LaatjePaneel() {
           </label>
         ))}
       </div>
+      {/* Jouw letter gevonden? Zet er hier meteen een klem op */}
+      {z.klem !== role && (
+        <button type="button" className="slip paper klem-knop" onClick={() => store.clamp(role)}>
+          <span className="klem" aria-hidden="true" />
+          {strings.werkbank.zetKlem(role)}: <span className="hand">{familyOf(z[role])}</span>
+        </button>
+      )}
       <div className="field kast-zoek">
         <label htmlFor={searchId}>{k.zoek}</label>
         <input id={searchId} type="search" value={query} onChange={(e) => setQuery(e.target.value)} autoComplete="off" />
