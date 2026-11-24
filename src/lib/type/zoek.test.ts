@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { alternatieven } from '../../content/alternatieven'
 import { parseCatalogue } from './catalogue'
-import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief, meetBouw, mist, voldoetEerst } from './zoek'
+import { bouw, kan, lijktOp, richting, schreefvorm, voldoet, zoekAlternatief, meetBouw, mist, voldoetEerst, leesWoorden, zoekOpEigenschappen } from './zoek'
+import { woorden } from '../../content/woorden'
 import { BOUWLIJST } from './bouwlijst'
 
 const catalogue = parseCatalogue(JSON.parse(readFileSync(new URL('../../../public/data/fonts.json', import.meta.url), 'utf8')))
@@ -107,5 +108,37 @@ describe('wat een letter mist', () => {
     const list = [font('abril-fatface'), font('inter'), font('pt-serif'), font('fraunces')]
     const sorted = voldoetEerst(list, ['gewichten'])
     expect(sorted.map((f) => f.id)).toEqual(['inter', 'fraunces', 'abril-fatface', 'pt-serif'])
+  })
+})
+
+describe('zoeken met gewone woorden', () => {
+  it('leest "ronde letter voor kinderen" als rond, speels en warm', () => {
+    const { herkend, eigenschappen } = leesWoorden('ronde letter voor kinderen', woorden)
+    expect(herkend).toEqual(['rond', 'voor kinderen'])
+    expect(eigenschappen).toContainEqual({ soort: 'gevoel', gevoel: 'speels' })
+    expect(eigenschappen).toContainEqual({ soort: 'maat', maat: 'rond' })
+  })
+
+  it('neemt het langste woord: modern is niet mode', () => {
+    expect(leesWoorden('modern', woorden).herkend).toEqual(['modern'])
+  })
+
+  it('vindt bij rond en speels ronde, speelse letters', () => {
+    const found = zoekOpEigenschappen(fonts, leesWoorden('ronde letter voor kinderen', woorden).eigenschappen, 8)
+    expect(found.length).toBeGreaterThan(3)
+    expect(found.slice(0, 4).filter((f) => f.moods.includes('speels') || f.moods.includes('warm')).length).toBeGreaterThanOrEqual(2)
+    expect(found.slice(0, 4).every((f) => f.metrics.roundness > 0.9), found.map((f) => f.id).join(' ')).toBe(true)
+  })
+
+  it('vindt bij chic een letter met contrast, bij stoer een grove displayletter', () => {
+    const chic = zoekOpEigenschappen(fonts, leesWoorden('chic', woorden).eigenschappen, 3)
+    expect(chic.every((f) => f.metrics.contrast > 2), chic.map((f) => f.id).join(' ')).toBe(true)
+    const stoer = zoekOpEigenschappen(fonts, leesWoorden('stoer', woorden).eigenschappen, 3)
+    expect(stoer.every((f) => f.kind === 'display' && bouw(f) === 'grotesk'), stoer.map((f) => f.id).join(' ')).toBe(true)
+  })
+
+  it('geeft niets bij woorden die het niet kent', () => {
+    expect(leesWoorden('blauwe banaan', woorden).eigenschappen).toEqual([])
+    expect(zoekOpEigenschappen(fonts, [])).toEqual([])
   })
 })

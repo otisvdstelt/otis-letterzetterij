@@ -3,9 +3,9 @@
 // Hier staan geen woorden: de knopjes en hun namen staan in strings.ts
 
 import { BOUWLIJST } from './bouwlijst.ts'
-import type { FontEntry, Kind } from './catalogue.ts'
+import type { FontEntry, Kind, Mood } from './catalogue.ts'
 
-type Font = Pick<FontEntry, 'id' | 'kind' | 'category' | 'weights' | 'axes' | 'italic' | 'metrics' | 'coverage' | 'scripts'>
+type Font = Pick<FontEntry, 'id' | 'kind' | 'category' | 'weights' | 'axes' | 'italic' | 'metrics' | 'coverage' | 'scripts' | 'moods'>
 
 /** Hoe de schreven eruitzien */
 export type Schreef = 'geen' | 'slab' | 'wig' | 'haarlijn'
@@ -165,4 +165,94 @@ export function zoekAlternatief(query: string, lijst: readonly Alternatief[]): A
   const q = plain(query)
   if (q.length < 3) return null
   return lijst.find((a) => [a.naam, ...(a.ook ?? [])].some((n) => plain(n).startsWith(q) || q.startsWith(plain(n)))) ?? null
+}
+
+/** Waar een gewoon woord naar wijst: een gevoel, een laatje, een bouw, een schreef, of een kant van een meting */
+export type Eigenschap =
+  | { soort: 'gevoel'; gevoel: Mood }
+  | { soort: 'laatje'; kind: Kind }
+  | { soort: 'bouw'; bouw: Bouw }
+  | { soort: 'schreef'; schreef: Schreef }
+  | { soort: 'maat'; maat: 'rond' | 'strak' | 'smal' | 'breed' | 'contrast' | 'groot-oog' | 'zwaar' }
+
+/** Een rijtje woorden ("rond", "ronde", "rondjes") en waar ze naar wijzen */
+export interface Woord {
+  woorden: string[]
+  eigenschappen: Eigenschap[]
+}
+
+/**
+ * Lees gewone woorden: "ronde letter voor kinderen" wordt rond, speels en warm. Een woord telt als het met een
+ * bekend woord begint, zodat "ronde" en "rondjes" ook "rond" zijn; het langste passende woord wint. Wat niet herkend wordt, wordt overgeslagen
+ */
+export function leesWoorden(query: string, lijst: readonly Woord[]): { herkend: string[]; eigenschappen: Eigenschap[] } {
+  const tokens = query.split(/[\s,.;!?]+/).map(plain).filter((t) => t.length >= 3)
+  const herkend: string[] = []
+  const eigenschappen: Eigenschap[] = []
+  for (const t of tokens) {
+    // Het langste woord dat past, wint: "modern" is modern, niet "mode"
+    let woord: Woord | null = null
+    let best = 0
+    for (const w of lijst)
+      for (const x of w.woorden) {
+        const p = plain(x)
+        if (t.startsWith(p) && p.length > best) {
+          best = p.length
+          woord = w
+        }
+      }
+    if (!woord) continue
+    herkend.push(woord.woorden[0])
+    for (const e of woord.eigenschappen) if (!eigenschappen.some((x) => JSON.stringify(x) === JSON.stringify(e))) eigenschappen.push(e)
+  }
+  return { herkend: [...new Set(herkend)], eigenschappen }
+}
+
+const zwaarste = (f: Font) => f.axes?.wght?.max ?? Math.max(...f.weights)
+
+/** Hoe ver een letter boven of onder het gemiddelde van de kast zit, in standaardafwijkingen, afgekapt op 2 */
+function zscore(fonts: readonly Font[], meet: (f: Font) => number) {
+  const values = fonts.map(meet)
+  const mean = values.reduce((s, v) => s + v, 0) / values.length
+  const sd = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length) || 1
+  return (f: Font) => Math.max(-2, Math.min(2, (meet(f) - mean) / sd))
+}
+
+/** De letters die het best bij de eigenschappen passen, de beste eerst. Alleen wat er echt bij past (score boven nul) */
+export function zoekOpEigenschappen<T extends Font>(fonts: readonly T[], eigenschappen: readonly Eigenschap[], n = 12): T[] {
+  if (eigenschappen.length === 0) return []
+  const maat = {
+    rond: zscore(fonts, (f) => f.metrics.roundness),
+    strak: zscore(fonts, (f) => -f.metrics.roundness),
+    smal: zscore(fonts, (f) => -f.metrics.avgWidth),
+    breed: zscore(fonts, (f) => f.metrics.avgWidth),
+    contrast: zscore(fonts, (f) => Math.log(f.metrics.contrast)),
+    'groot-oog': zscore(fonts, (f) => f.metrics.xHeight / f.metrics.capHeight),
+    zwaar: zscore(fonts, zwaarste),
+  }
+  // Handschrift en displayletters meten vreemd (een krul is ook rond); ze doen alleen mee als je om dat laatje vraagt
+  const laatjes = eigenschappen.flatMap((e) => (e.soort === 'laatje' ? [e.kind] : []))
+  const score = (f: Font) =>
+    (f.kind === 'display' && !laatjes.includes('display') ? -0.75 : 0) +
+    eigenschappen.reduce((s, e) => {
+      switch (e.soort) {
+        case 'gevoel':
+          return s + (f.moods.includes(e.gevoel) ? 1.5 : 0)
+        case 'laatje':
+          return s + (f.kind === e.kind ? 1.5 : -0.5)
+        case 'bouw':
+          return s + (bouw(f) === e.bouw ? 1 : 0)
+        case 'schreef':
+          return s + (schreefvorm(f) === e.schreef ? 1 : 0)
+        case 'maat':
+          return s + maat[e.maat](f) * 0.6
+      }
+    }, 0)
+  return fonts
+    .filter((f) => f.kind !== 'handschrift' || laatjes.includes('handschrift'))
+    .map((f) => ({ f, s: score(f) }))
+    .filter((x) => x.s > 0)
+    .sort((a, b) => b.s - a.s || a.f.id.localeCompare(b.f.id))
+    .slice(0, n)
+    .map((x) => x.f)
 }
