@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber'
 import { useState, useRef } from 'react'
 import { Color, type DirectionalLight, type HemisphereLight, type PointLight } from 'three'
-import { air, type Phase } from '../../lib/air'
+import { air, stepNight, type Phase } from '../../lib/air'
 import { LAMP, WINDOW } from '../../lib/world/spec'
 import { look } from './look'
 import { setGlow } from './materials'
@@ -11,8 +11,6 @@ const c = (hex: string) => new Color(hex)
 // Overdag valt er licht door het raam. 's Nachts doet de lamp boven de pers het werk
 const DAY = { hemiSky: c('#fbf1dc'), hemiGround: c('#a08266'), hemi: 2.2, sun: c('#ffe6b8'), sunPower: 2.6, lamp: 0.8, paper: c('#f7f4eb'), ink: c('#1c1917') }
 const NIGHT: typeof DAY = { hemiSky: c('#4a5488'), hemiGround: c('#1d1a26'), hemi: 0.5, sun: c('#a9bfff'), sunPower: 0.3, lamp: 4.2, paper: c('#171b2e'), ink: c('#070914') }
-
-const ease = (from: number, to: number, delta: number, rate: number) => from + (to - from) * (1 - Math.exp(-delta * rate))
 
 /** Het licht, het uur en de klok die elke shader leest */
 export function Atmosphere({ phase, shadowSize }: { phase: Phase; shadowSize: number }) {
@@ -29,7 +27,7 @@ export function Atmosphere({ phase, shadowSize }: { phase: Phase; shadowSize: nu
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1)
     air.time.value += dt
-    air.night.value = ease(air.night.value, night ? 1 : 0, Math.min(delta, 1), 1.6)
+    air.night.value = stepNight(air.night.value, phase, delta)
     const dusk = air.night.value
     look.paper.copy(DAY.paper).lerp(NIGHT.paper, dusk)
     look.ink.copy(DAY.ink).lerp(NIGHT.ink, dusk)

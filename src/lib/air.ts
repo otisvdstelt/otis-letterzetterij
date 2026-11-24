@@ -15,6 +15,24 @@ export const air = {
   wind: { x: 1, z: 0.35, strength: 0.4 },
 }
 
+/** Zo dichtbij is dag of nacht: dan staat het licht stil */
+export const SETTLED = 0.002
+
+/** Eén stap van de schemering naar het uur toe. Dichtbij springt hij erop, zodat hij echt stil komt te staan */
+export function stepNight(value: number, phase: Phase, delta: number): number {
+  const target = phase === 'night' ? 1 : 0
+  const next = value + (target - value) * (1 - Math.exp(-Math.min(delta, 1) * 3.5))
+  return Math.abs(next - target) < SETTLED ? target : next
+}
+
+/**
+ * Beweegt de lucht nog? Dan moet de drukkerij frames blijven vragen (frameloop demand),
+ * anders blijft het licht halverwege hangen
+ */
+export function airMoving(phase: Phase, a: Pick<typeof air, 'night' | 'reveal' | 'wipe'> = air): boolean {
+  return Math.abs(a.night.value - (phase === 'night' ? 1 : 0)) > SETTLED || a.reveal.value < 1 || a.wipe.value !== 0
+}
+
 const PHASE_KEY = 'letterzetterij-uur'
 
 /** Nacht van acht uur 's avonds tot zeven uur 's ochtends */
