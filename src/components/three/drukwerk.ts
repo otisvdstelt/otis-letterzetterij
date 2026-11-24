@@ -9,7 +9,7 @@ import { air } from '../../lib/air'
 
 /** Een vel is een vlak met genoeg punten om te wapperen. In de pers liggend, aan de lijn hangend aan zijn bovenrand */
 export const sheetGeometry = new PlaneGeometry(0.52, 0.36, 16, 12)
-export const hangingGeometry = new PlaneGeometry(0.3, 0.4, 12, 16).translate(0, -0.2, 0)
+export const hangingGeometry = new PlaneGeometry(0.42, 0.56, 12, 16).translate(0, -0.28, 0)
 
 /** De papiersoorten, in de volgorde van de potjes. Een eigen kleur krijgt de eerste */
 const PAPERS = Object.keys(strings.inkt.papieren)
