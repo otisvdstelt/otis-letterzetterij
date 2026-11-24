@@ -744,6 +744,92 @@
     background: var(--color-oat);
   }
 
+  /* ============================================================ eigen font en flesje */
+
+  .eigen,
+  .flesje-plakken {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 0.7rem;
+    padding: 0.6rem 0.7rem 0.7rem;
+    border: 1.5px dashed var(--color-rule);
+    border-radius: 6px;
+    transition:
+      border-color 200ms,
+      background-color 200ms;
+  }
+
+  .eigen[data-erover='true'] {
+    border-color: var(--color-rust);
+    background: color-mix(in srgb, var(--color-terracotta) 10%, transparent);
+  }
+
+  .eigen-kop {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--color-rust);
+  }
+
+  .eigen-knop {
+    cursor: pointer;
+  }
+
+  .eigen:has(input:focus-visible) .eigen-knop {
+    outline: 2.5px solid var(--color-dusk);
+    outline-offset: 3px;
+  }
+
+  .eigen-belofte {
+    font-style: italic;
+  }
+
+  .eigen-fout {
+    margin: 0;
+    color: var(--color-rust);
+  }
+
+  .sleep-hint {
+    position: fixed;
+    left: 50%;
+    top: 40%;
+    z-index: 70;
+    translate: -50% 0;
+    font-size: 1.4rem;
+    pointer-events: none;
+  }
+
+  .flesje-rij {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 0.5rem;
+  }
+
+  .flesje-keuze ul {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0.3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .flesje-knop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+  }
+
+  .flesje-stalen {
+    display: inline-flex;
+  }
+
+  .flesje-stalen span {
+    width: 1rem;
+    height: 1.4rem;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.2);
+  }
+
   /* ============================================================ het voorstel */
 
   .voorstel {

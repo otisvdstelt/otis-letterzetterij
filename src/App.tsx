@@ -1,5 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useState, type ReactNode } from 'react'
 import { PaperFilters } from './components/ui/Chrome'
+import { EigenFont } from './components/ui/EigenFont'
+import { FlesjePlakken } from './components/ui/FlesjePlakken'
 import { Header } from './components/ui/Header'
 import { InktPapier } from './components/ui/InktPapier'
 import { Inktrol, Rollend } from './components/ui/Inktrol'
@@ -109,7 +111,7 @@ export default function App({ broken = false }: { broken?: boolean }) {
       content: (
         <>
           <Winkelhaak />
-          <InktPapier />
+          <InktPapier plakken={<FlesjePlakken />} />
         </>
       ),
     },
@@ -125,7 +127,7 @@ export default function App({ broken = false }: { broken?: boolean }) {
       {failed && <p className="mislukt slip paper hand">{strings.wereld.mislukt}</p>}
       <main className="drukkerij">
         <div className="links">
-          <Werkbank />
+          <Werkbank dropzone={<EigenFont />} />
           <Kast failed={catalogue.isError} />
         </div>
         <div className="midden">
