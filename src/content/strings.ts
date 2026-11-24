@@ -751,6 +751,7 @@ export const strings = {
     opStapel: (naam: string, n: number) => `${naam} ligt opzij. Er liggen er nu ${inWoorden(n)}.`,
     vanStapel: (naam: string) => `${naam} ligt niet meer opzij.`,
     stapelVol: 'Er liggen al zes letters opzij. Haal er eerst een weg.',
+    zipMislukt: 'Het inpakken lukte niet. Probeer het nog eens.',
     houd: (naam: string, rol: Role) => `${naam} blijft de ${ROLNAAM[rol]}. Ik zoek er drie andere ${rol === 'kop' ? 'teksten' : 'koppen'} bij.`,
     proef: 'Drie paren naast elkaar gedrukt, met jouw tekst.',
     drukkerStil: (stil: boolean) => (stil ? 'De drukker houdt zijn mond.' : 'De drukker praat weer mee.'),
