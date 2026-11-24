@@ -15,7 +15,7 @@ export function Voorstel() {
   return (
     <div className="voorstel" aria-labelledby="voorstel-kop">
       <h3 id="voorstel-kop" className="voorstel-kop">
-        {v.kop}
+        {strings.kast.paren}
       </h3>
       <p className="klein-uitleg">{z.klem ? v.uitlegKlem(familyOf(z[z.klem]), z.klem) : v.uitlegVrij(z.doel)}</p>
       {list.length === 0 && <p className="hand">{v.leeg}</p>}
@@ -44,12 +44,6 @@ export function Voorstel() {
           )
         })}
       </ol>
-      <button type="button" className="inked" onClick={() => store.surprise()} aria-describedby="verras-uitleg">
-        {v.verras}
-      </button>
-      <p id="verras-uitleg" className="klein-uitleg">
-        {v.verrasUitleg}
-      </p>
     </div>
   )
 }
