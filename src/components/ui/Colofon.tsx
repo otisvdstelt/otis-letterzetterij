@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { strings } from '../../content/strings'
-import { lettersOf, useLetters } from '../../lib/store'
+import { lettersOf, store, useLetters } from '../../lib/store'
+import { Schakelaar } from './Schakelaar'
 
 const PORTFOLIO = 'https://otisstelt.vercel.app'
 
@@ -8,6 +9,7 @@ const PORTFOLIO = 'https://otisstelt.vercel.app'
 export function Colofon() {
   const dialog = useRef<HTMLDialogElement>(null)
   const letters = useLetters((s) => lettersOf(s.zetsel, s))
+  const quiet = useLetters((s) => s.quiet)
   const c = strings.colofon
   const inUse = letters ? [...new Map([letters.kop, letters.tekst].map((f) => [f.id, f])).values()] : []
   return (
@@ -34,6 +36,9 @@ export function Colofon() {
               {c.portfolio}
             </a>
           </p>
+          <h3>{c.drukkerKop}</h3>
+          <p>{c.drukkerUitleg}</p>
+          <Schakelaar label={strings.drukkerStil.label} on={quiet} off={strings.drukkerStil.praat} onWord={strings.drukkerStil.stil} toggle={() => store.setQuiet(!quiet)} />
           <h3>{c.privacyKop}</h3>
           <p>{c.privacy}</p>
           <h3>{c.lettersKop}</h3>
