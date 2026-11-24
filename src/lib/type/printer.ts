@@ -63,6 +63,10 @@ export type FixId =
   | 'betere-inkt'
   | 'betere-tweede-inkt'
 
+/** Alle opmerkingen en oplossingen, voor wie ze allemaal een zin moet geven */
+export const REMARK_IDS: readonly RemarkId[] = ['twee-schreef', 'te-gelijk', 'twee-display', 'tekst-display', 'tekst-handschrift', 'tekst-mono', 'x-hoogte', 'familie-dun', 'regel-lang', 'regel-kort', 'te-klein', 'interlinie-krap', 'interlinie-ruim', 'weduwe', 'uitvullen', 'nep-vet', 'nep-cursief', 'geen-vet', 'geen-cursief', 'doel-handschrift', 'doel-dun', 'doel-tekens', 'doel-cijfers', 'doel-schaal', 'doel-display', 'doel-haarlijnen', 'ij', 'inkt-zwak', 'tweede-inkt-zwak', 'inkt-presentatie', 'lof-paar', 'lof-klaar']
+export const FIX_IDS: readonly FixId[] = ['wissel-kop', 'wissel-tekst', 'als-kop', 'zet-regel', 'zet-maat', 'zet-interlinie', 'mooi-afbreken', 'links-uitlijnen', 'echt-gewicht', 'cursief-uit', 'zwaarder', 'tabelcijfers-aan', 'zet-schaal', 'ij-hoofdletter', 'betere-inkt', 'betere-tweede-inkt']
+
 export type Tone = 'kritiek' | 'tip' | 'lof'
 export type Topic = 'paar' | 'zetsel' | 'ontbrekend' | 'doel' | 'nederlands' | 'inkt' | 'lof'
 export type Params = Record<string, string | number>

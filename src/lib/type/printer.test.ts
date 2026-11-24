@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { parseCatalogue } from './catalogue'
 import { contrastRatio } from './contrast'
 import { parsePairings } from './pairing'
-import { remarks, type Facts, type RemarkId } from './printer'
+import { REMARK_IDS, remarks, type Facts, type RemarkId } from './printer'
 import { startZetsel, withFont, withGoal, withStyle, type Zetsel } from './zetsel'
 
 const catalogue = parseCatalogue(JSON.parse(readFileSync(new URL('../../../public/data/fonts.json', import.meta.url), 'utf8')))
@@ -53,7 +53,7 @@ const situations: Record<RemarkId, Facts> = {
 
 describe('de drukker', () => {
   it('heeft voor elke opmerking een situatie', () => {
-    expect(Object.keys(situations).sort()).toHaveLength(32)
+    expect(Object.keys(situations).sort()).toEqual([...REMARK_IDS].sort())
   })
 
   it('zegt bij een goed zetsel alleen iets aardigs', () => {
