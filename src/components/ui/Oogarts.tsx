@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { strings } from '../../content/strings'
 import { fontStack } from '../../lib/type/fontface'
-import { fontById, store, useLetters } from '../../lib/store'
+import { fontById, oogartsNog, store, useLetters } from '../../lib/store'
 import { useFontFaces } from '../../hooks/useFontFaces'
 
 const o = strings.oogarts
@@ -13,6 +13,7 @@ const o = strings.oogarts
 export function Oogarts() {
   const oogarts = useLetters((s) => s.oogarts)
   const z = useLetters((s) => s.zetsel)
+  const nog = useLetters(oogartsNog)
   const ref = useRef<HTMLDialogElement>(null)
   const pair = oogarts?.staat.paar ?? null
   const fonts = (pair ?? []).map((id) => fontById(id)).filter((f) => f !== null)
@@ -41,7 +42,7 @@ export function Oogarts() {
           </div>
           <p className="klein-uitleg">{o.uitleg(oogarts.fase)}</p>
           <p className="hand oogarts-ronde" aria-live="polite">
-            {o.ronde(oogarts.staat.ronde, oogarts.staat.stapel.length)}
+            {o.nog(nog, oogarts.fase)}
           </p>
           <div className="oogarts-kaartjes">
             {fonts.map((f, i) => (

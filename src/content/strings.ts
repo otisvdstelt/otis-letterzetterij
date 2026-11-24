@@ -290,7 +290,7 @@ export const strings = {
     knop: 'Kies op het oog',
     kop: 'Deze of deze?',
     uitleg: (fase: string) => (fase === 'kop' ? 'Welke kop vind je beter? Kijk, en kies. Namen komen straks.' : 'En welke tekst leest het fijnst onder je kop?'),
-    ronde: (n: number, over: number) => `Ronde ${n} · nog ${over} op de stapel`,
+    nog: (n: number, fase: string) => (n <= 1 ? 'Nog één keer kiezen' : `Nog ±${n} keer kiezen`) + (fase === 'kop' ? ', dan de tekst.' : '.'),
     deze: 'Deze',
     dezeLabel: (kant: string) => `Deze, de ${kant}`,
     kanten: ['linker', 'rechter'],
