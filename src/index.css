@@ -1062,6 +1062,32 @@
     color: #8f4526;
   }
 
+  .magazijn {
+    display: grid;
+    gap: 0.4rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed rgb(243 234 216 / 0.3);
+  }
+
+  .magazijn-knop {
+    justify-self: start;
+    min-height: 2.75rem;
+  }
+
+  .magazijn-boven {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .kast .magazijn .quiet {
+    color: #e6dcc8;
+  }
+
+  .magazijn-letter {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   /* ============================================================ de pers */
 
   .pers {

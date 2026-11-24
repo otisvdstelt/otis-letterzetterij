@@ -191,6 +191,26 @@ export const strings = {
     soorten: { schreef: 'schreef', schreefloos: 'schreefloos', display: 'display', handschrift: 'handschrift', mono: 'mono' } as Record<string, string>,
   },
 
+  // ------------------------------------------------------------------ het magazijn
+  magazijn: {
+    knop: (n: number) => `Het magazijn: nog ${n} letters`,
+    knopKort: 'Het magazijn',
+    uitleg: 'Het hele archief van Fontsource. Die letters staan niet hier, maar bij jsDelivr.',
+    vraagKop: 'Naar het magazijn?',
+    vraag: 'Dit haalt letters op bij jsDelivr. Daarbij gaat je IP-adres naar hen. Doorgaan?',
+    sessie: 'Je antwoord geldt alleen zolang deze tab open is.',
+    ja: 'Doorgaan',
+    nee: 'Liever niet',
+    zoek: 'Zoek in het magazijn',
+    leeg: 'Niks gevonden.',
+    meer: (n: number) => `en nog ${n}. Zoek wat preciezer.`,
+    pak: (naam: string, rol: Role) => `${naam} ophalen, voor de ${ROLNAAM[rol]}`,
+    halen: 'wordt opgehaald',
+    mislukt: (naam: string) => `${naam} kwam niet uit het magazijn. Probeer het nog eens, of een andere.`,
+    categorie: { serif: 'schreef', 'sans-serif': 'schreefloos', display: 'display', handwriting: 'handschrift', monospace: 'mono' } as Record<string, string>,
+    sluit: 'dicht',
+  },
+
   // ------------------------------------------------------------------ een flesje uit de Kleurenalchemist
   flesje: {
     kop: 'Een flesje uit de Kleurenalchemist',
@@ -553,13 +573,13 @@ export const strings = {
     portfolio: 'Naar het portfolio',
     privacyKop: 'Privacy',
     privacy:
-      'Er is geen backend, er zijn geen analytics en geen cookies. Alle letters staan op deze site zelf: er gaat geen verzoek naar Google. Een eigen fontbestand verlaat je apparaat nooit. Je waslijn en je keuze voor dag of nacht staan alleen in je eigen browser. Een deellink bevat het zetsel en je zin, niet meer.',
+      'Er is geen backend, er zijn geen analytics en geen cookies. Alle letters in de kast staan op deze site zelf: er gaat geen verzoek naar Google. Alleen het magazijn haalt letters bij jsDelivr, en dat pas als je daar ja op zegt. Een eigen fontbestand verlaat je apparaat nooit. Je waslijn en je keuze voor dag of nacht staan alleen in je eigen browser. Een deellink bevat het zetsel en je zin, niet meer.',
     lettersKop: 'De letters',
     letters: 'Lettertypes van Google Fonts, via Fontsource, onder hun eigen open licenties (meestal OFL). De licentie staat bij elke letter in de kast.',
     inGebruik: 'Nu op het vel',
     bronnenKop: 'Bronnen',
     bronnen: [
-      ['Fontsource, de letters zelf gehost', 'https://fontsource.org'],
+      ['Fontsource, de letters zelf gehost (en het magazijn, via jsDelivr, alleen als je dat wilt)', 'https://fontsource.org'],
       ['SIL Open Font License', 'https://openfontlicense.org'],
       ['fontkit, letters lezen en meten', 'https://github.com/foliojs/fontkit'],
       ['culori, kleurruimtes en gamut mapping uit CSS Color 4', 'https://culorijs.org'],

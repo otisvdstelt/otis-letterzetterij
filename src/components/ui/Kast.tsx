@@ -5,6 +5,7 @@ import { ROLES } from '../../lib/type/zetsel'
 import { store, useLetters } from '../../lib/store'
 import { useSpecimens } from '../../hooks/useCatalogue'
 import { useMediaQuery } from '../../hooks/useLayout'
+import { Magazijn } from './Magazijn'
 import { Specimen } from './Specimen'
 
 const normal = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
@@ -105,6 +106,7 @@ export function Kast({ failed }: { failed: boolean }) {
           </details>
         )
       })}
+      <Magazijn />
     </section>
   )
 }
