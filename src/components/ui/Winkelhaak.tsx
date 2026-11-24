@@ -114,49 +114,66 @@ function RolInstellingen({ role }: { role: Role }) {
   )
 }
 
-/** De winkelhaak: je zin, en hoe hij gezet wordt. Per rol, en voor het hele vel */
-export function Winkelhaak() {
+/** Je zin, in de winkelhaak. Hij komt als grote kop op het vel en als lood in de pers */
+export function ZinVeld({ titel = false }: { titel?: boolean }) {
   const z = useLetters((s) => s.zetsel)
-  const role = useLetters((s) => s.role)
-  const tekst = useLetters((s) => fontById(s.zetsel.tekst, s))
   const zinId = useId()
-  const sjabloonId = useId()
   const count = [...z.zin].length
   return (
-    <section className="winkelhaak" aria-labelledby="winkelhaak-kop">
-      <h3 id="winkelhaak-kop" className="paneel-kop">
-        <Woord uitleg={w.uitleg.winkelhaak}>{w.kop}</Woord>
-      </h3>
+    <div className="field zin-veld">
+      <label htmlFor={zinId}>{titel ? <Woord uitleg={w.uitleg.winkelhaak}>{w.zin}</Woord> : w.zin}</label>
+      <textarea id={zinId} rows={2} maxLength={MAX_ZIN * 2} value={z.zin} onChange={(e) => store.update({ zin: e.target.value }, 'zin')} aria-describedby={`${zinId}-uitleg`} />
+      <p id={`${zinId}-uitleg`} className="klein-uitleg">
+        {w.zinUitleg} <span className="teller">{w.teller(count, MAX_ZIN)}</span>
+      </p>
+      <Stempel ids={['ij']} />
+    </div>
+  )
+}
 
-      <div className="field">
-        <label htmlFor={zinId}>{w.zin}</label>
-        <textarea id={zinId} rows={2} maxLength={MAX_ZIN * 2} value={z.zin} onChange={(e) => store.update({ zin: e.target.value }, 'zin')} aria-describedby={`${zinId}-uitleg`} />
-        <p id={`${zinId}-uitleg`} className="klein-uitleg">
-          {w.zinUitleg} <span className="teller">{w.teller(count, MAX_ZIN)}</span>
-        </p>
-        <Stempel ids={['ij']} />
-      </div>
-
-      <div className="field">
-        <label htmlFor={sjabloonId}>{w.sjabloon}</label>
-        <select id={sjabloonId} value={z.sjabloon} onChange={(e) => store.template(e.target.value as typeof z.sjabloon)}>
-          {TEMPLATES.map((t) => (
-            <option key={t} value={t}>
-              {strings.vel.sjablonen[t]}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="kast-rol" role="radiogroup" aria-label={w.rol}>
-        <span className="hand">{w.rol}</span>
-        {ROLES.map((r) => (
-          <label key={r} className="stemming" data-aan={role === r}>
-            <input type="radio" name="winkelhaak-rol" checked={role === r} onChange={() => store.setRole(r)} />
-            {strings.kast.rollen[r]}
-          </label>
+/** Welk sjabloon het vel is */
+export function SjabloonKeuze() {
+  const z = useLetters((s) => s.zetsel)
+  const sjabloonId = useId()
+  return (
+    <div className="field">
+      <label htmlFor={sjabloonId}>{w.sjabloon}</label>
+      <select id={sjabloonId} value={z.sjabloon} onChange={(e) => store.template(e.target.value as typeof z.sjabloon)}>
+        {TEMPLATES.map((t) => (
+          <option key={t} value={t}>
+            {strings.vel.sjablonen[t]}
+          </option>
         ))}
-      </div>
+      </select>
+    </div>
+  )
+}
+
+/**
+ * Fijnzetten: gewicht, cursief, spatiëring, assen, korps, interlinie, regel, schaal, uitlijning, tabelcijfers en afbreken.
+ * Standaard dicht. De drukker zet het open als hij iets oplost dat hier staat, zodat je ziet wat er veranderde
+ */
+export function Fijnzetten() {
+  const z = useLetters((s) => s.zetsel)
+  const role = useLetters((s) => s.role)
+  const open = useLetters((s) => s.fine)
+  const tekst = useLetters((s) => fontById(s.zetsel.tekst, s))
+  return (
+    <details className="fijnzetten" open={open} onToggle={(e) => store.setFine(e.currentTarget.open)}>
+      <summary>
+        <span className="paneel-kop">{strings.vel.fijnzetten}</span>
+        <span className="klein-uitleg">{strings.vel.fijnUitleg}</span>
+      </summary>
+      <div className="fijnzetten-inhoud">
+        <div className="kast-rol" role="radiogroup" aria-label={w.rol}>
+          <span className="hand">{w.rol}</span>
+          {ROLES.map((r) => (
+            <label key={r} className="stemming" data-aan={role === r}>
+              <input type="radio" name="winkelhaak-rol" checked={role === r} onChange={() => store.setRole(r)} />
+              {strings.kast.rollen[r]}
+            </label>
+          ))}
+        </div>
       <RolInstellingen role={role} key={role} />
 
       <h4 className="hand winkelhaak-sub">{w.algemeen}</h4>
@@ -229,6 +246,7 @@ export function Winkelhaak() {
         </label>
       </div>
       <Stempel ids={['weduwe']} />
-    </section>
+      </div>
+    </details>
   )
 }
