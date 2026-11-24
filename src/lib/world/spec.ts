@@ -93,8 +93,24 @@ export const DRUKKER = {
   shoulderR: [0.21, 1.4, 0] as Vec3,
 }
 
-/** Hoe de camera kijkt. Breed de hele drukkerij, smal (een telefoon) wat dichter op de pers */
-export const VIEWS = {
-  wide: { position: [0.35, 2.35, 6.3] as Vec3, target: [0.15, 1.25, -0.5] as Vec3, fov: 36 },
-  narrow: { position: [0.3, 2.1, 5.4] as Vec3, target: [0.25, 1.2, -0.4] as Vec3, fov: 46 },
+/** Hoe de camera kijkt, per plek. Breed de hele drukkerij, smal (een telefoon) wat dichter en wijder */
+export interface View {
+  position: Vec3
+  target: Vec3
+  fov: number
+}
+
+export const VIEWS: Record<'pers' | 'kast' | 'waslijn', { wide: View; narrow: View }> = {
+  pers: {
+    wide: { position: [0.35, 2.35, 6.3], target: [0.15, 1.25, -0.5], fov: 36 },
+    narrow: { position: [0.3, 2.1, 5.4], target: [0.25, 1.2, -0.4], fov: 46 },
+  },
+  kast: {
+    wide: { position: [-2.0, 1.85, 2.4], target: [-3.05, 0.95, -1.8], fov: 40 },
+    narrow: { position: [-2.3, 1.8, 2.6], target: [-3.05, 0.95, -1.8], fov: 50 },
+  },
+  waslijn: {
+    wide: { position: [2.0, 2.15, 0.8], target: [2.0, 2.35, -1.55], fov: 42 },
+    narrow: { position: [2.0, 2.1, 1.4], target: [2.0, 2.3, -1.55], fov: 54 },
+  },
 }
