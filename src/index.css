@@ -2898,10 +2898,11 @@
       display: none;
     }
 
+    /* Bovenin, onder de kop: daar ligt nooit een paneel, hoe hoog het laatje ook wordt */
     .terug-naar-vel {
-      top: auto;
+      top: calc(var(--boven) + 0.2rem);
       right: 0.8rem;
-      bottom: calc(var(--strook) + 38svh + 1.2rem);
+      bottom: auto;
     }
 
     .papier[data-uitzicht='waslijn'] .waslijn {
