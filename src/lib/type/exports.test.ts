@@ -118,7 +118,7 @@ describe('zelf hosten', () => {
     const names = host.files.map((f) => f.name)
     expect(names.filter((n) => n.startsWith('fraunces-')).every((n) => n.includes('normal'))).toBe(true)
     expect(names.some((n) => n.startsWith('inter-') && n.includes('italic'))).toBe(true)
-    expect(host.css).toMatch(/src: url("./fonts/inter-latin-(wght|standard)-normal.woff2") format("woff2");/)
+    expect(host.css).toMatch(/src: url\("\.\/fonts\/inter-latin-(wght|standard)-normal\.woff2"\) format\("woff2"\);/)
     expect(host.bytes).toBeGreaterThan(50_000)
   })
 
