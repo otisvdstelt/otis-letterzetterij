@@ -4,7 +4,7 @@ import type { EigenTekst } from '../../lib/type/zetsel'
 
 /**
  * De zes sjablonen. Elk heeft koppen op meerdere niveaus, broodtekst, een citaat en een klein bijschrift,
- * zodat de hele schaal te zien is. Jouw zin is de grote kop
+ * zodat de hele schaal te zien is. Jouw kop, naam, alinea's, knop en menu gaan voor; verder staat er neutrale vultekst bij het doel
  */
 export function Sjabloon({ kind, zin, eigen }: { kind: Template; zin: string; eigen?: EigenTekst }) {
   const t = strings.zetsel
@@ -51,7 +51,7 @@ export function Sjabloon({ kind, zin, eigen }: { kind: Template; zin: string; ei
     case 'boek':
       return (
         <div className="sj sj-boek">
-          <p className="lv-klein kapitalen sj-kopregel">{t.boek.kopregel}</p>
+          <p className="lv-klein kapitalen sj-kopregel">{merk(t.boek.kopregel)}</p>
           <p className="lv-klein kapitalen tweede">{t.boek.hoofdstuk}</p>
           <h1 className="lv-h2">{zin}</h1>
           <p className="lv-tekst sj-eerste" data-weduwe>
@@ -147,6 +147,11 @@ export function Sjabloon({ kind, zin, eigen }: { kind: Template; zin: string; ei
             </li>
           </ul>
           <span className="sj-knop">{knop(t.app.knop)}</span>
+          <nav className="sj-tabs lv-klein" aria-hidden="true">
+            {menu.map((m) => (
+              <span key={m}>{m}</span>
+            ))}
+          </nav>
           <p className="lv-klein cijfers sj-tekens">{t.app.tekens}</p>
           <blockquote className="lv-tekst cursief">{t.app.citaat}</blockquote>
           <p className="lv-klein">{t.app.bijschrift}</p>
