@@ -246,6 +246,15 @@ async function main() {
   await writeFile(join(PUBLIC, 'data', 'fonts.json'), JSON.stringify(catalogue))
   await writeFile(join(PUBLIC, 'data', 'specimens.json'), JSON.stringify(specimens))
 
+  // Het magazijn: de hele lijst van Fontsource, kort, zodat de app hem lokaal kan doorzoeken.
+  // De bestanden zelf komen pas na toestemming, bij jsDelivr
+  const all = await json<{ id: string; family: string; subsets: string[]; weights: number[]; styles: string[]; variable: boolean; category: string; license: string; type: string }[]>(`${API}/fonts`, 'api/alle.json')
+  const magazijn = all
+    .filter((f) => f.type === 'google' && f.subsets.includes('latin') && f.category !== 'icons' && !ids.has(f.id))
+    .map((f) => [f.id, f.family, f.category, f.weights.join(','), f.styles.includes('italic') ? 1 : 0, f.variable ? 1 : 0, f.license])
+  await writeFile(join(PUBLIC, 'data', 'magazijn.json'), JSON.stringify(magazijn))
+  console.log(`magazijn.json: ${magazijn.length} families die niet in de kast staan`)
+
   const total = built.reduce((sum, b) => sum + b.bytes, 0)
   const size = async (f: string) => (await stat(join(PUBLIC, 'data', f))).size
   console.log(`${built.length} families, ${(total / 1e6).toFixed(1)} MB aan fonts`)
