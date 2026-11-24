@@ -1,15 +1,19 @@
-import { useRef } from 'react'
+import { useRef, useSyncExternalStore } from 'react'
 import { strings } from '../../content/strings'
+import type { Phase } from '../../lib/air'
+import { sound } from '../../lib/sound'
 import { lettersOf, store, useLetters } from '../../lib/store'
 import { Schakelaar } from './Schakelaar'
 
 const PORTFOLIO = 'https://otisstelt.vercel.app'
 
 /** Het colofon: wat het is, wie het maakte, wat er met je gegevens gebeurt (niks), de letters en hun licenties, en de bronnen */
-export function Colofon() {
+export function Colofon({ phase, onPhase }: { phase: Phase; onPhase: (phase: Phase) => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const letters = useLetters((s) => lettersOf(s.zetsel, s))
   const quiet = useLetters((s) => s.quiet)
+  const loud = useSyncExternalStore(sound.subscribe, sound.on)
+  const dark = phase === 'night'
   const c = strings.colofon
   const inUse = letters ? [...new Map([letters.kop, letters.tekst].map((f) => [f.id, f])).values()] : []
   return (
@@ -38,7 +42,13 @@ export function Colofon() {
           </p>
           <h3>{c.drukkerKop}</h3>
           <p>{c.drukkerUitleg}</p>
-          <Schakelaar label={strings.drukkerStil.label} on={quiet} off={strings.drukkerStil.praat} onWord={strings.drukkerStil.stil} toggle={() => store.setQuiet(!quiet)} />
+          <div className="colofon-schakelaars">
+            <Schakelaar label={strings.drukkerStil.label} on={quiet} off={strings.drukkerStil.praat} onWord={strings.drukkerStil.stil} toggle={() => store.setQuiet(!quiet)} />
+            <span className="colofon-telefoon">
+              <Schakelaar label={strings.geluid.label} on={loud} off={strings.geluid.uit} onWord={strings.geluid.aan} toggle={() => sound.set(!loud)} />
+              <Schakelaar label={strings.uur.label} on={dark} off={strings.uur.dag} onWord={strings.uur.nacht} toggle={() => onPhase(dark ? 'day' : 'night')} />
+            </span>
+          </div>
           <h3>{c.privacyKop}</h3>
           <p>{c.privacy}</p>
           <h3>{c.lettersKop}</h3>

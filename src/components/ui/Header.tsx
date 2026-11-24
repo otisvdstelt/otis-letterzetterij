@@ -18,15 +18,17 @@ export function Header({ phase, onPhase, boek }: { phase: Phase; onPhase: (phase
       <div className="kop-links">
         <h1 className="slip paper woordmerk">{strings.titel}</h1>
         {boek}
-        <Colofon />
+        <Colofon phase={phase} onPhase={onPhase} />
       </div>
       <div className="kop-schakelaars">
         <button type="button" className="slip paper schakelaar kop-uitzicht" aria-pressed={atLine} onClick={() => store.look(atLine ? step : 'waslijn')}>
           {atLine ? `← ${strings.stappen.namen[step]}` : `${strings.pers.plekken.waslijn.replace('de ', '')} →`}
         </button>
-        {/* Geen geluid waar niemand om vroeg: het staat uit tot je het zelf aanzet */}
-        <Schakelaar label={strings.geluid.label} on={loud} off={strings.geluid.uit} onWord={strings.geluid.aan} toggle={() => sound.set(!loud)} />
-        <Schakelaar label={strings.uur.label} on={dark} off={strings.uur.dag} onWord={strings.uur.nacht} toggle={() => onPhase(dark ? 'day' : 'night')} />
+        {/* Geen geluid waar niemand om vroeg: het staat uit tot je het zelf aanzet. Op een telefoon staan deze twee in het colofon */}
+        <span className="kop-instellingen">
+          <Schakelaar label={strings.geluid.label} on={loud} off={strings.geluid.uit} onWord={strings.geluid.aan} toggle={() => sound.set(!loud)} />
+          <Schakelaar label={strings.uur.label} on={dark} off={strings.uur.dag} onWord={strings.uur.nacht} toggle={() => onPhase(dark ? 'day' : 'night')} />
+        </span>
       </div>
     </header>
   )
