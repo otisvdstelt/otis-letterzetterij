@@ -71,7 +71,7 @@ export function Vel({ zetsel, kop, tekst, scale, onWidow, label, compact }: VelP
   }, [zetsel, kop, tekst, onWidow])
 
   return (
-    <article ref={ref} className="vel" data-sjabloon={zetsel.sjabloon} data-compact={compact} style={velStijl(zetsel, kop, tekst, scale)} aria-label={label ?? strings.vel.letters(kop.family, tekst.family)}>
+    <article ref={ref} lang="nl" className="vel" data-sjabloon={zetsel.sjabloon} data-compact={compact} style={velStijl(zetsel, kop, tekst, scale)} aria-label={label ?? strings.vel.letters(kop.family, tekst.family)}>
       <Sjabloon kind={zetsel.sjabloon} zin={zetsel.zin} />
     </article>
   )
