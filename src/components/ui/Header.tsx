@@ -1,4 +1,6 @@
+import { useSyncExternalStore } from 'react'
 import { strings } from '../../content/strings'
+import { sound } from '../../lib/sound'
 import { store, useLetters } from '../../lib/store'
 import type { Phase } from '../../lib/air'
 import { Colofon } from './Colofon'
@@ -31,6 +33,7 @@ function Schakelaar({ label, on, off, onWord, toggle }: Switch) {
 /** Bovenaan: de naam op een snipper, het colofon, en de schakelaars voor de drukker en het uur */
 export function Header({ phase, onPhase }: { phase: Phase; onPhase: (phase: Phase) => void }) {
   const quiet = useLetters((s) => s.quiet)
+  const loud = useSyncExternalStore(sound.subscribe, sound.on)
   const dark = phase === 'night'
   return (
     <header className="kop">
@@ -39,6 +42,8 @@ export function Header({ phase, onPhase }: { phase: Phase; onPhase: (phase: Phas
         <Colofon />
       </div>
       <div className="kop-schakelaars">
+        {/* Geen geluid waar niemand om vroeg: het staat uit tot je het zelf aanzet */}
+        <Schakelaar label={strings.geluid.label} on={loud} off={strings.geluid.uit} onWord={strings.geluid.aan} toggle={() => sound.set(!loud)} />
         <Schakelaar label={strings.drukkerStil.label} on={quiet} off={strings.drukkerStil.praat} onWord={strings.drukkerStil.stil} toggle={() => store.setQuiet(!quiet)} />
         <Schakelaar label={strings.uur.label} on={dark} off={strings.uur.dag} onWord={strings.uur.nacht} toggle={() => onPhase(dark ? 'day' : 'night')} />
       </div>

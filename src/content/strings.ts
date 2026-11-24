@@ -141,10 +141,15 @@ export const strings = {
     dag: 'dag',
     nacht: 'nacht',
   },
+  geluid: {
+    label: 'Geluid',
+    uit: 'stil',
+    aan: 'geluid',
+  },
   drukkerStil: {
     label: 'De drukker',
-    praat: 'praat',
-    stil: 'stil',
+    praat: 'drukker praat',
+    stil: 'zwijgt',
   },
 
   // ------------------------------------------------------------------ de werkbank
