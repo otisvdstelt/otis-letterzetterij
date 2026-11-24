@@ -1,0 +1,456 @@
+@import 'tailwindcss';
+
+/* De nacht volgt de klok en niet de media query. Hij wordt één keer gezet in main.tsx */
+@custom-variant dark (&:where([data-theme='night'], [data-theme='night'] *));
+
+@theme {
+  /* Vier handschriften. Script voor de naam, antiek voor bordjes, schoolschrift om te lezen, viltstift voor etiketten */
+  --font-script: 'Homemade Apple', 'Klee One', cursive;
+  --font-display: 'Zen Antique Soft', 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-sans: 'Klee One', 'Hiragino Maru Gothic ProN', ui-rounded, system-ui, sans-serif;
+  --font-hand: 'Yomogi', 'Klee One', cursive;
+
+  /* De vier kleuren van het portfolio. De letters zijn het belangrijkste in beeld, dus de drukkerij blijft rustig */
+  --color-canvas-base: #f7f4eb; /* perkament */
+  --color-canvas-text: #2c2823; /* inkt */
+  --color-ghibli-green: #3b533e; /* mos */
+  --color-ghibli-earth: #b8623b; /* terracotta */
+
+  /* De namen die het stijlblad gebruikt, en de tussentinten */
+  --color-paper: var(--color-canvas-base);
+  --color-canvas: #fcfaf3;
+  --color-oat: #ebe4d0;
+  --color-rule: #cfc5ab;
+  --color-ink: var(--color-canvas-text);
+  --color-ink-soft: #5e554a;
+  --color-moss: var(--color-ghibli-green);
+  --color-terracotta: var(--color-ghibli-earth);
+  /* Terracotta diep genoeg om mee te schrijven */
+  --color-rust: #8f4526;
+  /* Links en de focusring */
+  --color-dusk: var(--color-ghibli-green);
+  --color-gold: #e3b659;
+
+  /* De drukkerij zelf: lood voor de letters, ijzer voor de pers, donker eiken voor de kast */
+  --color-lead: #7d8186;
+  --color-lead-deep: #4b4e52;
+  --color-iron: #33363b;
+  --color-oak: #5a3d29;
+  --color-oak-deep: #2f1f15;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    /* De tand van het vel, een fijne bruine spikkel, getegeld */
+    --tooth: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .16 0 0 0 0 .14 .2 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* Een pennenstreek onder wat gekozen is */
+    --squiggle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5C8 1 12 7 20 4S32 1 40 4s12 3 19-1' fill='none' stroke='%23b8623b' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    --shadow-rest: 0 1px 1px rgb(44 40 35 / 0.18), 0 8px 18px -8px rgb(44 40 35 / 0.42);
+    color-scheme: light;
+  }
+
+  [data-theme='night'] {
+    --color-canvas-base: #171b2e;
+    --color-canvas-text: #f3ead8;
+    --color-canvas: #20263f;
+    --color-oat: #2b3254;
+    --color-rule: #3d4672;
+    --color-ink-soft: #c9c0ae;
+    --color-moss: #a9c979;
+    --color-rust: #f0a27f;
+    --color-dusk: #bcd8c5;
+    --color-lead: #9a9ea4;
+    --color-oak: #3a2a20;
+    --color-oak-deep: #1c120d;
+    --shadow-rest: 0 1px 1px rgb(0 0 0 / 0.4), 0 10px 22px -8px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    /* Kaal papier, wat je ziet voordat de drukkerij geschilderd is */
+    background: var(--color-paper) var(--tooth);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
+  :focus-visible {
+    outline: 2.5px solid var(--color-dusk);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: #2c2823;
+  }
+}
+
+@layer components {
+  .hand {
+    font-family: var(--font-hand);
+    letter-spacing: 0.01em;
+  }
+
+  /* ============================================================ papier */
+
+  /* Gescheurd papier. Het vel is een pseudo-element, zodat het deckle-filter de woorden scherp laat */
+  .paper {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .paper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 3px 5px 4px 6px;
+    background: var(--color-canvas) var(--tooth);
+    box-shadow: inset 0 0 0 1px rgb(58 42 32 / 0.1);
+    filter: url(#deckle) drop-shadow(0 1px 0.5px rgb(58 42 32 / 0.2)) drop-shadow(0 9px 12px rgb(58 42 32 / 0.26));
+  }
+
+  [data-theme='night'] .paper::before {
+    filter: url(#deckle) drop-shadow(0 1px 0.5px rgb(0 0 0 / 0.5)) drop-shadow(0 10px 16px rgb(0 0 0 / 0.55));
+  }
+
+  /* Een slip is een snippertje voor een etiket of een paar woorden */
+  .slip {
+    padding: 0.4rem 0.95rem 0.45rem;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+  }
+
+  .slip.paper::before {
+    filter: url(#deckle-fine) drop-shadow(0 1px 0.5px rgb(58 42 32 / 0.22)) drop-shadow(0 5px 7px rgb(58 42 32 / 0.22));
+  }
+
+  /* Een scheef terracotta bordje dat rechttrekt onder je hand */
+  .plaque {
+    position: relative;
+    isolation: isolate;
+    padding: 0.8rem 1.9rem 0.9rem;
+    border: 0;
+    background: none;
+    color: #fcfaf3;
+    font-family: var(--font-display);
+    font-size: 1.42rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    rotate: -1.6deg;
+    transition:
+      rotate 420ms var(--ease-out-expo),
+      translate 420ms var(--ease-out-expo),
+      opacity 400ms;
+  }
+
+  .plaque::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 5px 9px 6px 10px;
+    background: #9a4c2a var(--tooth);
+    box-shadow:
+      inset 0 0 0 2px rgb(248 241 224 / 0.22),
+      inset 0 -6px 12px -6px rgb(40 16 8 / 0.5);
+    filter: url(#deckle-fine) drop-shadow(0 2px 0 #63301a) drop-shadow(0 12px 12px rgb(58 42 32 / 0.34));
+  }
+
+  .plaque:hover:not(:disabled) {
+    rotate: 0deg;
+    translate: 0 -3px;
+  }
+
+  .plaque:active:not(:disabled) {
+    translate: 0 1px;
+    transition-duration: 90ms;
+  }
+
+  .plaque:disabled {
+    opacity: 0.55;
+  }
+
+  /* Een etiket dat aan iets vastgeprikt is. Hier ook de tekstballon van de drukker */
+  .tag {
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    justify-items: center;
+    width: max-content;
+    max-width: 15rem;
+    padding: 0.3rem 0.8rem 0.4rem;
+    border: 0;
+    background: none;
+    color: #2c2823;
+    font-family: var(--font-hand);
+    font-size: 1.08rem;
+    line-height: 1.25;
+    text-align: center;
+    rotate: -2deg;
+  }
+
+  .tag::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 3px 6px 4px 7px;
+    background: #fcfaf3 var(--tooth);
+    filter: url(#deckle-fine) drop-shadow(0 1px 0.5px rgb(58 42 32 / 0.3)) drop-shadow(0 5px 6px rgb(58 42 32 / 0.28));
+  }
+
+  .pen-link {
+    color: var(--color-dusk);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, var(--color-dusk) 50%, transparent);
+    transition: text-decoration-color 200ms;
+  }
+
+  .pen-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* Een geïnkte knop, een omtrek die vol loopt onder je hand */
+  .inked {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding: 0.35rem 1.15rem 0.45rem;
+    border: 1.6px solid var(--color-ink);
+    border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 1.04rem;
+    line-height: 1.2;
+    text-decoration: none;
+    transition:
+      background-color 220ms,
+      color 220ms,
+      translate 300ms var(--ease-out-expo),
+      border-radius 500ms var(--ease-out-expo);
+  }
+
+  .inked:hover:not(:disabled, [aria-disabled='true']) {
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    translate: 0 -2px;
+    border-radius: 18px 225px 18px 255px / 255px 18px 225px 18px;
+  }
+
+  .inked[data-tone='rust'] {
+    border-color: #8f4526;
+    background: #8f4526;
+    color: #fcfaf3;
+  }
+
+  .inked[data-tone='rust']:hover:not(:disabled) {
+    background: #6f3019;
+    color: #fcfaf3;
+  }
+
+  .inked[aria-disabled='true'],
+  .inked:disabled {
+    border-style: dashed;
+    color: var(--color-ink-soft);
+    border-color: var(--color-ink-soft);
+    cursor: default;
+  }
+
+  .quiet {
+    border: 0;
+    background: none;
+    color: var(--color-ink-soft);
+    font-family: var(--font-hand);
+    font-size: 1.06rem;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    min-height: 2.75rem;
+    padding: 0 0.4rem;
+  }
+
+  .quiet:hover {
+    color: var(--color-ink);
+  }
+
+  /* Velden worden op de lijntjes geschreven, zonder hokjes */
+  .field {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .field label {
+    font-family: var(--font-hand);
+    font-size: 1.08rem;
+    color: var(--color-ink-soft);
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 0.2rem 0.1rem 0.25rem;
+    border: 0;
+    border-bottom: 1.5px solid var(--color-rule);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: 1.06rem;
+    transition: border-color 200ms;
+  }
+
+  .field input:hover,
+  .field input:focus,
+  .field textarea:hover,
+  .field textarea:focus {
+    border-bottom-color: var(--color-ink);
+  }
+
+  /* ============================================================ titelkaart */
+
+  .titelkaart {
+    display: grid;
+    place-items: center;
+    min-height: 100%;
+    padding: 2rem 1rem;
+  }
+
+  .titelkaart-vel {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 34rem;
+    padding: 2.4rem 2.2rem 2.2rem;
+    text-align: center;
+  }
+
+  .woordmerk {
+    margin: 0;
+    font-family: var(--font-script);
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .titelkaart-zin {
+    margin: 0;
+    color: var(--color-ink-soft);
+    text-wrap: pretty;
+  }
+
+  /* ============================================================ de inktrol (laden) */
+
+  /* Een inktrol die in de hoek heen en weer rolt zolang er iets onderweg is. Hij laat een streep inkt achter */
+  .inktrol {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 60;
+    width: 6.5rem;
+    pointer-events: none;
+    transition: opacity 600ms 500ms;
+  }
+
+  .inktrol[data-done='true'] {
+    opacity: 0;
+  }
+
+  .inktrol svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .inktrol-rol {
+    animation: inktrol-rol 1.6s ease-in-out infinite alternate;
+  }
+
+  .inktrol-wiel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: inktrol-draai 1.6s ease-in-out infinite alternate;
+  }
+
+  .inktrol-streep {
+    transform-box: fill-box;
+    transform-origin: left center;
+    scale: 0 1;
+    transition: scale 1.4s var(--ease-out-expo);
+  }
+
+  .inktrol[data-filling='true'] .inktrol-streep {
+    scale: 0.55 1;
+    transition-duration: 8s;
+  }
+
+  .inktrol[data-done='true'] .inktrol-streep {
+    scale: 1 1;
+    transition-duration: 500ms;
+  }
+
+  .inktrol[data-done='true'] .inktrol-rol,
+  .inktrol[data-done='true'] .inktrol-wiel {
+    animation-play-state: paused;
+  }
+
+  @keyframes inktrol-rol {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 64px 0;
+    }
+  }
+
+  @keyframes inktrol-draai {
+    from {
+      rotate: 0deg;
+    }
+    to {
+      rotate: 300deg;
+    }
+  }
+}
+
+/* Minder beweging: dezelfde stappen, zonder het rollen */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
