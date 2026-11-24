@@ -1,5 +1,5 @@
 // Of de drukkerij nog onderweg is, opengehouden door een Suspense-fallback
-// Dit staat buiten de 3D-chunk, zodat het inktrol er al is voordat three.js binnen is
+// Dit staat buiten de 3D-chunk, zodat de inktrol er al is voordat three.js binnen is
 
 let holds = 0
 let everHeld = false
