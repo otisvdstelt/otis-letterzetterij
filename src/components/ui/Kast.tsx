@@ -1,10 +1,11 @@
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { alternatieven } from '../../content/alternatieven'
+import { woorden } from '../../content/woorden'
 import { strings, waaromZin } from '../../content/strings'
 import { DRAWERS, type FontEntry } from '../../lib/type/catalogue'
 import { fontStack } from '../../lib/type/fontface'
 import { waaromPaar } from '../../lib/type/paar'
-import { bouw, lijktOp, mist, richting, RICHTINGEN, schreefvorm, voldoet, voldoetEerst, zoekAlternatief, type Richting } from '../../lib/type/zoek'
+import { bouw, leesWoorden, lijktOp, mist, richting, RICHTINGEN, schreefvorm, voldoet, voldoetEerst, zoekAlternatief, zoekOpEigenschappen, type Richting } from '../../lib/type/zoek'
 import { ROLES, type Role } from '../../lib/type/zetsel'
 import { currentScale, familyOf, fontById, lettersOf, store, useLetters } from '../../lib/store'
 import { useFontFaces } from '../../hooks/useFontFaces'
@@ -122,6 +123,8 @@ function Laatje() {
   const all = useMemo(() => catalogue ?? [], [catalogue])
   const mine = fontById(z[role])
   const iets = zoekAlternatief(query, alternatieven)
+  // Gewone woorden: "ronde letter voor kinderen" wordt rond, speels en warm
+  const gelezen = useMemo(() => leesWoorden(query, woorden), [query])
 
   const fonts = useMemo(() => {
     if (toon.soort === 'richting') {
@@ -136,14 +139,16 @@ function Laatje() {
     if (q) {
       const named = all.filter((f) => normal(f.family).includes(q))
       const alike = iets ? iets.ids.flatMap((id) => all.find((f) => f.id === id) ?? []) : []
-      return [...alike, ...named.filter((f) => !alike.includes(f))]
+      const byWords = zoekOpEigenschappen(all, gelezen.eigenschappen, 12)
+      return [...new Set([...alike, ...named, ...byWords])]
     }
     return all.filter((f) => f.drawer === drawer)
-  }, [all, toon, query, drawer, iets])
+  }, [all, toon, query, drawer, iets, gelezen])
+  const opWoorden = !iets && gelezen.herkend.length > 0 && toon.soort === 'laatje' && query.trim() !== ''
 
   if (!drawer) return null
   const titel =
-    toon.soort === 'richting' ? z_.richtingKop(z_.richtingen[toon.richting], familyOf(toon.vanaf)) : toon.soort === 'lijkt' ? z_.lijktOpKop(familyOf(toon.vanaf)) : query.trim() ? (iets ? z_.ietsAls(iets.naam) : k.zoek) : k.laatjeKop(k.laatjes[drawer])
+    toon.soort === 'richting' ? z_.richtingKop(z_.richtingen[toon.richting], familyOf(toon.vanaf)) : toon.soort === 'lijkt' ? z_.lijktOpKop(familyOf(toon.vanaf)) : query.trim() ? (iets ? z_.ietsAls(iets.naam) : opWoorden ? z_.opWoorden(gelezen.herkend.join(' · ')) : k.zoek) : k.laatjeKop(k.laatjes[drawer])
 
   return (
     <>
@@ -184,7 +189,7 @@ function Laatje() {
           id={searchId}
           type="search"
           value={query}
-          placeholder="Helvetica, Garamond…"
+          placeholder={z_.zoekVoorbeeld}
           onChange={(e) => {
             setQuery(e.target.value)
             setToon({ soort: 'laatje' })
@@ -193,6 +198,7 @@ function Laatje() {
         />
       </div>
       {iets && toon.soort === 'laatje' && <p className="klein-uitleg">{z_.ietsAlsUitleg}</p>}
+      {opWoorden && <p className="klein-uitleg">{z_.woordenUitleg}</p>}
       {mine && (
         <div className="richtingen">
           <p className="klein-uitleg">{z_.vanaf(mine.family)}</p>
