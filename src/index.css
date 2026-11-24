@@ -43,6 +43,8 @@
 
 @layer base {
   :root {
+    /* Hoe hoog het strookje onderin is; het strookje meet zichzelf en zet dit */
+    --strook: 7rem;
     /* De tand van het vel, een fijne bruine spikkel, getegeld */
     --tooth: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .16 0 0 0 0 .14 .2 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     /* Een pennenstreek onder wat gekozen is */
@@ -493,66 +495,7 @@
     margin: 0.5rem auto;
   }
 
-  /* ============================================================ de drukkerij: drie kolommen */
-
-  .drukkerij-pagina {
-    min-height: 100%;
-    padding: 0 max(1rem, env(safe-area-inset-left)) max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-right));
-  }
-
-  .drukkerij {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.4rem;
-    padding-top: 0.6rem;
-  }
-
-  .links,
-  .midden {
-    display: grid;
-    gap: 1.4rem;
-    align-content: start;
-    min-width: 0;
-  }
-
-  /* De middenkolom meet zichzelf: wat erin staat, past zich aan zijn eigen breedte aan, niet aan het scherm */
-  .midden {
-    container: midden / inline-size;
-  }
-
-  .rechts {
-    min-width: 0;
-    padding: 0.4rem 1.1rem 1.2rem;
-  }
-
-  @media (min-width: 1024px) {
-    .drukkerij {
-      grid-template-columns: minmax(15rem, 17.5rem) minmax(0, 1fr) minmax(19rem, 22rem);
-      align-items: start;
-    }
-
-    /* De zijkanten blijven staan en scrollen zelf: ze groeien nooit over het vel heen */
-    .links,
-    .rechts {
-      position: sticky;
-      top: 0.8rem;
-      max-height: calc(100dvh - 1.6rem);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      scrollbar-width: thin;
-    }
-
-    .links {
-      padding: 0.3rem 0.4rem 1rem 0.2rem;
-    }
-  }
-
-  @media (min-width: 1360px) {
-    .drukkerij {
-      grid-template-columns: minmax(17rem, 19rem) minmax(0, 1fr) minmax(21rem, 25rem);
-      gap: 1.8rem;
-    }
-  }
+  /* ============================================================ gedeeld door de panelen */
 
   .paneel-kop {
     margin: 0;
@@ -913,7 +856,7 @@
 
   /* ============================================================ de kast */
 
-  .kast {
+  .laatje-paneel {
     display: grid;
     gap: 0.6rem;
     padding: 1rem 0.9rem 1.1rem;
@@ -923,32 +866,32 @@
     box-shadow: var(--shadow-rest);
   }
 
-  .kast .paneel-uitleg,
-  .kast .klein-uitleg,
-  .kast .hand {
+  .laatje-paneel .paneel-uitleg,
+  .laatje-paneel .klein-uitleg,
+  .laatje-paneel .hand {
     color: #e6dcc8;
   }
 
-  .kast .field label {
+  .laatje-paneel .field label {
     color: #e6dcc8;
   }
 
-  .kast .field input {
+  .laatje-paneel .field input {
     color: #f3ead8;
     border-bottom-color: rgb(243 234 216 / 0.4);
   }
 
-  .kast .stemming {
+  .laatje-paneel .stemming {
     border-color: rgb(243 234 216 / 0.45);
   }
 
-  .kast .stemming[data-aan='true'] {
+  .laatje-paneel .stemming[data-aan='true'] {
     border-color: #f3ead8;
     background: rgb(243 234 216 / 0.16);
   }
 
-  .kast :focus-visible,
-  .kast .stemming:has(input:focus-visible) {
+  .laatje-paneel :focus-visible,
+  .laatje-paneel .stemming:has(input:focus-visible) {
     outline-color: var(--color-gold);
   }
 
@@ -1094,259 +1037,12 @@
     align-items: baseline;
   }
 
-  .kast .magazijn .quiet {
+  .laatje-paneel .magazijn .quiet {
     color: #e6dcc8;
   }
 
   .magazijn-letter {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* ============================================================ de pers */
-
-  .pers {
-    display: grid;
-    gap: 0.7rem;
-    justify-items: center;
-  }
-
-  .pers-podium {
-    position: relative;
-    width: min(100%, 26rem);
-    color: var(--color-ink);
-  }
-
-  /* Met de drukkerij in 3D is het podium een raam over de hele breedte van de kolom */
-  .pers[data-geschilderd='true'] {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: stretch;
-  }
-
-  .pers-podium[data-geschilderd='true'] {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    max-height: 52vh;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .pers-wereld {
-    position: absolute;
-    inset: 0;
-  }
-
-  .pers-podium[data-geschilderd='true'] .pers-tekening {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: min(70%, 26rem);
-    translate: -50% -50%;
-  }
-
-  .pers-podium[data-geschilderd='true'] .pers-hendel {
-    left: 50%;
-    top: 22%;
-    width: 22%;
-    height: 34%;
-  }
-
-  .pers[data-geschilderd='true'] .pers-zij {
-    justify-items: start;
-  }
-
-  .uitzicht {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    justify-self: center;
-  }
-
-  .pers-hint-onder {
-    rotate: 1.5deg;
-    font-size: 0.98rem;
-  }
-
-  .pers-zij {
-    display: grid;
-    gap: 0.7rem;
-    justify-items: center;
-    min-width: 0;
-  }
-
-  /* Naast elkaar zodra het past: de pers links, de drukker en de knoppen rechts. Zo staat het vel hoog */
-  @container midden (min-width: 540px) {
-    .pers {
-      grid-template-columns: minmax(13rem, 19rem) minmax(0, 1fr);
-      align-items: center;
-      justify-items: stretch;
-    }
-
-    .pers-zij {
-      justify-items: start;
-    }
-
-    .pers-knoppen,
-    .eerder {
-      justify-content: flex-start;
-      justify-items: start;
-    }
-
-    .eerder-lijst {
-      justify-content: flex-start;
-    }
-  }
-
-  .pers-tekening {
-    display: block;
-    width: 100%;
-    height: auto;
-    overflow: visible;
-  }
-
-  .pers-ijzer {
-    stroke: var(--color-iron);
-  }
-
-  [data-theme='night'] .pers-ijzer {
-    stroke: var(--color-lead);
-  }
-
-  /* De hendel om aan te trekken: een onzichtbare knop over de getekende hendel */
-  .pers-hendel {
-    position: absolute;
-    left: 56%;
-    top: 4%;
-    width: 42%;
-    height: 42%;
-    border: 0;
-    border-radius: 40% 60% 50% 50%;
-    background: none;
-    cursor: grab;
-    touch-action: none;
-  }
-
-  .pers-hendel[data-sleept='true'] {
-    cursor: grabbing;
-  }
-
-  .pers-hint {
-    position: absolute;
-    right: -0.5rem;
-    top: 50%;
-    max-width: 13rem;
-    rotate: 2deg;
-    font-size: 0.98rem;
-    pointer-events: none;
-  }
-
-  .pers-vel {
-    position: absolute;
-    left: 50%;
-    top: 48%;
-    width: min(70%, 20rem);
-    padding: 0.7rem 0.9rem;
-    translate: -50% 0;
-    font-size: 1.1rem;
-    line-height: 1.15;
-    text-align: center;
-    pointer-events: none;
-    overflow-wrap: anywhere;
-  }
-
-  .pers-vel[data-beweegt='true'] {
-    animation: vel-uit-pers 1.6s var(--ease-out-expo) forwards;
-  }
-
-  .pers-vel[data-beweegt='false'] {
-    opacity: 0;
-  }
-
-  @keyframes vel-uit-pers {
-    0% {
-      opacity: 0;
-      translate: -50% 1.5rem;
-      scale: 0.6 0.2;
-    }
-    35% {
-      opacity: 1;
-      translate: -50% -1rem;
-      scale: 1;
-    }
-    80% {
-      opacity: 1;
-      translate: -50% -1.2rem;
-    }
-    100% {
-      opacity: 0;
-      translate: -50% -1.6rem;
-    }
-  }
-
-  .pers-knoppen {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.7rem 1rem;
-  }
-
-  .drukker {
-    display: grid;
-    justify-items: start;
-    gap: 0.4rem;
-    max-width: 100%;
-  }
-
-  .drukker-ballon {
-    display: grid;
-    justify-items: start;
-    width: auto;
-    max-width: min(26rem, 100%);
-    text-align: left;
-    font-size: 1.12rem;
-    rotate: -1deg;
-  }
-
-  .drukker[data-toon='kritiek'] .drukker-ballon::before {
-    box-shadow: inset 3px 0 0 var(--color-terracotta);
-  }
-
-  .drukker-wie {
-    justify-self: end;
-    font-size: 0.85rem;
-    color: #5e554a;
-  }
-
-  .eerder {
-    display: grid;
-    justify-items: center;
-    gap: 0.3rem;
-  }
-
-  .eerder-kop {
-    margin: 0;
-    font-weight: 400;
-    font-size: 1rem;
-    color: var(--color-ink-soft);
-  }
-
-  .eerder-lijst {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .eerder-vel {
-    min-height: 2.5rem;
-    font-size: 0.88rem;
-  }
-
-  .eerder-vel[aria-pressed='true'] {
-    font-weight: 600;
   }
 
   /* ============================================================ het welkom */
@@ -1778,71 +1474,6 @@
     margin: 0;
   }
 
-  /* ============================================================ het onderblad (telefoon) */
-
-  .onderblad {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 40;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    height: 88dvh;
-    padding: 0 max(0.8rem, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(0.8rem, env(safe-area-inset-left));
-    /* Ingeklapt steekt alleen de greep en de bovenkant van het vel uit */
-    translate: 0 calc(88dvh - 11.5rem);
-    transition: translate 420ms var(--ease-out-expo);
-  }
-
-  .onderblad[data-open='true'] {
-    translate: 0 0;
-  }
-
-  .onderblad::before {
-    border-radius: 14px 16px 0 0;
-  }
-
-  .onderblad-greep {
-    display: grid;
-    justify-items: center;
-    gap: 0.2rem;
-    min-height: 3rem;
-    padding: 0.5rem 0 0.3rem;
-    border: 0;
-    background: none;
-    color: var(--color-ink-soft);
-    touch-action: none;
-  }
-
-  .onderblad-streep {
-    width: 3rem;
-    height: 0.3rem;
-    border-radius: 1rem;
-    background: var(--color-rule);
-  }
-
-  .onderblad-inhoud {
-    display: grid;
-    align-content: start;
-    gap: 1rem;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding-bottom: 1.5rem;
-  }
-
-  .onderblad[data-open='false'] .onderblad-inhoud {
-    overflow: hidden;
-  }
-
-  /* Ruimte onderaan de pagina, zodat het blad niets van de waslijn bedekt */
-  @media (max-width: 1023px) {
-    .drukkerij-pagina {
-      padding-bottom: 12.5rem;
-    }
-  }
-
   /* ============================================================ het rechterpaneel */
 
   .tabs-rij {
@@ -2267,6 +1898,612 @@
   .zelf-kopieren textarea {
     font-family: ui-monospace, monospace;
     font-size: 0.8rem;
+  }
+
+  /* ============================================================ de opbouw: de drukkerij achter alles, het papier erop */
+
+  .papier {
+    --rand: clamp(1rem, 2.5vw, 2rem);
+    --boven: 4.6rem;
+    --links: calc(var(--rand) + 14.6rem);
+    --rechts: var(--rand);
+    --vel: min(36rem, 40vw);
+    min-height: 100%;
+  }
+
+  .papier[data-laatje='true'] {
+    --links: calc(var(--rand) + 32.2rem);
+  }
+
+  .papier[data-vel='true'] {
+    --rechts: calc(var(--rand) * 2 + var(--vel));
+  }
+
+  .papier[data-uitzicht='waslijn'] {
+    --links: var(--rand);
+  }
+
+  .wereld {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .papier .kop {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 5;
+    padding: max(0.8rem, env(safe-area-inset-top)) var(--rand) 0;
+    pointer-events: none;
+  }
+
+  .papier .kop > * {
+    pointer-events: auto;
+  }
+
+  .kop .woordmerk {
+    font-size: 1.35rem;
+  }
+
+  .tafel {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .tafel > * {
+    pointer-events: auto;
+  }
+
+  /* Een vel papier om iets op te leggen, met een rafelrand: de panelen, het strookje en het vel */
+  :is(.paneel, .strook, .toonbank, .waslijn, .welkom) {
+    position: absolute;
+    isolation: isolate;
+    color: var(--color-ink);
+  }
+
+  :is(.strook, .welkom)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 3px 5px 4px 6px;
+    background: var(--color-canvas) var(--tooth);
+    box-shadow: inset 0 0 0 1px rgb(58 42 32 / 0.1);
+    filter: url(#deckle) drop-shadow(0 1px 0.5px rgb(58 42 32 / 0.2)) drop-shadow(0 9px 12px rgb(58 42 32 / 0.26));
+  }
+
+  /* Panelen die zelf scrollen, dragen hun papier zelf: een filter op een laag die stil blijft staan, scrolt niet mee */
+  :is(.paneel, .toonbank, .waslijn) {
+    background: var(--color-canvas) var(--tooth);
+    border-radius: 3px 5px 4px 6px;
+    box-shadow: var(--shadow-rest);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-rule) transparent;
+  }
+
+  /* Het paneel van de stap, links en smal, zoals de potjes bij de alchemist */
+  .paneel {
+    top: var(--boven);
+    left: var(--rand);
+    width: 14rem;
+    max-height: calc(100svh - var(--boven) - var(--strook) - 2rem);
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    padding: 0.6rem 0.9rem 0.9rem;
+  }
+
+  .paneel-naam {
+    margin: 0;
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.7;
+  }
+
+  .paneel-boven {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  /* Het open laatje, van eikenhout, naast het kastpaneel */
+  .paneel.laatje-paneel {
+    left: calc(var(--rand) + 14.6rem);
+    width: 17rem;
+    background: linear-gradient(var(--color-oak), var(--color-oak-deep));
+    color: #f3ead8;
+  }
+
+  /* In 3D hangen de vellen echt aan de lijn; het papier laat alleen zien wat je vergelijkt */
+  .papier[data-wereld='true'] .waslijn .lijn {
+    display: none;
+  }
+
+  .papier[data-wereld='true'] .waslijn:has(.vergelijk) .lijn {
+    display: flex;
+  }
+
+  .laatje-paneel .paneel-naam {
+    color: #f3ead8;
+  }
+
+  /* Het strookje onderin: wat de drukker zegt, en hooguit drie knoppen */
+  .strook {
+    left: var(--links);
+    right: var(--rechts);
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    width: fit-content;
+    max-width: min(44rem, calc(100vw - var(--links) - var(--rechts)));
+    margin-inline: auto;
+    display: grid;
+    justify-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.2rem 0.75rem;
+    text-align: center;
+  }
+
+  .strook-zin {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+
+  .strook-knoppen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem 0.9rem;
+  }
+
+  .strook .plaque {
+    font-size: 1.2rem;
+    padding: 0.55rem 1.4rem 0.65rem;
+  }
+
+  /* Het vel, groot in beeld, rechts, zoals het flesje bij de alchemist */
+  .toonbank {
+    top: var(--boven);
+    right: var(--rand);
+    bottom: 1rem;
+    width: var(--vel);
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+    padding: 0.8rem 1.2rem 1.4rem;
+    animation: vel-erin 520ms var(--ease-out-expo);
+  }
+
+  @keyframes vel-erin {
+    from {
+      translate: 0 2rem;
+      opacity: 0;
+    }
+  }
+
+  .toonbank-kop {
+    margin: 0;
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .toonbank .tabs-rij {
+    top: -0.8rem;
+  }
+
+  .terug-naar-vel {
+    position: absolute;
+    right: var(--rand);
+    top: var(--boven);
+    font-size: 1.12rem;
+    rotate: 1.5deg;
+  }
+
+  .welkom {
+    top: var(--boven);
+    left: 50%;
+    z-index: 3;
+    width: min(26rem, calc(100vw - 2rem));
+    translate: -50% 0;
+  }
+
+  /* De waslijn: een strook boven het strookje, bij de lijn */
+  .papier[data-uitzicht='waslijn'] .waslijn {
+    left: 50%;
+    bottom: calc(var(--strook) + 1.8rem);
+    width: min(48rem, calc(100vw - 2 * var(--rand)));
+    max-height: calc(100svh - var(--boven) - var(--strook) - 3rem);
+    translate: -50% 0;
+    margin: 0;
+    padding: 0.6rem 1.2rem 0.9rem;
+  }
+
+  /* De getekende pers, midden in beeld, zolang er geen drukkerij in 3D is */
+  .pers-getekend {
+    position: fixed;
+    z-index: 1;
+    left: calc((var(--links) + 100vw - var(--rechts)) / 2);
+    top: 47%;
+    width: min(26rem, 46vw);
+    translate: -50% -50%;
+    color: var(--color-ink);
+  }
+
+  .pers-tekening {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .pers-ijzer {
+    stroke: var(--color-iron);
+  }
+
+  [data-theme='night'] .pers-ijzer {
+    stroke: var(--color-lead);
+  }
+
+  /* De hendel om aan te trekken: een onzichtbare knop over de getekende of de gebakken hendel */
+  .hendel {
+    position: absolute;
+    left: 56%;
+    top: 4%;
+    width: 42%;
+    height: 42%;
+    border: 0;
+    border-radius: 40% 60% 50% 50%;
+    background: none;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .hendel[data-wereld='true'] {
+    position: fixed;
+    z-index: 1;
+    width: 140px;
+    height: 100px;
+  }
+
+  .hendel[data-sleept='true'] {
+    cursor: grabbing;
+  }
+
+  .hendel-hint {
+    position: absolute;
+    right: -2rem;
+    top: 46%;
+    max-width: 13rem;
+    rotate: 2deg;
+    font-size: 0.98rem;
+    pointer-events: none;
+  }
+
+  .tafel ~ .hendel-hint,
+  .hendel[data-wereld='true'] + .hendel-hint {
+    position: fixed;
+    right: auto;
+    z-index: 1;
+  }
+
+  /* De werkbank: doelen als een lijstje, gevoelens als knopjes */
+  .doelen {
+    display: grid;
+    margin-top: 0.2rem;
+  }
+
+  .doel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 2.1rem;
+    padding: 0 0.4rem 0 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: translate 200ms var(--ease-out-expo);
+  }
+
+  .doel input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .doel::before {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1.6px solid var(--color-ink-soft);
+    border-radius: 50%;
+  }
+
+  .doel[data-aan='true']::before {
+    border-color: var(--color-rust);
+    background: radial-gradient(circle, var(--color-rust) 45%, transparent 50%);
+  }
+
+  .doel:hover {
+    translate: 0.2rem 0;
+  }
+
+  .doel:has(input:focus-visible) {
+    outline: 2.5px solid var(--color-dusk);
+    outline-offset: 1px;
+  }
+
+  .gevoelens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+
+  .gevoel {
+    min-height: 2.2rem;
+    padding: 0.1rem 0.6rem;
+    border: 1.5px dashed var(--color-rule);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    background: none;
+    color: var(--color-ink);
+    font-family: var(--font-hand);
+    font-size: 0.98rem;
+  }
+
+  .gevoel[aria-pressed='true'] {
+    border-style: solid;
+    border-color: var(--color-ink);
+    background: var(--color-oat);
+  }
+
+  .jouw-letter {
+    padding-left: 0;
+  }
+
+  .jouw-letter-inhoud {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .werkbank-deel {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  /* De kast: drie paren en de laatjes */
+  .laatjes-lijst {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .laatje-knop {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    min-height: 2.4rem;
+    padding: 0.2rem 0.6rem;
+    border: 0;
+    border-radius: 3px;
+    background: linear-gradient(var(--color-oak), var(--color-oak-deep));
+    color: #f3ead8;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    text-align: left;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.3);
+    transition: translate 200ms var(--ease-out-expo);
+  }
+
+  .laatje-knop:hover,
+  .laatje-knop[aria-pressed='true'] {
+    translate: 0.3rem 0;
+  }
+
+  .laatje-greep {
+    width: 1.1rem;
+    height: 0.3rem;
+    border-radius: 3px;
+    background: var(--color-gold);
+  }
+
+  .voorstel-kopletter {
+    font-size: 1.25rem;
+  }
+
+  .in-de-pers {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  /* Fijnzetten: dicht tot je het opent, of de drukker het opent */
+  .fijnzetten {
+    border-top: 1.5px dashed var(--color-rule);
+    padding-top: 0.5rem;
+  }
+
+  .fijnzetten > summary {
+    display: grid;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .fijnzetten > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .fijnzetten > summary .paneel-kop::after {
+    content: ' ▸';
+    font-size: 0.8em;
+    color: var(--color-ink-soft);
+  }
+
+  .fijnzetten[open] > summary .paneel-kop::after {
+    content: ' ▾';
+  }
+
+  .fijnzetten-inhoud {
+    display: grid;
+    gap: 0.8rem;
+    padding-top: 0.7rem;
+  }
+
+  /* Het zetboek, als het receptenboek bij de alchemist */
+  .boek {
+    width: min(64rem, calc(100vw - 2rem));
+  }
+
+  .boek-intro {
+    margin: 0.3rem 0 0.9rem;
+  }
+
+  .boek-bladzijden {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.9rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bladzijde {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.35rem;
+    padding: 0.9rem 1rem 1rem;
+    border-radius: 3px;
+    background: var(--color-paper) var(--tooth);
+    box-shadow: var(--shadow-rest);
+  }
+
+  .bladzijde p {
+    margin: 0;
+  }
+
+  .bladzijde-naam {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+  }
+
+  .bladzijde-uitleg {
+    color: var(--color-ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .bladzijde-recept {
+    font-size: 0.98rem;
+  }
+
+  /* ============================================================ de telefoon: de drukkerij bovenin, het papier van onder */
+
+  @media (max-width: 1023px) {
+    .papier {
+      --boven: 5.6rem;
+      --links: 0px;
+      --rechts: 0px;
+      --vel: 100vw;
+    }
+
+    .papier[data-laatje='true'],
+    .papier[data-vel='true'],
+    .papier[data-uitzicht='waslijn'] {
+      --links: 0px;
+      --rechts: 0px;
+    }
+
+    .kop .woordmerk {
+      font-size: 1.05rem;
+    }
+
+    .kop-links,
+    .kop-schakelaars {
+      gap: 0.3rem;
+    }
+
+    .papier .schakelaar {
+      min-height: 2.4rem;
+      padding: 0.25rem 0.55rem 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .strook {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto;
+      max-width: none;
+      padding: 0.6rem 0.8rem calc(0.7rem + env(safe-area-inset-bottom));
+    }
+
+    .strook-zin {
+      font-size: 1rem;
+    }
+
+    .strook .plaque {
+      font-size: 1.05rem;
+      padding: 0.45rem 1.1rem 0.55rem;
+    }
+
+    /* Eén paneel tegelijk, van onder omhoog, boven het strookje */
+    .paneel,
+    .laatje-paneel {
+      top: auto;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: calc(var(--strook) + 0.5rem);
+      width: auto;
+      max-height: 38svh;
+    }
+
+    .papier[data-laatje='true'] .paneel.kast,
+    .papier[data-vel='true'] .paneel {
+      display: none;
+    }
+
+    .toonbank {
+      top: auto;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: calc(var(--strook) + 0.5rem);
+      width: auto;
+      max-height: 50svh;
+    }
+
+    .terug-naar-vel {
+      top: auto;
+      right: 0.8rem;
+      bottom: calc(var(--strook) + 38svh + 1.2rem);
+    }
+
+    .papier[data-uitzicht='waslijn'] .waslijn {
+      bottom: calc(var(--strook) + 0.5rem);
+      width: calc(100vw - 1rem);
+      max-height: 46svh;
+    }
+
+    .pers-getekend {
+      left: 50%;
+      top: calc(var(--boven) + 22svh);
+      width: min(20rem, 80vw);
+    }
+
+    .welkom {
+      top: var(--boven);
+    }
   }
 
   /* ============================================================ de inktrol (laden) */
