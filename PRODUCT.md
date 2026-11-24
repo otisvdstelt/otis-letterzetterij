@@ -14,7 +14,9 @@ Het is het zusje van de Kleurenalchemist. Dezelfde hand, een andere werkplaats.
 
 - Eén idee, helemaal doorgezet. Alles is drukkerij: lood, inkt en papier.
 - De drukkerij houdt zijn eigen kleuren: perkament, inkt, mos en terracotta, met lood, ijzer en donker eiken. De letters zijn het belangrijkste in beeld.
-- Het vel staat centraal en is altijd te zien. Het verandert terwijl je kiest.
+- De drukkerij vult het scherm, het gereedschap ligt erop. Drie plekken, drie stappen: werkbank, kast, pers.
+- Het vel is het belangrijkste. Na het drukken staat het groot in beeld, en daarna verandert het mee terwijl je kiest.
+- Wat je niet nodig hebt, zit dicht. Fijnzetten gaat pas open als jij of de drukker het opent.
 - Het vel is echte tekst, geen plaatje. Wat je ziet, is hoe de browser die letter echt zet.
 - Nooit een lege pagina. Zolang er iets onderweg is, rolt de inktrol in de hoek, en de pers staat klaar.
 - Zonder 3D werkt alles nog. Kiezen, zetten, drukken, ophangen en meenemen werken dan op papier.
