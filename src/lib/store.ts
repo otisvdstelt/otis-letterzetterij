@@ -6,7 +6,7 @@ import { useSyncExternalStore } from 'react'
 import pairingsData from '../content/pairings.json'
 import { opmerking, oplossing, strings } from '../content/strings'
 import { hintSeen, keepHintSeen, keepQuiet, keepWaslijn, readQuiet, readWaslijn } from './keep'
-import type { FontEntry, Mood } from './type/catalogue'
+import type { Drawer, FontEntry, Mood } from './type/catalogue'
 import type { Goal, Template } from './type/goals'
 import { closestFont, parsePairings, surprise as surprisePair, suggest, type Suggestion } from './type/pairing'
 import { remarks as remarksOf, type Remark } from './type/printer'
@@ -57,7 +57,13 @@ export interface State {
   surprises: number
   /** Wat het vel in de browser zag */
   sheet: { weduwe: boolean }
+  /** Waar de camera in de drukkerij naar kijkt */
+  view: View
+  /** Een laatje dat in de drukkerij is opengetrokken, zodat de kast in de papieren laag het ook opent */
+  drawer: Drawer | null
 }
+
+export type View = 'pers' | 'kast' | 'waslijn'
 
 const browser = typeof window !== 'undefined'
 
@@ -81,6 +87,8 @@ let state: State = {
   hinted: browser ? hintSeen() : false,
   surprises: 0,
   sheet: { weduwe: false },
+  view: 'pers',
+  drawer: null,
 }
 
 const listeners = new Set<() => void>()
@@ -293,7 +301,7 @@ export const store = {
     const z = state.zetsel
     const recent = [z, ...state.recent.filter((r) => !sameSheet(r, z))].slice(0, RECENT)
     if (!state.hinted) keepHintSeen()
-    set({ printed: z, recent, pulls: state.pulls + 1, hinted: true, ...say(strings.nieuws.gedrukt) })
+    set({ printed: z, recent, pulls: state.pulls + 1, hinted: true, view: 'pers', ...say(strings.nieuws.gedrukt) })
   },
 
   /** Hang een vel aan de waslijn: het net gedrukte, of wat er nu staat */
@@ -308,7 +316,7 @@ export const store = {
     }
     const waslijn = [...state.waslijn, z]
     const kept = keep(waslijn)
-    set({ waslijn, kept, ...say(strings.nieuws.opgehangen(waslijn.length) + (kept ? '' : ` ${strings.waslijn.nietBewaard}`)) })
+    set({ waslijn, kept, view: 'waslijn', ...say(strings.nieuws.opgehangen(waslijn.length) + (kept ? '' : ` ${strings.waslijn.nietBewaard}`)) })
   },
 
   unhang(index: number) {
@@ -378,6 +386,16 @@ export const store = {
   /** Wat het vel in de browser zag, voor de drukker */
   setSheet(sheet: State['sheet']) {
     if (sheet.weduwe !== state.sheet.weduwe) set({ sheet })
+  },
+
+  /** Kijk ergens anders in de drukkerij */
+  look(view: View) {
+    if (view !== state.view) set({ view })
+  },
+
+  /** Trek een laatje open, in 3D of in de kast; null schuift het weer dicht */
+  openDrawer(drawer: Drawer | null) {
+    if (drawer !== state.drawer) set({ drawer, ...(drawer ? { view: 'kast' as const } : {}) })
   },
 
   /** Een eigen font erbij (fase 7: slepen op de werkbank) */
