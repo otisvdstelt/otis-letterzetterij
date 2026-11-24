@@ -331,3 +331,18 @@ export function surprise(fonts: readonly Font[], pairings: readonly Pairing[], o
   if (ranked.length === 0) return null
   return ranked[pick(mulberry32(hash(`verras-${seed}-${options.goal}`)), ranked.length)]
 }
+
+/** De letter uit deze lijst die het meest op `target` lijkt: dezelfde soort eerst, dan het kleinste verschil in karakter */
+export function closestFont<T extends Font>(fonts: readonly T[], target: Font): T | null {
+  let best: T | null = null
+  let bestScore = Infinity
+  for (const f of fonts) {
+    if (f.id === target.id) continue
+    const score = distance(f, target)
+    if (score < bestScore || (score === bestScore && best && f.id < best.id)) {
+      best = f
+      bestScore = score
+    }
+  }
+  return best
+}

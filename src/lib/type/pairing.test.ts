@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { parseCatalogue } from './catalogue'
 import { GOAL_SPECS, GOALS } from './goals'
-import { distance, ENOUGH, parsePairings, rankPairs, scorePair, suggest, surprise } from './pairing'
+import { closestFont, distance, ENOUGH, parsePairings, rankPairs, scorePair, suggest, surprise } from './pairing'
 
 const catalogue = parseCatalogue(JSON.parse(readFileSync(new URL('../../../public/data/fonts.json', import.meta.url), 'utf8')))
 const pairings = parsePairings(JSON.parse(readFileSync(new URL('../../content/pairings.json', import.meta.url), 'utf8')))
@@ -132,5 +132,13 @@ describe('het voorstel van de drukker', () => {
   it('kent elk paar uit het zetboek, en geen enkel breekt een harde regel voor zijn eigen doel', () => {
     expect(pairings.length).toBeGreaterThanOrEqual(35)
     for (const p of pairings) for (const goal of p.doel) expect(scorePair(font(p.kop), font(p.tekst), goal).blocked, `${p.kop}/${p.tekst} voor ${goal}`).toBe(false)
+  })
+})
+
+describe('de letter die er het meest op lijkt', () => {
+  it('vindt bij een schreefloze een schreefloze', () => {
+    const own = { ...font('inter'), id: 'eigen:Mijn Inter' }
+    const found = closestFont(catalogue.fonts, own)!
+    expect(found.kind).toBe('schreefloos')
   })
 })
