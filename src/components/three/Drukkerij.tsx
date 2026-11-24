@@ -11,6 +11,7 @@ import { glow, shaft, windowGlow } from './materials'
 import { Pers3D } from './Pers3D'
 import { Piece } from './Piece'
 import { Waslijn3D } from './Waslijn3D'
+import { Vlucht, Zetbank3D } from './Zetbank3D'
 
 /** Het zetboek ligt open op een recept voor het doel van nu. Erop tikken zet dat paar op het vel */
 function Zetboek() {
@@ -45,7 +46,7 @@ function Zetboek() {
 export function Drukkerij({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <>
-      {['kamer', 'pers', 'kast', 'bank', 'waslijn', 'lamp'].map((name) => (
+      {['kamer', 'pers', 'kast', 'zetbank', 'bank', 'waslijn', 'lamp'].map((name) => (
         <Piece key={name} name={name} />
       ))}
       <Piece name="raam" material={windowGlow} castShadow={false} receiveShadow={false} />
@@ -56,6 +57,8 @@ export function Drukkerij({ reducedMotion }: { reducedMotion: boolean }) {
       <Zetboek />
       <Drukker3D reducedMotion={reducedMotion} />
       <Waslijn3D reducedMotion={reducedMotion} />
+      <Zetbank3D />
+      <Vlucht reducedMotion={reducedMotion} />
     </>
   )
 }
