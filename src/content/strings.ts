@@ -177,6 +177,35 @@ export const strings = {
     leeg: 'Niks dat past. Haal de klem eraf of kies een ander doel.',
   },
 
+  // ------------------------------------------------------------------ een eigen font
+  eigen: {
+    kop: 'Of je eigen fontbestand',
+    uitleg: 'Sleep een .woff2, .woff, .ttf of .otf hierheen, of kies er een.',
+    belofte: 'Het blijft op je apparaat. Het wordt hier in je browser geladen en gaat nergens heen, ook niet in een deellink.',
+    kies: 'Kies een fontbestand',
+    loslaten: 'Laat maar los, op de werkbank',
+    bezig: 'Het font wordt gemeten',
+    fout: 'Dit kan ik niet lezen als font. Probeer een .woff2, .woff, .ttf of .otf.',
+    teGroot: 'Dit bestand is groter dan 12 MB. Dat is geen letter meer, dat is een hele familie.',
+    soort: (naam: string) => `Wat voor letter is ${naam}?`,
+    soorten: { schreef: 'schreef', schreefloos: 'schreefloos', display: 'display', handschrift: 'handschrift', mono: 'mono' } as Record<string, string>,
+  },
+
+  // ------------------------------------------------------------------ een flesje uit de Kleurenalchemist
+  flesje: {
+    kop: 'Een flesje uit de Kleurenalchemist',
+    label: 'Plak een flesjes- of plankenlink',
+    knop: 'Gebruik',
+    kies: 'Welk flesje van deze plank?',
+    pak: (naam: string) => `Pak ${naam}`,
+    fouten: {
+      'geen-link': 'Dat is geen flesjeslink. Hij ziet eruit als …/fles/… of …/plank/….',
+      onleesbaar: 'Dit flesje kan ik niet lezen. Misschien is de link afgeknipt, of komt hij uit een nieuwere Kleurenalchemist dan ik ken.',
+      leeg: 'Deze plank is leeg.',
+    } as Record<string, string>,
+    uitleg: 'Tekst wordt inkt, achtergrond wordt papier, accent wordt de tweede inkt.',
+  },
+
   // ------------------------------------------------------------------ de kast
   kast: {
     kop: 'De letterkast',
@@ -507,6 +536,9 @@ export const strings = {
     overgenomen: (n: number) => `De vellen hangen aan je lijn. Er hangen er nu ${inWoorden(n)}.`,
     welkom: 'Er is een vel voor je gezet.',
     drukkerStil: (stil: boolean) => (stil ? 'De drukker houdt zijn mond.' : 'De drukker praat weer mee.'),
+    eigen: (naam: string, rol: Role) => `${naam} ligt op de werkbank, met een klem erop, als ${ROLNAAM[rol]}. Het bestand blijft op je apparaat.`,
+    soort: (naam: string, soort: string) => `${naam} telt nu als ${soort}.`,
+    flesje: (naam: string) => `Inkt en papier komen nu uit het flesje ${naam}.`,
   },
 
   // ------------------------------------------------------------------ colofon
