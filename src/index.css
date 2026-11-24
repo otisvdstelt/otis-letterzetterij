@@ -2029,8 +2029,15 @@
     display: flex;
   }
 
-  .laatje-paneel .paneel-naam {
+  .laatje-paneel .paneel-naam,
+  .laatje-paneel .paneel-boven .quiet {
     color: #f3ead8;
+  }
+
+  /* Een papiertje op het hout houdt zijn eigen inkt */
+  .laatje-paneel .klem-knop,
+  .laatje-paneel .klem-knop .hand {
+    color: #2c2823;
   }
 
   /* Het strookje onderin: wat de drukker zegt, en hooguit drie knoppen */
@@ -2460,7 +2467,7 @@
 
     /* Eén paneel tegelijk, van onder omhoog, boven het strookje */
     .paneel,
-    .laatje-paneel {
+    .paneel.laatje-paneel {
       top: auto;
       left: 0.5rem;
       right: 0.5rem;
