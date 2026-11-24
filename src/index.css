@@ -1157,8 +1157,8 @@
     left: calc(var(--rand) + 14.6rem + var(--rand));
     right: var(--rand);
     bottom: calc(var(--strook) + 1.5rem);
-    display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 0.6rem;
     padding: 0.8rem 1.2rem 1.2rem;
     background: var(--color-canvas) var(--tooth);
@@ -1168,33 +1168,92 @@
     animation: vel-erin 520ms var(--ease-out-expo);
   }
 
+  /* Eén scrollbalk voor de drie samen; elk vel is als geheel verkleind tot het in zijn kolom past */
   .proef-vellen {
     display: grid;
-    grid-template-columns: repeat(3, minmax(14rem, 1fr));
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    flex: 1 1 auto;
     gap: 1rem;
     min-height: 0;
-    overflow-x: auto;
     margin: 0;
     padding: 0;
-    list-style: none;
-  }
-
-  /* Eerst de knop, dan het vel, dat zelf scrolt: zo staat Deze altijd in beeld */
-  .proef-vel {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0.5rem;
-    justify-items: center;
-    min-height: 0;
-  }
-
-  .proef-vel .vel-houder {
-    width: 100%;
-    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
+    list-style: none;
+  }
+
+  .proef-vel {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .proef-boven {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.2rem 0.6rem;
+    min-height: 2.75rem;
+    padding-bottom: 0.3rem;
+    background: var(--color-canvas) var(--tooth);
+    text-align: center;
+  }
+
+  .proef-naam {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .proef-vel[data-gekozen='true'] .geschaald {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 3px;
+  }
+
+  .geschaald {
+    overflow: hidden;
+  }
+
+  /* Een proef begint met je kop en je alinea: menubalk, kaartje en kopregel schuiven naar achteren */
+  .vel[data-start='kop'] :is(.sj-nav, .sj-kaartje, .sj-kopregel) {
+    order: 9;
+  }
+
+  .vel[data-start='kop'] :is(.sj, .sj-brief-vel) > h1 {
+    order: -1;
+  }
+
+  .proef-stipjes {
+    display: none;
+    justify-content: center;
+    gap: 0.2rem;
+  }
+
+  .stipje {
+    width: 2.75rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .stipje::before {
+    content: '';
+    display: block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin: auto;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 50%;
+  }
+
+  .stipje[aria-current='true']::before {
+    background: var(--color-ink);
   }
 
   /* De oogarts: twee kaartjes, geen namen */
@@ -2798,16 +2857,23 @@
       left: 0.5rem;
       right: 0.5rem;
       bottom: calc(var(--strook) + 0.5rem);
-      height: 60svh;
-      grid-template-rows: auto auto minmax(0, 1fr);
+      height: 62svh;
+      padding: 0.6rem 0.8rem 0.8rem;
+    }
+
+    /* Op een telefoon één proef tegelijk: vegen, met stipjes */
+    .proef-stipjes {
+      display: flex;
     }
 
     .proef-vellen {
       grid-template-columns: none;
       grid-auto-flow: column;
-      grid-auto-columns: 82%;
-      overflow-x: auto;
+      grid-auto-columns: 100%;
+      gap: 12px;
+      overflow: auto;
       scroll-snap-type: x mandatory;
+      scrollbar-width: none;
     }
 
     .proef-vel {
