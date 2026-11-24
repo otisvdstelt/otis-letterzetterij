@@ -14,7 +14,8 @@ export function Reveal({ reducedMotion }: { reducedMotion: boolean }) {
   }, [reducedMotion, invalidate])
 
   useFrame((_, delta) => {
-    if (air.reveal.value >= 1) return
+    if (air.reveal.value >= 1 || air.wipe.value !== 0) return
+    motion.wake(0.2)
     air.reveal.value = Math.min(1, air.reveal.value + Math.min(delta, 0.05) / 1.4)
   })
   return null
