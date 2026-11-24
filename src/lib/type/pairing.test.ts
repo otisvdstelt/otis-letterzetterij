@@ -80,7 +80,7 @@ describe('het voorstel van de drukker', () => {
           const score = scorePair(font(s.kop), font(s.tekst), goal)
           expect(score.blocked, `${goal}: ${s.kop}/${s.tekst}`).toBe(false)
           expect(['schreef', 'schreefloos']).toContain(font(s.tekst).kind)
-          if (GOAL_SPECS[goal].needsItalic) expect(font(s.tekst).italic).toBe(true)
+          expect(!GOAL_SPECS[goal].needsItalic || font(s.tekst).italic, `${goal}: cursief in ${s.tekst}`).toBe(true)
         }
       }
     }
