@@ -153,7 +153,15 @@ function Laatje() {
         ))}
       </div>
       {z.klem !== role && (
-        <button type="button" className="slip paper klem-knop" onClick={() => store.clamp(role)}>
+        <button
+          type="button"
+          className="slip paper klem-knop"
+          onClick={() => {
+            // Met een klem erop zoekt de drukker er paren bij: die zie je meteen
+            store.clamp(role)
+            store.openDrawer(null)
+          }}
+        >
           <span className="klem" aria-hidden="true" />
           {strings.werkbank.zetKlem(role)}: <span className="hand">{familyOf(z[role])}</span>
         </button>
