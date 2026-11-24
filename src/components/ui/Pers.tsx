@@ -144,9 +144,10 @@ export function Pers({ painted = false }: { painted?: boolean }) {
             <span style={{ fontFamily: fontStack(letters.kop), fontWeight: printed.kopStijl.weight, color: printed.inkt }}>{printed.zin}</span>
           </div>
         )}
-        <Drukker />
       </div>
 
+      <div className="pers-zij">
+      <Drukker />
       <div className="pers-knoppen">
         <button type="button" className="plaque" onClick={() => store.pull()}>
           {p.trek}
@@ -180,6 +181,7 @@ export function Pers({ painted = false }: { painted?: boolean }) {
           </ul>
         </div>
       )}
+      </div>
     </section>
   )
 }
