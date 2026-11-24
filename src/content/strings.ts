@@ -224,6 +224,26 @@ export const strings = {
     } as Record<string, string>,
     kanNiet: (wat: string) => `kan geen ${wat}`,
     grijs: 'voldoet niet aan je eisen',
+    /** Wat er mist, kort: "geen Ĳ · maar 2 gewichten" */
+    mist: (eisen: string[], gewichten: number) =>
+      eisen
+        .map((e) =>
+          e === 'gewichten'
+            ? `maar ${gewichten} ${gewichten === 1 ? 'gewicht' : 'gewichten'}`
+            : e === 'ij'
+              ? 'geen Ĳ'
+              : e === 'euro'
+                ? 'geen €'
+                : e === 'accenten'
+                  ? 'niet alle accenten'
+                  : e === 'cursief'
+                    ? 'geen cursief'
+                    : e === 'tabelcijfers'
+                      ? 'geen tabelcijfers'
+                      : `geen ${({ pools: 'Pools', turks: 'Turks', grieks: 'Grieks', cyrillisch: 'Cyrillisch' } as Record<string, string>)[e] ?? e}`,
+        )
+        .join(' · '),
+    onderaan: (n: number) => `${n === 1 ? 'Eén letter haalt' : `${n} letters halen`} je eisen niet`,
   },
 
   // ------------------------------------------------------------------ zoeken in de kast
