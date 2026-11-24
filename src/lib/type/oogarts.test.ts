@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { begin, kies, klaar, type Afstand } from './oogarts'
+import { begin, kies, klaar, nogKeer, stapelOpGevoel, type Afstand } from './oogarts'
 
 /** Zestien letters op een lijn: de afstand is het verschil in nummer */
 const ids = Array.from({ length: 16 }, (_, i) => `f${i}`)
@@ -42,5 +42,27 @@ describe('de oogarts', () => {
 
   it('is met één kandidaat meteen klaar', () => {
     expect(klaar(begin(['f3'], afstand))).toBe('f3')
+  })
+})
+
+describe('hoe vaak nog', () => {
+  it('schat bij zestien zes tot acht keer, en telt af tot nul', () => {
+    let s = begin(ids, afstand)
+    const eerst = nogKeer(s, afstand)
+    expect(eerst).toBeGreaterThanOrEqual(6)
+    expect(eerst).toBeLessThanOrEqual(8)
+    while (s.paar) {
+      const voor = nogKeer(s, afstand)
+      s = kies(s, s.paar[0], afstand)
+      expect(nogKeer(s, afstand)).toBeLessThan(voor)
+    }
+    expect(nogKeer(s, afstand)).toBe(0)
+  })
+})
+
+describe('de stapel vullen', () => {
+  it('legt wat bij je gevoel past bovenop, en houdt verder de volgorde van de drukker', () => {
+    const gevoel = (id: string) => (id === 'f9' || id === 'f12' ? 2 : id === 'f3' ? 1 : 0)
+    expect(stapelOpGevoel(ids, gevoel, 5)).toEqual(['f9', 'f12', 'f3', 'f0', 'f1'])
   })
 })

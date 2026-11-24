@@ -56,3 +56,32 @@ export function kies(staat: Oogarts, winnaar: string, afstand: Afstand): Oogarts
 
 /** Klaar als er één over is */
 export const klaar = (staat: Oogarts) => (staat.stapel.length === 1 ? staat.stapel[0] : null)
+
+/**
+ * Hoe vaak je nog ongeveer moet kiezen. Gespeeld vanaf hier, een keer steeds links en een keer steeds rechts;
+ * het gemiddelde. "Nog ±5 keer" zegt meer dan een stapel die van zestien naar elf springt
+ */
+export function nogKeer(staat: Oogarts, afstand: Afstand): number {
+  const speel = (kant: 0 | 1) => {
+    let s = staat
+    let n = 0
+    while (s.paar && n < 30) {
+      s = kies(s, s.paar[kant], afstand)
+      n++
+    }
+    return n
+  }
+  return Math.round((speel(0) + speel(1)) / 2)
+}
+
+/**
+ * Vul de stapel: de beste kandidaten, maar wat bij je gevoel past eerst. `gevoel` geeft per letter hoeveel van
+ * je gevoelens hij heeft; bij gelijk spel blijft de volgorde van de drukker staan
+ */
+export function stapelOpGevoel(ids: readonly string[], gevoel: (id: string) => number, n = 16): string[] {
+  return [...new Set(ids)]
+    .map((id, i) => ({ id, i, g: gevoel(id) }))
+    .sort((a, b) => b.g - a.g || a.i - b.i)
+    .slice(0, n)
+    .map((x) => x.id)
+}
