@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { opmerking, strings } from '../../content/strings'
 import { checkInk } from '../../lib/type/contrast'
-import { cssExport, figmaExport, npmExport, tailwindExport, type ExportInput } from '../../lib/type/exports'
+import { cssExport, figmaExport, npmExport, selfHost, tailwindExport, type ExportInput, type SelfHost } from '../../lib/type/exports'
+import { fileUrl } from '../../lib/type/fontface'
+import { makeZip } from '../../lib/type/zip'
 import { currentRemarks, currentScale, currentSuggestions, codeOf, isOwn, lettersOf, store, useLetters } from '../../lib/store'
+import type { FontEntry } from '../../lib/type/catalogue'
 import type { Remark } from '../../lib/type/printer'
 import { Kopieer } from './Kopieer'
 import { download, sheetPng } from './png'
@@ -48,6 +51,33 @@ function briefje(input: ExportInput, remarks: Remark[], waarom: string | null): 
     .join('\n')
 }
 
+const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024))
+
+/**
+ * Alles in één map: de fonts, de @font-face-regels, de Tailwind- en CSS-export, een leesmij en de licenties.
+ * De bestanden komen uit de kast van deze site (of het magazijn, als je daar een letter vandaan haalde); er gaat niks heen
+ */
+async function zip(input: ExportInput, fonts: readonly FontEntry[], host: SelfHost) {
+  const files = await Promise.all(
+    host.files.map(async (f) => {
+      const url = /^(blob:|data:|https?:)/.test(f.from) ? f.from : fileUrl(f.from)
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(f.name)
+      return { name: `fonts/${f.name}`, data: new Uint8Array(await response.arrayBuffer()) }
+    }),
+  )
+  const text = (t: string) => new TextEncoder().encode(t)
+  const licenties = [...fonts.map((f) => m.licentieRegel(f.family, f.license)), '', m.bron].join('\n')
+  return makeZip([
+    ...files,
+    { name: 'letters.css', data: text(host.css + '\n') },
+    { name: 'tailwind.css', data: text(tailwindExport(input)) },
+    { name: 'schaal.css', data: text(cssExport(input)) },
+    { name: 'LEESMIJ.txt', data: text(m.zipLeesmij(input.kop.family, input.tekst.family)) },
+    { name: 'LICENTIES.txt', data: text(licenties + '\n') },
+  ])
+}
+
 /** Tab Meenemen: alles om dit vel in je eigen project te zetten, in één menu */
 export function Meenemen() {
   const z = useLetters((s) => s.zetsel)
@@ -56,6 +86,7 @@ export function Meenemen() {
   const remarks = useLetters(currentRemarks)
   const suggestions = useLetters(currentSuggestions)
   const [busy, setBusy] = useState(false)
+  const [packing, setPacking] = useState(false)
   if (!letters || !scale) return null
   const input: ExportInput = { zetsel: z, kop: letters.kop, tekst: letters.tekst, scale }
   const npm = npmExport(input)
@@ -64,6 +95,20 @@ export function Meenemen() {
   const book = suggestions.find((s) => s.kop === z.kop && s.tekst === z.tekst && s.reason.kind === 'zetboek')
   const note = briefje(input, remarks, book?.reason.kind === 'zetboek' ? book.reason.waarom : null)
   const fonts = [...new Map([letters.kop, letters.tekst].map((f) => [f.id, f])).values()]
+  const host = selfHost({ zetsel: z, kop: letters.kop, tekst: letters.tekst })
+
+  const pack = async () => {
+    setPacking(true)
+    try {
+      const data = await zip(input, fonts, host)
+      download(new Blob([data as BlobPart], { type: 'application/zip' }), 'letters.zip')
+      store.say(strings.nieuws.gedownload(m.zip))
+    } catch {
+      store.say(strings.nieuws.zipMislukt)
+    } finally {
+      setPacking(false)
+    }
+  }
 
   const png = async () => {
     setBusy(true)
@@ -113,6 +158,34 @@ export function Meenemen() {
       <Code titel={m.tailwind} uitleg={m.tailwindUitleg} code={tailwindExport(input)} what={m.tailwind} />
       <Code titel={m.css} uitleg={m.cssUitleg} code={cssExport(input)} what={m.css} />
       {npm.install ? <Code titel={m.npm} uitleg={m.npmUitleg} code={`${npm.install}\n\n${npm.imports}`} what={m.npm} /> : <p className="klein-uitleg">{m.geenNpm}</p>}
+
+      {host.files.length > 0 && (
+        <section className="mee">
+          <div className="mee-boven">
+            <h3 className="mee-kop">{m.zelfHosten}</h3>
+            <Kopieer text={host.css} what={m.zelfHosten} />
+          </div>
+          <p className="klein-uitleg">{m.zelfHostenUitleg(kb(host.bytes), host.files.length)}</p>
+          <ul className="klein-uitleg mee-bestanden">
+            {host.files.map((f) => (
+              <li key={f.name}>{m.bestand(f.name, kb(f.bytes))}</li>
+            ))}
+          </ul>
+          <pre className="mee-code" tabIndex={0}>
+            <code>{host.css}</code>
+          </pre>
+        </section>
+      )}
+
+      <section className="mee">
+        <div className="mee-boven">
+          <h3 className="mee-kop">{m.zip}</h3>
+          <button type="button" className="inked klein" disabled={packing || host.files.length === 0} aria-busy={packing} onClick={() => void pack()}>
+            {packing ? m.zipBezig : m.download}
+          </button>
+        </div>
+        <p className="klein-uitleg">{m.zipUitleg}</p>
+      </section>
 
       <section className="mee">
         <div className="mee-boven">
