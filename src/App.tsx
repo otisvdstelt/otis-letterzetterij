@@ -4,7 +4,7 @@ import { EigenFont } from './components/ui/EigenFont'
 import { FlesjePlakken } from './components/ui/FlesjePlakken'
 import { Header } from './components/ui/Header'
 import { Inktrol, Rollend } from './components/ui/Inktrol'
-import { KastPaneel, LaatjePaneel } from './components/ui/Kast'
+import { KastPaneel } from './components/ui/Kast'
 import { Nieuws } from './components/ui/Nieuws'
 import { PersPaneel } from './components/ui/PersPaneel'
 import { Hendel, PersTekening } from './components/ui/PersTekening'
@@ -78,7 +78,7 @@ function useInset(compact: boolean): Inset {
     return { left: 0, right: 0, top: 5.5 * REM, bottom: height * (velOpen && view !== 'waslijn' ? 0.55 : 0.46) }
   }
   const gutter = Math.min(2, Math.max(1, (width * 0.025) / REM)) * REM
-  const left = view === 'waslijn' ? 0 : gutter + 14 * REM + (view === 'kast' && drawer ? 17.5 * REM : 0)
+  const left = view === 'waslijn' ? 0 : gutter + (view === 'kast' && drawer ? 21 : 14) * REM
   const right = velOpen && view !== 'waslijn' ? gutter + Math.min(36 * REM, width * 0.4) : 0
   return { left, right, top: 4.5 * REM, bottom: (view === 'waslijn' ? 14 : 7.5) * REM }
 }
@@ -152,7 +152,6 @@ export default function App({ broken = false, firstVisit = true }: { broken?: bo
       <main className="tafel">
         {!atLine && step === 'werkbank' && <Werkbank eigen={<EigenFont />} />}
         {!atLine && step === 'kast' && <KastPaneel failed={catalogue.isError} />}
-        {!atLine && step === 'kast' && <LaatjePaneel />}
         {!atLine && step === 'pers' && <PersPaneel />}
         {atLine && <Waslijn />}
         <Welkom />
